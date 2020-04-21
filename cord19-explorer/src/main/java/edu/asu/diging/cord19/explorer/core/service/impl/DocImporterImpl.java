@@ -156,6 +156,7 @@ public class DocImporterImpl implements DocImporter {
 				pub.setSourceX(entry.getSourceX());
 				pub.setUrl(entry.getUrl());
 				pub.setWhoCovidence(entry.getWhoCov());
+				extractYear(pub);
 				pubRepo.save(pub);
 			}
 		}
@@ -172,7 +173,6 @@ public class DocImporterImpl implements DocImporter {
 		}
 		ObjectMapper mapper = new ObjectMapper();
 		PublicationImpl publication = mapper.readValue(f, PublicationImpl.class);
-		extractYear(publication);
 		findLocations(publication);
 		pubRepo.save(publication);
 		task.setProcessed(task.getProcessed() + 1);

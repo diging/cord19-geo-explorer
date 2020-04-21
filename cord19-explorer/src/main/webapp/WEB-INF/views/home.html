@@ -6,16 +6,19 @@
    <div layout:fragment="content">
    	<div class="row">
    		<div class="col-md-4">
+   		<h4>Countries in affiliation field</h4>
    		 <div th:each="country : ${countries}">
 	      [[${country}]]
 	      </div>
    		</div>
    		<div class="col-md-4">
+   		<h4>Publication years</h4>
    		<div th:each="year : ${years}">
 	      [[${year}]]
 	     </div>
    		</div>
    		<div class="col-md-4">
+   		<h4>Countries in text</h4>
    		<div th:each="country : ${textCountries}">
 	      [[${country}]]
 	     </div>

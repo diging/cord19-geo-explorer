@@ -6,6 +6,7 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import edu.asu.diging.cord19.explorer.core.model.impl.BibEntryImpl;
+import edu.asu.diging.cord19.explorer.core.model.impl.LocationMatchImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.ParagraphImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.RefEntryImpl;
@@ -106,4 +107,8 @@ public interface Publication {
 	List<ParagraphImpl> getBackMatter();
 
 	void setBackMatter(List<ParagraphImpl> backMatter);
+
+	void setLocationMatches(List<LocationMatch> locationMatches);
+
+	List<LocationMatch> getLocationMatches();
 }

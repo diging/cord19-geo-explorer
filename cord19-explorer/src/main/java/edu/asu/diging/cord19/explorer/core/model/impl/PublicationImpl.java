@@ -3,15 +3,21 @@ package edu.asu.diging.cord19.explorer.core.model.impl;
 import java.util.List;
 import java.util.Map;
 
+import org.bson.types.ObjectId;
+import org.springframework.data.annotation.Id;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import edu.asu.diging.cord19.explorer.core.model.LocationMatch;
 import edu.asu.diging.cord19.explorer.core.model.Metadata;
 import edu.asu.diging.cord19.explorer.core.model.Publication;
 
 @JsonIgnoreProperties(ignoreUnknown=true)
 public class PublicationImpl implements Publication {
 	
+	@Id 
+	private ObjectId id;
 	private String cordId;
 	private String sha;
 	@JsonProperty("paper_id")
@@ -42,8 +48,15 @@ public class PublicationImpl implements Publication {
 	private Map<String, RefEntryImpl> refEntries;
 	@JsonProperty("back_matter")
 	private List<ParagraphImpl> backMatter;
+	private List<LocationMatch> locationMatches;
 	
 	
+	public ObjectId getId() {
+		return id;
+	}
+	public void setId(ObjectId id) {
+		this.id = id;
+	}
 	/* (non-Javadoc)
 	 * @see edu.asu.diging.cord19.explorer.core.model.impl.Publication#getCordId()
 	 */
@@ -366,6 +379,14 @@ public class PublicationImpl implements Publication {
 	@Override
 	public void setBackMatter(List<ParagraphImpl> backMatter) {
 		this.backMatter = backMatter;
+	}
+	@Override
+	public List<LocationMatch> getLocationMatches() {
+		return locationMatches;
+	}
+	@Override
+	public void setLocationMatches(List<LocationMatch> locationMatches) {
+		this.locationMatches = locationMatches;
 	}
 	
 }

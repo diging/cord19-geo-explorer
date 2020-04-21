@@ -4,9 +4,24 @@
   </head>
   <body>
    <div layout:fragment="content">
-      <div th:each="country : ${countries}">
-      [[${country}]]
-      </div>
+   	<div class="row">
+   		<div class="col-md-4">
+   		 <div th:each="country : ${countries}">
+	      [[${country}]]
+	      </div>
+   		</div>
+   		<div class="col-md-4">
+   		<div th:each="year : ${years}">
+	      [[${year}]]
+	     </div>
+   		</div>
+   		<div class="col-md-4">
+   		<div th:each="country : ${textCountries}">
+	      [[${country}]]
+	     </div>
+   		</div>
+   	</div>
+     
    </div>
   </body>
 </html>

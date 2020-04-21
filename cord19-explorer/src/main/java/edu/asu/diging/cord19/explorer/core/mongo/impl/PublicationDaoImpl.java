@@ -39,4 +39,28 @@ public class PublicationDaoImpl implements PublicationDao {
 		}
 		return results;
 	}
+	
+	@Override
+	public List<Integer> getYears() {
+		String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
+		DistinctIterable<Integer> output = mongoTemplate.getCollection(collection).distinct("publishYear", Integer.class);
+		List<Integer> results = new ArrayList<>();
+		MongoCursor<Integer> it = output.iterator();
+		while (it.hasNext()) {
+			results.add(it.next());
+		}
+		return results;
+	}
+	
+	@Override
+	public List<String> getCountriesInText() {
+		String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
+		DistinctIterable<String> output = mongoTemplate.getCollection(collection).distinct("locationMatches.locationName", String.class);
+		List<String> results = new ArrayList<>();
+		MongoCursor<String> it = output.iterator();
+		while (it.hasNext()) {
+			results.add(it.next());
+		}
+		return results;
+	}
 }

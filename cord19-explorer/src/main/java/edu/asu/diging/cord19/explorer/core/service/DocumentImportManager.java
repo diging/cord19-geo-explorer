@@ -6,4 +6,8 @@ public interface DocumentImportManager {
 
 	String startImport(String path) throws IOException;
 
+	String startYearExtraction();
+
+	String startLocationExtraction() throws ClassCastException, ClassNotFoundException, IOException;
+
 }

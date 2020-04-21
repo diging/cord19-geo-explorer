@@ -6,5 +6,5 @@ import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
 
 public interface PublicationRepository extends MongoRepository<PublicationImpl, String> {
 
-	
+	PublicationImpl findFirstByPaperId(String paperId);
 }

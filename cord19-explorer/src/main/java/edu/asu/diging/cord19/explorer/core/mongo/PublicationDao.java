@@ -6,4 +6,8 @@ public interface PublicationDao {
 
 	List<String> getCountries();
 
+	List<Integer> getYears();
+
+	List<String> getCountriesInText();
+
 }

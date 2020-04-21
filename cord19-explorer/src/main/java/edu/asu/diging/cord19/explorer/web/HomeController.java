@@ -16,6 +16,8 @@ public class HomeController {
     @RequestMapping(value = "/")
     public String home(Model model) {
     	model.addAttribute("countries", pubDao.getCountries());
+    	model.addAttribute("years", pubDao.getYears());
+    	model.addAttribute("textCountries", pubDao.getCountriesInText());
         return "home";
     }
 }

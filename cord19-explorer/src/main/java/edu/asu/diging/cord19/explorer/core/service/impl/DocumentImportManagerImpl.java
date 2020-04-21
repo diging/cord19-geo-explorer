@@ -37,4 +37,28 @@ public class DocumentImportManagerImpl implements DocumentImportManager {
 		
 		return task.getId();
 	}
+	
+	@Override
+	public String startYearExtraction() {
+		ImportTaskImpl task = new ImportTaskImpl();
+		task.setDateStarted(OffsetDateTime.now());
+		task.setProcessed(0);
+		task = taskRepo.save(task);
+		
+		importer.extractYears(task.getId());
+		
+		return task.getId();
+	}
+	
+	@Override
+	public String startLocationExtraction() throws ClassCastException, ClassNotFoundException, IOException {
+		ImportTaskImpl task = new ImportTaskImpl();
+		task.setDateStarted(OffsetDateTime.now());
+		task.setProcessed(0);
+		task = taskRepo.save(task);
+		
+		importer.extractLocations(task.getId());
+		
+		return task.getId();
+	}
 }

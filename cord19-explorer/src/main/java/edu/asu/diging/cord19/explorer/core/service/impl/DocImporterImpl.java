@@ -12,15 +12,14 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -173,6 +172,9 @@ public class DocImporterImpl implements DocImporter {
 		}
 		ObjectMapper mapper = new ObjectMapper();
 		PublicationImpl publication = mapper.readValue(f, PublicationImpl.class);
+		for (ParagraphImpl para : publication.getBodyText()) {
+			para.setId(new ObjectId());
+		}
 		findLocations(publication);
 		pubRepo.save(publication);
 		task.setProcessed(task.getProcessed() + 1);
@@ -246,24 +248,24 @@ public class DocImporterImpl implements DocImporter {
 	}
 
 	private void findLocations(Publication pub) throws ClassCastException, ClassNotFoundException, IOException {
-		if (pub.getLocationMatches() == null) {
-			pub.setLocationMatches(new ArrayList<LocationMatch>());
-		}
 		for (ParagraphImpl para : pub.getBodyText()) {
+			if (para.getLocationMatches() == null) {
+				para.setLocationMatches(new ArrayList<>());
+			}
 			String[] tokens = tokenize(para.getText());
 			Span nameSpans[] = nameFinder.find(tokens);
 
 			for (Span span : nameSpans) {
-				LocationMatchImpl match = createMatch(span, para, tokens);
+				LocationMatch match = createMatch(span, para, tokens);
 				if (isValid(match)) {
-					pub.getLocationMatches().add(match);
+					para.getLocationMatches().add(match);
 				}
 			}
 			nameFinder.clearAdaptiveData();
 		}
 	}
 
-	private boolean isValid(LocationMatchImpl match) {
+	private boolean isValid(LocationMatch match) {
 		// we do want only numbers
 		Pattern pattern = Pattern.compile("[0-9,\\.\\-\\:&\\W]+");
 		Matcher m = pattern.matcher(match.getLocationName());
@@ -275,22 +277,38 @@ public class DocImporterImpl implements DocImporter {
 		if (match.getLocationName().length() <= 2) {
 			return false;
 		}
-
+		
+		if (m.find()) {
+			// length of match
+			int matchLength = m.group().length();
+			// if the match is as long as rest of string, we assume it's not a location
+			if (matchLength >= match.getLocationName().length()-matchLength) {
+				return false;
+			}
+		}
+		
 		return true;
 	}
 
-	private LocationMatchImpl createMatch(Span span, ParagraphImpl para, String[] tokens) {
-		LocationMatchImpl match = new LocationMatchImpl();
+	private LocationMatch createMatch(Span span, ParagraphImpl para, String[] tokens) {
+		LocationMatch match = new LocationMatchImpl();
+		match.setId(new ObjectId());
 		match.setStart(span.getStart());
 		match.setType(span.getType());
 		match.setSection(para.getSection());
-		match.setLocationName("");
+		StringBuilder sb = new StringBuilder();
 		for (int i = span.getStart(); i <= span.getEnd(); i++) {
 			if (tokens.length > i) {
-				match.setLocationName(String.join(" ", new String[] { match.getLocationName(), tokens[i] }));
+				String location = tokens[i];
+				Pattern pattern = Pattern.compile("[0-9,\\.\\-\\:&\\W]+");
+				Matcher m = pattern.matcher(location);
+				if (!m.matches()) {
+					sb.append(" ");
+					sb.append(location);
+				}
 			}
 		}
-
+		match.setLocationName(sb.toString().trim());
 		match.setEnd(match.getStart() + match.getLocationName().length());
 
 		return match;

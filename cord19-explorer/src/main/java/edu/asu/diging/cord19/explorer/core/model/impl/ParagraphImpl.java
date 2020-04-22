@@ -2,12 +2,16 @@ package edu.asu.diging.cord19.explorer.core.model.impl;
 
 import java.util.List;
 
+import org.bson.types.ObjectId;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import edu.asu.diging.cord19.explorer.core.model.LocationMatch;
 import edu.asu.diging.cord19.explorer.core.model.Paragraph;
 
 public class ParagraphImpl implements Paragraph {
 
+	private ObjectId id;
 	private String text;
 	@JsonProperty("cite_spans")
 	private List<SpanImpl> citeSpans;
@@ -17,6 +21,15 @@ public class ParagraphImpl implements Paragraph {
 	private List<SpanImpl> eqSpans;
 	private String section;
 	
+	private List<LocationMatch> locationMatches;
+	
+	
+	public ObjectId getId() {
+		return id;
+	}
+	public void setId(ObjectId id) {
+		this.id = id;
+	}
 	/* (non-Javadoc)
 	 * @see edu.asu.diging.cord19.explorer.core.model.impl.Paragraph#getText()
 	 */
@@ -88,4 +101,12 @@ public class ParagraphImpl implements Paragraph {
 		this.section = section;
 	}
 	
+	@Override
+	public List<LocationMatch> getLocationMatches() {
+		return locationMatches;
+	}
+	@Override
+	public void setLocationMatches(List<LocationMatch> locationMatches) {
+		this.locationMatches = locationMatches;
+	}
 }

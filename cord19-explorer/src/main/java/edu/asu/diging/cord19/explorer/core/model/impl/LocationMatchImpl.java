@@ -1,9 +1,12 @@
 package edu.asu.diging.cord19.explorer.core.model.impl;
 
+import org.bson.types.ObjectId;
+
 import edu.asu.diging.cord19.explorer.core.model.LocationMatch;
 
 public class LocationMatchImpl implements LocationMatch {
 
+	private ObjectId id;
 	private String locationName;
 	private int start;
 	private int end;
@@ -11,6 +14,14 @@ public class LocationMatchImpl implements LocationMatch {
 	private String type;
 	private String section;
 	
+	@Override
+	public ObjectId getId() {
+		return id;
+	}
+	@Override
+	public void setId(ObjectId id) {
+		this.id = id;
+	}
 	/* (non-Javadoc)
 	 * @see edu.asu.diging.cord19.explorer.core.model.impl.LocationMatch#getLocationName()
 	 */

@@ -32,4 +32,7 @@ public interface Paragraph {
 
 	void setSection(String section);
 
+	void setLocationMatches(List<LocationMatch> locationMatches);
+
+	List<LocationMatch> getLocationMatches();
 }

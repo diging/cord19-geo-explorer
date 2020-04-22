@@ -107,8 +107,4 @@ public interface Publication {
 	List<ParagraphImpl> getBackMatter();
 
 	void setBackMatter(List<ParagraphImpl> backMatter);
-
-	void setLocationMatches(List<LocationMatch> locationMatches);
-
-	List<LocationMatch> getLocationMatches();
 }

@@ -48,7 +48,6 @@ public class PublicationImpl implements Publication {
 	private Map<String, RefEntryImpl> refEntries;
 	@JsonProperty("back_matter")
 	private List<ParagraphImpl> backMatter;
-	private List<LocationMatch> locationMatches;
 	
 	
 	public ObjectId getId() {
@@ -379,14 +378,6 @@ public class PublicationImpl implements Publication {
 	@Override
 	public void setBackMatter(List<ParagraphImpl> backMatter) {
 		this.backMatter = backMatter;
-	}
-	@Override
-	public List<LocationMatch> getLocationMatches() {
-		return locationMatches;
-	}
-	@Override
-	public void setLocationMatches(List<LocationMatch> locationMatches) {
-		this.locationMatches = locationMatches;
 	}
 	
 }

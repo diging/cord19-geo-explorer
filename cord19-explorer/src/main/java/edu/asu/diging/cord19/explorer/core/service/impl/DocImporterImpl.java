@@ -172,9 +172,6 @@ public class DocImporterImpl implements DocImporter {
 		}
 		ObjectMapper mapper = new ObjectMapper();
 		PublicationImpl publication = mapper.readValue(f, PublicationImpl.class);
-		for (ParagraphImpl para : publication.getBodyText()) {
-			para.setId(new ObjectId());
-		}
 		findLocations(publication);
 		pubRepo.save(publication);
 		task.setProcessed(task.getProcessed() + 1);
@@ -257,7 +254,7 @@ public class DocImporterImpl implements DocImporter {
 
 			for (Span span : nameSpans) {
 				LocationMatch match = createMatch(span, para, tokens);
-				if (isValid(match)) {
+				if (match != null && isValid(match)) {
 					para.getLocationMatches().add(match);
 				}
 			}
@@ -287,27 +284,40 @@ public class DocImporterImpl implements DocImporter {
 			}
 		}
 		
+		Pattern pattern2 = Pattern.compile("[A-Z]*[0-9,\\.\\-\\(\\)/]+[A-Z]*");
+		Matcher m2 = pattern2.matcher(match.getLocationName());
+		if (m2.matches()) {
+			return false;
+		}
+		
 		return true;
 	}
 
 	private LocationMatch createMatch(Span span, ParagraphImpl para, String[] tokens) {
-		LocationMatch match = new LocationMatchImpl();
-		match.setId(new ObjectId());
-		match.setStart(span.getStart());
-		match.setType(span.getType());
-		match.setSection(para.getSection());
 		StringBuilder sb = new StringBuilder();
 		for (int i = span.getStart(); i <= span.getEnd(); i++) {
 			if (tokens.length > i) {
 				String location = tokens[i];
 				Pattern pattern = Pattern.compile("[0-9,\\.\\-\\:&\\W]+");
 				Matcher m = pattern.matcher(location);
-				if (!m.matches()) {
+				
+				Pattern pattern2 = Pattern.compile("[^A-Z].*");
+				Matcher m2 = pattern2.matcher(location);
+				if (!m.matches() && !m2.matches()) {
 					sb.append(" ");
 					sb.append(location);
 				}
 			}
 		}
+		if (sb.toString().trim().isEmpty()) {
+			return null;
+		}
+		
+		LocationMatch match = new LocationMatchImpl();
+		match.setId(new ObjectId());
+		match.setStart(span.getStart());
+		match.setType(span.getType());
+		match.setSection(para.getSection());
 		match.setLocationName(sb.toString().trim());
 		match.setEnd(match.getStart() + match.getLocationName().length());
 

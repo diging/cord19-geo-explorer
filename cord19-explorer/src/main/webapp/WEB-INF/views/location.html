@@ -4,6 +4,18 @@
   </head>
   <body>
    <div layout:fragment="content">
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js"></script>
+   <script>
+   $(function() {
+	   $(".paraText").mark("[[${location}]]");
+   });
+   </script>
+   <style>
+	mark{
+	    background: #f7ceff;
+	    color: black;
+	}
+   </style>
    <h3>[[${location}]]</h3>
    	<div class="row">
    		<div th:each="pub : ${publications}">
@@ -13,7 +25,9 @@
 		      <li th:each="para : ${pub.bodyText}">
 		      	<i th:text="*{para.section != ''} ? *{para.section}: 'No Section title'"></i>
 		      	<br>
+		      	<span class="paraText">
 		      	[[${para.text}]]
+		      	</span>
 		      </li>
 	      	</ul>
 	     </div>

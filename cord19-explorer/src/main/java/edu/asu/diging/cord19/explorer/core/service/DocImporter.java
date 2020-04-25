@@ -12,4 +12,6 @@ public interface DocImporter {
 
 	void extractLocations(String taskId) throws ClassCastException, ClassNotFoundException, IOException;
 
+	void removeUnvalid(String taskId);
+
 }

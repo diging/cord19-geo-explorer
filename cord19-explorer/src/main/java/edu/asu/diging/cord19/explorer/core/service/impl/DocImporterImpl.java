@@ -1,8 +1,10 @@
 package edu.asu.diging.cord19.explorer.core.service.impl;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -59,10 +61,6 @@ import opennlp.tools.util.Span;
 public class DocImporterImpl implements DocImporter {
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
-
-	private final String classifier = "/Users/jdamerow/jars/stanford-english-corenlp-2018-10-05-models/edu/stanford/nlp/models/ner/english.all.3class.caseless.distsim.crf.ser.gz";
-	// private final String classifier =
-	// "/classifier/english.muc.7class.distsim.crf.ser.gz";
 
 	@Value("${metadata.filename}")
 	private String metadataFilename;
@@ -274,23 +272,91 @@ public class DocImporterImpl implements DocImporter {
 		if (match.getLocationName().length() <= 2) {
 			return false;
 		}
-		
+
 		if (m.find()) {
 			// length of match
 			int matchLength = m.group().length();
 			// if the match is as long as rest of string, we assume it's not a location
-			if (matchLength >= match.getLocationName().length()-matchLength) {
+			if (matchLength >= match.getLocationName().length() - matchLength) {
 				return false;
 			}
 		}
-		
+
 		Pattern pattern2 = Pattern.compile("[A-Z]*[0-9,\\.\\-\\(\\)/]+[A-Z]*");
 		Matcher m2 = pattern2.matcher(match.getLocationName());
 		if (m2.matches()) {
 			return false;
 		}
-		
+
+		// exclude things like "A,T,M", "A/Anhui/1/2005"
+		Pattern p3 = Pattern.compile("[\\S]*[0-9/\\+,]+[\\S]*");
+		Matcher m3 = p3.matcher(match.getLocationName());
+		if (m3.matches()) {
+			return false;
+		}
+
 		return true;
+	}
+
+	@Override
+	@Async
+	public void removeUnvalid(String taskId) {
+		Optional<ImportTaskImpl> optional = taskRepo.findById(taskId);
+		if (!optional.isPresent()) {
+			return;
+			// FIXME: mark as failure
+		}
+
+		ImportTask task = optional.get();
+		task.setStatus(TaskStatus.PROCESSING);
+
+		File file = new File(appdataPath + File.separator + task.getId());
+		try {
+			file.createNewFile();
+		} catch (IOException e) {
+			logger.error("Could not create outfile.", e);
+			return;
+		}
+
+		BufferedWriter writer;
+		try {
+			writer = new BufferedWriter(new FileWriter(file, true));
+		} catch (IOException e) {
+			logger.error("Could not create outfile.", e);
+			return;
+		}
+		try (CloseableIterator<PublicationImpl> docs = mongoTemplate.stream(new Query(), PublicationImpl.class)) {
+			while (docs.hasNext()) {
+				PublicationImpl pub = docs.next();
+				logger.debug("Cleaning: " + pub.getPaperId());
+				for (ParagraphImpl para : pub.getBodyText()) {
+					Iterator<LocationMatch> it = para.getLocationMatches().iterator();
+					while (it.hasNext()) {
+						LocationMatch match = it.next();
+						if (!isValid(match)) {
+							try {
+								writer.newLine();
+								writer.write(match.getLocationName());
+							} catch (IOException e) {
+								logger.error("Could not write to file.", e);
+							}
+							it.remove();
+						}
+					}
+				}
+				pubRepo.save(pub);
+			}
+		}
+
+		try {
+			writer.close();
+		} catch (IOException e) {
+			logger.error("Could not close file.", e);
+		}
+		
+		task.setStatus(TaskStatus.DONE);
+		task.setDateEnded(OffsetDateTime.now());
+		taskRepo.save((ImportTaskImpl) task);
 	}
 
 	private LocationMatch createMatch(Span span, ParagraphImpl para, String[] tokens) {
@@ -300,7 +366,7 @@ public class DocImporterImpl implements DocImporter {
 				String location = tokens[i];
 				Pattern pattern = Pattern.compile("[0-9,\\.\\-\\:&\\W]+");
 				Matcher m = pattern.matcher(location);
-				
+
 				Pattern pattern2 = Pattern.compile("[^A-Z].*");
 				Matcher m2 = pattern2.matcher(location);
 				if (!m.matches() && !m2.matches()) {
@@ -312,7 +378,7 @@ public class DocImporterImpl implements DocImporter {
 		if (sb.toString().trim().isEmpty()) {
 			return null;
 		}
-		
+
 		LocationMatch match = new LocationMatchImpl();
 		match.setId(new ObjectId());
 		match.setStart(span.getStart());

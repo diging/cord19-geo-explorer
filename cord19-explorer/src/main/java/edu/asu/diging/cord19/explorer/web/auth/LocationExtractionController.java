@@ -23,7 +23,7 @@ public class LocationExtractionController {
 	
 	@RequestMapping(value = "/auth/extract/locations", method=RequestMethod.POST)
 	public String start() throws ClassCastException, ClassNotFoundException, IOException {
-		importManager.startLocationExtraction();
+		importManager.startLocationMatchCleaning();
 		
 		return "redirect:/";
 	}

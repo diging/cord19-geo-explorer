@@ -10,4 +10,6 @@ public interface DocumentImportManager {
 
 	String startLocationExtraction() throws ClassCastException, ClassNotFoundException, IOException;
 
+	String startLocationMatchCleaning();
+
 }

@@ -13,7 +13,9 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,11 +24,17 @@ import java.util.stream.Stream;
 import javax.annotation.PostConstruct;
 
 import org.bson.types.ObjectId;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.util.CloseableIterator;
@@ -40,6 +48,8 @@ import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 
 import edu.asu.diging.cord19.explorer.core.data.TaskRepository;
+import edu.asu.diging.cord19.explorer.core.elastic.data.WikipediaSearchRepository;
+import edu.asu.diging.cord19.explorer.core.elastic.model.impl.Wikientry;
 import edu.asu.diging.cord19.explorer.core.model.LocationMatch;
 import edu.asu.diging.cord19.explorer.core.model.Publication;
 import edu.asu.diging.cord19.explorer.core.model.impl.LocationMatchImpl;
@@ -76,6 +86,12 @@ public class DocImporterImpl implements DocImporter {
 
 	@Autowired
 	private PublicationRepository pubRepo;
+	
+	@Autowired
+	private WikipediaSearchRepository searchRepo;
+	
+	@Autowired
+	private ElasticsearchTemplate searchTemplate;
 
 	@Autowired
 	private MongoTemplate mongoTemplate;
@@ -294,6 +310,56 @@ public class DocImporterImpl implements DocImporter {
 		if (m3.matches()) {
 			return false;
 		}
+		
+		// exclude things like ADP-ribose or ADPrs
+		Pattern p4 = Pattern.compile("[A-Z0-9\\+\\?]{2,}\\-+[a-z]{2,}");
+		Matcher m4 = p4.matcher(match.getLocationName());
+		if (m4.matches()) {
+			return false;
+		}
+		
+		if (match.getLocationName().startsWith("Appendix") || match.getLocationName().startsWith("A-")) {
+			return false;
+		}
+		
+		// exclude names with multiple /
+		Pattern p5 = Pattern.compile("\\/");
+		Matcher m5 = p5.matcher(match.getLocationName());
+		int count = 0;
+		while(m5.find()) {
+			count++;
+		}
+		if (count > 1) {
+			return false;
+		}
+		
+		PageRequest page = PageRequest.of(0, 3);
+		
+		BoolQueryBuilder builder = QueryBuilders.boolQuery();
+		builder.must(QueryBuilders.queryStringQuery("content:" + match.getLocationName().replace("/", " ").replace("(", " ").replace(")", " ").replace("[", " ").replace("]", " ").replace(":", " ")));
+		NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
+	    nativeSearchQueryBuilder.withQuery(builder);
+	    nativeSearchQueryBuilder.withPageable(page);
+	    NativeSearchQuery query = nativeSearchQueryBuilder.build();
+	    List<Wikientry> entries = searchTemplate.queryForList(query, Wikientry.class);
+	    
+	    List<String> placeIndicators = Arrays.asList("state", "countr", "place", "cit", "park", "region", "continent", "town", "captial");
+		//List<Wikientry> page = searchRepo.findByContent(match.getLocationName());
+		if (entries.size() > 0) {
+			if (match.getLocationName().equals("South Korea")) {
+				System.out.println("South Korea");
+			}
+			boolean isPlace = false;
+			// if one of the first 3 results seems to be a place, we assume it's one
+			for (Wikientry entry : entries) {
+				isPlace = isPlace || entry.getCategories().stream().anyMatch(c -> 
+					placeIndicators.stream().anyMatch(p -> c.toLowerCase().contains(p))
+				);
+			};
+			if (!isPlace) {
+				return false;
+			}
+		}
 
 		return true;
 	}
@@ -310,7 +376,7 @@ public class DocImporterImpl implements DocImporter {
 		ImportTask task = optional.get();
 		task.setStatus(TaskStatus.PROCESSING);
 
-		File file = new File(appdataPath + File.separator + task.getId());
+		File file = new File(appdataPath + File.separator + task.getId() + ".txt");
 		try {
 			file.createNewFile();
 		} catch (IOException e) {
@@ -337,10 +403,11 @@ public class DocImporterImpl implements DocImporter {
 							try {
 								writer.newLine();
 								writer.write(match.getLocationName());
+								writer.flush();
 							} catch (IOException e) {
 								logger.error("Could not write to file.", e);
 							}
-							it.remove();
+							//it.remove();
 						}
 					}
 				}

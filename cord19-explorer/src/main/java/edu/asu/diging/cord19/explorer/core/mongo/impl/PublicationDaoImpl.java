@@ -3,10 +3,11 @@ package edu.asu.diging.cord19.explorer.core.mongo.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bson.conversions.Bson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import com.mongodb.client.DistinctIterable;
@@ -37,11 +38,47 @@ public class PublicationDaoImpl implements PublicationDao {
 	}
 	
 	@Override
+	public long getPublicationCount() {
+		String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
+		return mongoTemplate.getCollection(collection).countDocuments();
+	}
+	
+	@Override
+	public long getAffiliationCount() {
+		Query query = new Query(Criteria.where("metadata.authors.affiliation.locationCountry").ne(null));
+		return mongoTemplate.count(query, PublicationImpl.class);
+	}
+	
+	@Override
+	public long getYearCount() {
+		Query query = new Query(Criteria.where("publishYear").ne(0));
+		return mongoTemplate.count(query, PublicationImpl.class);
+	}
+	
+	@Override
+	public long getJournalCount() {
+		Query query = new Query(Criteria.where("journal").ne(null));
+		return mongoTemplate.count(query, PublicationImpl.class);
+	}
+	
+	@Override
 	public List<Integer> getYears() {
 		String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
 		DistinctIterable<Integer> output = mongoTemplate.getCollection(collection).distinct("publishYear", Integer.class);
 		List<Integer> results = new ArrayList<>();
 		MongoCursor<Integer> it = output.iterator();
+		while (it.hasNext()) {
+			results.add(it.next());
+		}
+		return results;
+	}
+	
+	@Override
+	public List<String> getJournals() {
+		String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
+		DistinctIterable<String> output = mongoTemplate.getCollection(collection).distinct("journal", String.class);
+		List<String> results = new ArrayList<>();
+		MongoCursor<String> it = output.iterator();
 		while (it.hasNext()) {
 			results.add(it.next());
 		}

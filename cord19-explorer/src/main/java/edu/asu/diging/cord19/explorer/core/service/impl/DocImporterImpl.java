@@ -86,10 +86,10 @@ public class DocImporterImpl implements DocImporter {
 
 	@Autowired
 	private PublicationRepository pubRepo;
-	
+
 	@Autowired
 	private WikipediaSearchRepository searchRepo;
-	
+
 	@Autowired
 	private ElasticsearchTemplate searchTemplate;
 
@@ -277,6 +277,10 @@ public class DocImporterImpl implements DocImporter {
 	}
 
 	private boolean isValid(LocationMatch match) {
+		if (match.getLocationName().isEmpty()) {
+			return false;
+		}
+		
 		// we do want only numbers
 		Pattern pattern = Pattern.compile("[0-9,\\.\\-\\:&\\W]+");
 		Matcher m = pattern.matcher(match.getLocationName());
@@ -310,58 +314,70 @@ public class DocImporterImpl implements DocImporter {
 		if (m3.matches()) {
 			return false;
 		}
-		
+
 		// exclude things like ADP-ribose or ADPrs
 		Pattern p4 = Pattern.compile("[A-Z0-9\\+\\?]{2,}\\-+[a-z]{2,}");
 		Matcher m4 = p4.matcher(match.getLocationName());
 		if (m4.matches()) {
 			return false;
 		}
-		
+
 		if (match.getLocationName().startsWith("Appendix") || match.getLocationName().startsWith("A-")) {
 			return false;
 		}
-		
+
 		// exclude names with multiple /
 		Pattern p5 = Pattern.compile("\\/");
 		Matcher m5 = p5.matcher(match.getLocationName());
 		int count = 0;
-		while(m5.find()) {
+		while (m5.find()) {
 			count++;
 		}
 		if (count > 1) {
 			return false;
 		}
-		
-		PageRequest page = PageRequest.of(0, 3);
-		
+
+		PageRequest page = PageRequest.of(0, 5);
+
 		BoolQueryBuilder builder = QueryBuilders.boolQuery();
-		builder.must(QueryBuilders.queryStringQuery("content:" + match.getLocationName().replace("/", " ").replace("(", " ").replace(")", " ").replace("[", " ").replace("]", " ").replace(":", " ")));
+		builder.must(QueryBuilders.queryStringQuery("title:" + prepareSearchTerm(match.getLocationName())));
 		NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
-	    nativeSearchQueryBuilder.withQuery(builder);
-	    nativeSearchQueryBuilder.withPageable(page);
-	    NativeSearchQuery query = nativeSearchQueryBuilder.build();
-	    List<Wikientry> entries = searchTemplate.queryForList(query, Wikientry.class);
-	    
-	    List<String> placeIndicators = Arrays.asList("state", "countr", "place", "cit", "park", "region", "continent", "town", "captial");
-		//List<Wikientry> page = searchRepo.findByContent(match.getLocationName());
-		if (entries.size() > 0) {
-			if (match.getLocationName().equals("South Korea")) {
-				System.out.println("South Korea");
-			}
+		nativeSearchQueryBuilder.withQuery(builder);
+		nativeSearchQueryBuilder.withPageable(page);
+		NativeSearchQuery query = nativeSearchQueryBuilder.build();
+		List<Wikientry> entries = searchTemplate.queryForList(query, Wikientry.class);
+
+		List<String> placeIndicators = Arrays.asList("republic", "land", "state", "countr", "place", "cit", "park", "region", "continent",
+				"district", "metro", "town", "captial");
+		if (entries.size() == 0) {
+			return false;
+		}
+		
+	    if (entries.size() > 0) {
 			boolean isPlace = false;
-			// if one of the first 3 results seems to be a place, we assume it's one
+			// if one of the first x results seems to be a place, we assume it's one
 			for (Wikientry entry : entries) {
-				isPlace = isPlace || entry.getCategories().stream().anyMatch(c -> 
-					placeIndicators.stream().anyMatch(p -> c.toLowerCase().contains(p))
-				);
-			};
+				isPlace = isPlace || entry.getCategories().stream()
+						.anyMatch(c -> placeIndicators.stream().anyMatch(p -> c.toLowerCase().contains(p)));
+			}
+			;
 			if (!isPlace) {
 				return false;
 			}
 		}
 
 		return true;
+	}
+
+	private String prepareSearchTerm(String term) {
+		term = term.replace("/", " ").replace("(", " ").replace(")", " ");
+		term = term.replace("[", " ").replace("]", " ").replace(":", " ");
+		term = term.replace("{", " ").replace("}", " ").replace("~", " ");
+		term = term.replace("\"", "").replace("'", "").replace("^", "");
+		term = term.replace("!", "").replace("-", " ").replace(".", " ");
+		term = term.replace(" OR", " ").replace(" OR ", " ");
+		term = term.replace(" AND", " ").replace(" AND ", " ");
+		return term;
 	}
 
 	@Override
@@ -420,7 +436,7 @@ public class DocImporterImpl implements DocImporter {
 		} catch (IOException e) {
 			logger.error("Could not close file.", e);
 		}
-		
+
 		task.setStatus(TaskStatus.DONE);
 		task.setDateEnded(OffsetDateTime.now());
 		taskRepo.save((ImportTaskImpl) task);

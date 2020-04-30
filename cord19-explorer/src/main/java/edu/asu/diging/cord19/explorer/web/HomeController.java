@@ -18,6 +18,11 @@ public class HomeController {
     	model.addAttribute("countries", pubDao.getCountries());
     	model.addAttribute("years", pubDao.getYears());
     	model.addAttribute("textCountries", pubDao.getCountriesInText());
+    	model.addAttribute("publicationCount", pubDao.getPublicationCount());
+    	model.addAttribute("affiliationCount", pubDao.getAffiliationCount());
+    	model.addAttribute("yearCount", pubDao.getYearCount());
+    	model.addAttribute("journals", pubDao.getJournals());
+    	model.addAttribute("journalCount", pubDao.getJournalCount());
         return "home";
     }
 }

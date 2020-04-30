@@ -7,7 +7,7 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
-@Document(indexName = "wikipedia_1", type = "wikientry")
+@Document(indexName = "wikipedia_full", type = "wikientry")
 public class Wikientry {
 
 	@Id

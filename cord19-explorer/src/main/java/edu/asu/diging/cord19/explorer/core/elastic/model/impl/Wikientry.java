@@ -7,7 +7,7 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
-@Document(indexName = "wikipedia_full", type = "wikientry")
+@Document(indexName = "#{@indexName}", type = "wikientry")
 public class Wikientry {
 
 	@Id
@@ -18,6 +18,10 @@ public class Wikientry {
 	private String shortDescription;
 	@Field(type=FieldType.Text)
 	private String content;
+	@Field(type=FieldType.Text)
+	private String complete_text;
+	@Field(type = FieldType.Keyword)
+	private String coordinates;
 	@Field(type = FieldType.Keyword, includeInParent = true)
     private List<String> categories;
 	
@@ -44,6 +48,18 @@ public class Wikientry {
 	}
 	public void setContent(String content) {
 		this.content = content;
+	}
+	public String getComplete_text() {
+		return complete_text;
+	}
+	public void setComplete_text(String complete_text) {
+		this.complete_text = complete_text;
+	}
+	public String getCoordinates() {
+		return coordinates;
+	}
+	public void setCoordinates(String coordinates) {
+		this.coordinates = coordinates;
 	}
 	public List<String> getCategories() {
 		return categories;

@@ -55,6 +55,7 @@ import edu.asu.diging.cord19.explorer.core.model.Publication;
 import edu.asu.diging.cord19.explorer.core.model.impl.LocationMatchImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.ParagraphImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
+import edu.asu.diging.cord19.explorer.core.model.impl.WikipediaArticleImpl;
 import edu.asu.diging.cord19.explorer.core.model.task.ImportTask;
 import edu.asu.diging.cord19.explorer.core.model.task.impl.ImportTaskImpl;
 import edu.asu.diging.cord19.explorer.core.model.task.impl.TaskStatus;
@@ -337,7 +338,7 @@ public class DocImporterImpl implements DocImporter {
 			return false;
 		}
 
-		PageRequest page = PageRequest.of(0, 5);
+		PageRequest page = PageRequest.of(0, 10);
 
 		BoolQueryBuilder builder = QueryBuilders.boolQuery();
 		builder.must(QueryBuilders.queryStringQuery("title:" + prepareSearchTerm(match.getLocationName())));
@@ -357,10 +358,51 @@ public class DocImporterImpl implements DocImporter {
 			boolean isPlace = false;
 			// if one of the first x results seems to be a place, we assume it's one
 			for (Wikientry entry : entries) {
+				if (entry.getComplete_text().trim().toLowerCase().startsWith("#redirect") ) {
+					Pattern redirectPattern = Pattern.compile("#(redirect|REDIRECT) \\[\\[(.+?)\\]\\]");
+					Matcher redirectMatcher = redirectPattern.matcher(entry.getComplete_text());
+					
+					if (redirectMatcher.find()) {
+						PageRequest redirectPage = PageRequest.of(0, 1);
+						String searchTerm = prepareSearchTerm(redirectMatcher.group(2));
+
+						BoolQueryBuilder redirectBuilder = QueryBuilders.boolQuery();
+						redirectBuilder.must(QueryBuilders.termQuery("title_keyword", searchTerm));
+						
+						NativeSearchQueryBuilder redirectQueryBuilder = new NativeSearchQueryBuilder();
+						redirectQueryBuilder.withQuery(redirectBuilder);
+						redirectQueryBuilder.withPageable(redirectPage);
+						NativeSearchQuery redirectQuery = redirectQueryBuilder.build();
+						List<Wikientry> redirectEntry = searchTemplate.queryForList(redirectQuery, Wikientry.class);
+						
+						if (redirectEntry.size() > 0) {
+							entry = redirectEntry.get(0);
+						}
+					}
+					
+
+				}
 				isPlace = isPlace || entry.getCategories().stream()
 						.anyMatch(c -> placeIndicators.stream().anyMatch(p -> c.toLowerCase().contains(p)));
+			
+				if (entry.getCoordinates() != null && !entry.getCoordinates().trim().isEmpty()) {
+					final Wikientry finalEntry = entry;
+					isPlace = true;
+					if (match.getWikipediaArticles() == null) {
+						match.setWikipediaArticles(new ArrayList<>());
+					}
+					boolean exists = match.getWikipediaArticles().stream().anyMatch(a -> a.getTitle().equals(finalEntry.getTitle()));
+						
+					if (!exists) {
+						WikipediaArticleImpl article = new WikipediaArticleImpl();
+						//article.setCompleteText(entry.getComplete_text());
+						article.setTitle(entry.getTitle());
+						article.setCoordinates(entry.getCoordinates());
+						match.getWikipediaArticles().add(article);
+					}
+				}
 			}
-			;
+			
 			if (!isPlace) {
 				return false;
 			}
@@ -375,6 +417,7 @@ public class DocImporterImpl implements DocImporter {
 		term = term.replace("{", " ").replace("}", " ").replace("~", " ");
 		term = term.replace("\"", "").replace("'", "").replace("^", "");
 		term = term.replace("!", "").replace("-", " ").replace(".", " ");
+		term = term.replace("_", " ");
 		term = term.replace(" OR", " ").replace(" OR ", " ");
 		term = term.replace(" AND", " ").replace(" AND ", " ");
 		return term;
@@ -392,7 +435,7 @@ public class DocImporterImpl implements DocImporter {
 		ImportTask task = optional.get();
 		task.setStatus(TaskStatus.PROCESSING);
 
-		File file = new File(appdataPath + File.separator + task.getId() + ".txt");
+		File file = new File(appdataPath + File.separator + "logs" + File.separator + task.getId() + ".txt");
 		try {
 			file.createNewFile();
 		} catch (IOException e) {
@@ -423,7 +466,7 @@ public class DocImporterImpl implements DocImporter {
 							} catch (IOException e) {
 								logger.error("Could not write to file.", e);
 							}
-							//it.remove();
+							it.remove();
 						}
 					}
 				}

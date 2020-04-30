@@ -5,6 +5,7 @@ import java.util.List;
 import org.bson.types.ObjectId;
 
 import edu.asu.diging.cord19.explorer.core.model.impl.LocationMatchImpl;
+import edu.asu.diging.cord19.explorer.core.model.impl.WikipediaArticleImpl;
 
 public interface LocationMatch {
 
@@ -35,5 +36,9 @@ public interface LocationMatch {
 	void setId(ObjectId id);
 
 	ObjectId getId();
+
+	void setWikipediaArticles(List<WikipediaArticleImpl> wikipediaArticles);
+
+	List<WikipediaArticleImpl> getWikipediaArticles();
 
 }

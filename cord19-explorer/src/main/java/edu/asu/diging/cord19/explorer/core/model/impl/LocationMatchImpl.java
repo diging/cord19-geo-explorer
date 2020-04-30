@@ -1,5 +1,7 @@
 package edu.asu.diging.cord19.explorer.core.model.impl;
 
+import java.util.List;
+
 import org.bson.types.ObjectId;
 
 import edu.asu.diging.cord19.explorer.core.model.LocationMatch;
@@ -13,6 +15,7 @@ public class LocationMatchImpl implements LocationMatch {
 	private double probability;
 	private String type;
 	private String section;
+	private List<WikipediaArticleImpl> wikipediaArticles;
 	
 	@Override
 	public ObjectId getId() {
@@ -99,6 +102,14 @@ public class LocationMatchImpl implements LocationMatch {
 	@Override
 	public void setSection(String section) {
 		this.section = section;
+	}
+	@Override
+	public List<WikipediaArticleImpl> getWikipediaArticles() {
+		return wikipediaArticles;
+	}
+	@Override
+	public void setWikipediaArticles(List<WikipediaArticleImpl> wikipediaArticles) {
+		this.wikipediaArticles = wikipediaArticles;
 	}
 	
 }

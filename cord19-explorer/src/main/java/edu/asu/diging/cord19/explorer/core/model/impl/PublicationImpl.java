@@ -9,7 +9,6 @@ import org.springframework.data.annotation.Id;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import edu.asu.diging.cord19.explorer.core.model.LocationMatch;
 import edu.asu.diging.cord19.explorer.core.model.Metadata;
 import edu.asu.diging.cord19.explorer.core.model.Publication;
 

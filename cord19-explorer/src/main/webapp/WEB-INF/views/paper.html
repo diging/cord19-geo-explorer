@@ -1,0 +1,42 @@
+<html layout:decorate="~{layouts/main}">
+  <head>
+    <title>CORD19 Geo Explorer</title>
+  </head>
+  <body>
+   <div layout:fragment="content">
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js"></script>
+   <style>
+	mark{
+	    background: #f7ceff;
+	    color: black;
+	}
+   </style>
+   <h3>[[${publication.metadata.title}]]</h3>
+   
+   	<div class="row">
+   		  <div class="col-sm-12">
+		   
+	      <div th:each="section : ${sections}">
+	      <h3 th:text="*{section.title != ''} ? *{section.title}: 'No Section title'"></h3>
+	      
+	      <span th:each="para : ${section.paragraphs}">
+	      <script th:inline="javascript" th:if="${not #lists.isEmpty(para.locationMatches)}">
+	      $(function() {
+	      	[# th:each="match : ${para.locationMatches}" ]
+	      	[# th:if="${match != null}" ]
+	      	$("#[(${#ids.next('para')})]").mark("[(${match.locationName})]", { "separateWordSearch": false})	
+	      	[/]
+	      	[/]
+	      });
+	      </script>
+	      <p th:id="${#ids.seq('para')}" class="paraText">
+	      [[${para.text}]]
+	      </p>	 
+	      	
+	      </span>     	
+   		  </div>
+   		</div>
+     
+   </div>
+  </body>
+</html>

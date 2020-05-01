@@ -8,5 +8,5 @@ import edu.asu.diging.cord19.explorer.core.elastic.model.impl.Wikientry;
 
 public interface WikipediaSearchRepository extends ElasticsearchRepository<Wikientry, String> {
 
-	List<Wikientry> findByContent(String term);
+    List<Wikientry> findByContent(String term);
 }

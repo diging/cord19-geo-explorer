@@ -1,4 +1,5 @@
 package edu.asu.diging.cord19.explorer.config;
+
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 

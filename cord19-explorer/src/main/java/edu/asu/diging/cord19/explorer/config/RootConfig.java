@@ -12,7 +12,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableWebMvc
 @EnableAspectJAutoProxy
 @EnableAsync
-@ComponentScan({"edu.asu.diging.cord19.explorer", "edu.asu.diging.simpleusers.core"})
+@ComponentScan({ "edu.asu.diging.cord19.explorer", "edu.asu.diging.simpleusers.core" })
 public class RootConfig {
 
     @Bean

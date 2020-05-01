@@ -11,100 +11,98 @@ import edu.asu.diging.cord19.explorer.core.model.impl.ParagraphImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.RefEntryImpl;
 
-@JsonTypeInfo(
-	    use = JsonTypeInfo.Id.NAME,
-	    defaultImpl=PublicationImpl.class)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, defaultImpl = PublicationImpl.class)
 public interface Publication {
 
-	String getCordId();
+    String getCordId();
 
-	void setCordId(String cordId);
+    void setCordId(String cordId);
 
-	String getSha();
+    String getSha();
 
-	void setSha(String sha);
+    void setSha(String sha);
 
-	String getPaperId();
+    String getPaperId();
 
-	void setPaperId(String paperId);
+    void setPaperId(String paperId);
 
-	Metadata getMetadata();
+    Metadata getMetadata();
 
-	void setMetadata(Metadata metadata);
+    void setMetadata(Metadata metadata);
 
-	String getDoi();
+    String getDoi();
 
-	void setDoi(String doi);
+    void setDoi(String doi);
 
-	String getPmcid();
+    String getPmcid();
 
-	void setPmcid(String pmcid);
+    void setPmcid(String pmcid);
 
-	String getPubmedId();
+    String getPubmedId();
 
-	void setPubmedId(String pubmedId);
+    void setPubmedId(String pubmedId);
 
-	String getLicense();
+    String getLicense();
 
-	void setLicense(String license);
+    void setLicense(String license);
 
-	String getSourceX();
+    String getSourceX();
 
-	void setSourceX(String sourceX);
+    void setSourceX(String sourceX);
 
-	String getPublishTime();
+    String getPublishTime();
 
-	void setPublishTime(String publishTime);
+    void setPublishTime(String publishTime);
 
-	int getPublishYear();
+    int getPublishYear();
 
-	void setPublishYear(int publishYear);
+    void setPublishYear(int publishYear);
 
-	String getJournal();
+    String getJournal();
 
-	void setJournal(String journal);
+    void setJournal(String journal);
 
-	String getMsAcademicPaperId();
+    String getMsAcademicPaperId();
 
-	void setMsAcademicPaperId(String msAcademicPaperId);
+    void setMsAcademicPaperId(String msAcademicPaperId);
 
-	boolean isHasPdfParse();
+    boolean isHasPdfParse();
 
-	void setHasPdfParse(boolean hasPdfParse);
+    void setHasPdfParse(boolean hasPdfParse);
 
-	boolean isHasPmcXmlParse();
+    boolean isHasPmcXmlParse();
 
-	void setHasPmcXmlParse(boolean hasPmcXmlParse);
+    void setHasPmcXmlParse(boolean hasPmcXmlParse);
 
-	String getFulltextFile();
+    String getFulltextFile();
 
-	void setFulltextFile(String fulltextFile);
+    void setFulltextFile(String fulltextFile);
 
-	String getUrl();
+    String getUrl();
 
-	void setUrl(String url);
+    void setUrl(String url);
 
-	String getWhoCovidence();
+    String getWhoCovidence();
 
-	void setWhoCovidence(String whoCovidence);
+    void setWhoCovidence(String whoCovidence);
 
-	List<ParagraphImpl> getAbstracts();
+    List<ParagraphImpl> getAbstracts();
 
-	void setAbstracts(List<ParagraphImpl> abstracts);
+    void setAbstracts(List<ParagraphImpl> abstracts);
 
-	List<ParagraphImpl> getBodyText();
+    List<ParagraphImpl> getBodyText();
 
-	void setBodyText(List<ParagraphImpl> bodyText);
+    void setBodyText(List<ParagraphImpl> bodyText);
 
-	Map<String, BibEntryImpl> getBibEntries();
+    Map<String, BibEntryImpl> getBibEntries();
 
-	void setBibEntries(Map<String, BibEntryImpl> bibEntries);
+    void setBibEntries(Map<String, BibEntryImpl> bibEntries);
 
-	Map<String, RefEntryImpl> getRefEntries();
+    Map<String, RefEntryImpl> getRefEntries();
 
-	void setRefEntries(Map<String, RefEntryImpl> refEntries);
+    void setRefEntries(Map<String, RefEntryImpl> refEntries);
 
-	List<ParagraphImpl> getBackMatter();
+    List<ParagraphImpl> getBackMatter();
 
-	void setBackMatter(List<ParagraphImpl> backMatter);
+    void setBackMatter(List<ParagraphImpl> backMatter);
 }

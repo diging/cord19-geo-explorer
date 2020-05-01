@@ -9,20 +9,20 @@ import edu.asu.diging.cord19.explorer.core.mongo.PublicationDao;
 
 @Controller
 public class HomeController {
-	
-	@Autowired
-	private PublicationDao pubDao;
+
+    @Autowired
+    private PublicationDao pubDao;
 
     @RequestMapping(value = "/")
     public String home(Model model) {
-    	model.addAttribute("countries", pubDao.getCountries());
-    	model.addAttribute("years", pubDao.getYears());
-    	model.addAttribute("textCountries", pubDao.getCountriesInText());
-    	model.addAttribute("publicationCount", pubDao.getPublicationCount());
-    	model.addAttribute("affiliationCount", pubDao.getAffiliationCount());
-    	model.addAttribute("yearCount", pubDao.getYearCount());
-    	model.addAttribute("journals", pubDao.getJournals());
-    	model.addAttribute("journalCount", pubDao.getJournalCount());
+        model.addAttribute("countries", pubDao.getCountries());
+        model.addAttribute("years", pubDao.getYears());
+        model.addAttribute("textCountries", pubDao.getCountriesInText());
+        model.addAttribute("publicationCount", pubDao.getPublicationCount());
+        model.addAttribute("affiliationCount", pubDao.getAffiliationCount());
+        model.addAttribute("yearCount", pubDao.getYearCount());
+        model.addAttribute("journals", pubDao.getJournals());
+        model.addAttribute("journalCount", pubDao.getJournalCount());
         return "home";
     }
 }

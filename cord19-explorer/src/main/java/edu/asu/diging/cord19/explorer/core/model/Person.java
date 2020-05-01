@@ -7,33 +7,31 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import edu.asu.diging.cord19.explorer.core.model.impl.AffiliationImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.PersonImpl;
 
-@JsonTypeInfo(
-	    use = JsonTypeInfo.Id.NAME,
-	    defaultImpl=PersonImpl.class)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, defaultImpl = PersonImpl.class)
 public interface Person {
 
-	String getFirst();
+    String getFirst();
 
-	void setFirst(String first);
+    void setFirst(String first);
 
-	List<String> getMiddle();
+    List<String> getMiddle();
 
-	void setMiddle(List<String> middle);
+    void setMiddle(List<String> middle);
 
-	String getLast();
+    String getLast();
 
-	void setLast(String last);
+    void setLast(String last);
 
-	String getSuffix();
+    String getSuffix();
 
-	void setSuffix(String suffix);
+    void setSuffix(String suffix);
 
-	AffiliationImpl getAffiliation();
+    AffiliationImpl getAffiliation();
 
-	void setAffiliation(AffiliationImpl affiliation);
+    void setAffiliation(AffiliationImpl affiliation);
 
-	String getEmail();
+    String getEmail();
 
-	void setEmail(String email);
+    void setEmail(String email);
 
 }

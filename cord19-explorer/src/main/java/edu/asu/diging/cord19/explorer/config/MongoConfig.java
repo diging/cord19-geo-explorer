@@ -19,35 +19,35 @@ import com.mongodb.client.MongoClients;
 
 @Configuration
 @PropertySource({ "classpath:config.properties", "${appConfigFile:classpath:}/app.properties" })
-@EnableMongoRepositories({"edu.asu.diging.cord19.explorer.core.mongo"})
+@EnableMongoRepositories({ "edu.asu.diging.cord19.explorer.core.mongo" })
 public class MongoConfig {
 
-	@Value("${mongo.database.name}")
-	private String mongoDbName;
+    @Value("${mongo.database.name}")
+    private String mongoDbName;
 
-	@Value("${mongo.database.host}")
-	private String mongoDbHost;
+    @Value("${mongo.database.host}")
+    private String mongoDbHost;
 
-	@Value("${mongo.database.port}")
-	private int mongoDbPort;
+    @Value("${mongo.database.port}")
+    private int mongoDbPort;
 
-	@Bean
-	public MongoClient mongo() throws UnknownHostException {
-		MongoClient mongoClient = MongoClients
-				.create(MongoClientSettings.builder()
-						.applyToClusterSettings(
-								builder -> builder.hosts(Arrays.asList(new ServerAddress(mongoDbHost, mongoDbPort))))
-						.build());
-		return mongoClient;
-	}
+    @Bean
+    public MongoClient mongo() throws UnknownHostException {
+        MongoClient mongoClient = MongoClients
+                .create(MongoClientSettings.builder()
+                        .applyToClusterSettings(
+                                builder -> builder.hosts(Arrays.asList(new ServerAddress(mongoDbHost, mongoDbPort))))
+                        .build());
+        return mongoClient;
+    }
 
-	@Bean
-	public MongoDbFactory mongoDbFactory() throws UnknownHostException {
-		return new SimpleMongoClientDbFactory(mongo(), mongoDbName);
-	}
+    @Bean
+    public MongoDbFactory mongoDbFactory() throws UnknownHostException {
+        return new SimpleMongoClientDbFactory(mongo(), mongoDbName);
+    }
 
-	@Bean
-	public MongoTemplate mongoTemplate() throws UnknownHostException {
-		return new MongoTemplate(mongoDbFactory());
-	}
+    @Bean
+    public MongoTemplate mongoTemplate() throws UnknownHostException {
+        return new MongoTemplate(mongoDbFactory());
+    }
 }

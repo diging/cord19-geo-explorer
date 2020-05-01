@@ -73,508 +73,511 @@ import opennlp.tools.util.Span;
 @PropertySource({ "classpath:config.properties", "${appConfigFile:classpath:}/app.properties" })
 public class DocImporterImpl implements DocImporter {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-	@Value("${metadata.filename}")
-	private String metadataFilename;
+    @Value("${metadata.filename}")
+    private String metadataFilename;
 
-	@Value("${app.data.path}")
-	private String appdataPath;
+    @Value("${app.data.path}")
+    private String appdataPath;
 
-	@Value("${models.folder.name}")
-	private String modelsFolderName;
+    @Value("${models.folder.name}")
+    private String modelsFolderName;
 
-	@Autowired
-	private TaskRepository taskRepo;
+    @Autowired
+    private TaskRepository taskRepo;
 
-	@Autowired
-	private PublicationRepository pubRepo;
+    @Autowired
+    private PublicationRepository pubRepo;
 
-	@Autowired
-	private WikipediaSearchRepository searchRepo;
+    @Autowired
+    private WikipediaSearchRepository searchRepo;
 
-	@Autowired
-	private ElasticsearchTemplate searchTemplate;
+    @Autowired
+    private ElasticsearchTemplate searchTemplate;
 
-	@Autowired
-	private MongoTemplate mongoTemplate;
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
-	private TokenNameFinderModel model;
+    private TokenNameFinderModel model;
 
-	private NameFinderME nameFinder;
+    private NameFinderME nameFinder;
 
-	@PostConstruct
-	public void init() throws ClassCastException, ClassNotFoundException, IOException {
-		File r = new File(appdataPath + modelsFolderName + File.separator + "en-ner-location.bin");
-		model = new TokenNameFinderModel(new FileInputStream(r));
-		nameFinder = new NameFinderME(model);
-	}
+    @PostConstruct
+    public void init() throws ClassCastException, ClassNotFoundException, IOException {
+        File r = new File(appdataPath + modelsFolderName + File.separator + "en-ner-location.bin");
+        model = new TokenNameFinderModel(new FileInputStream(r));
+        nameFinder = new NameFinderME(model);
+    }
 
-	@Override
-	@Async
-	public void run(String rootFolder, String taskId) throws IOException {
-		Optional<ImportTaskImpl> optional = taskRepo.findById(taskId);
-		if (!optional.isPresent()) {
-			return;
-			// FIXME: mark as failure
-		}
+    @Override
+    @Async
+    public void run(String rootFolder, String taskId) throws IOException {
+        Optional<ImportTaskImpl> optional = taskRepo.findById(taskId);
+        if (!optional.isPresent()) {
+            return;
+            // FIXME: mark as failure
+        }
 
-		ImportTask task = optional.get();
-		task.setStatus(TaskStatus.PROCESSING);
-		
-		File file = new File(appdataPath + File.separator + "logs" + File.separator + task.getId() + ".txt");
-		try {
-			file.createNewFile();
-		} catch (IOException e) {
-			logger.error("Could not create outfile.", e);
-			return;
-		}
-		
-		BufferedWriter writer;
-		try {
-			writer = new BufferedWriter(new FileWriter(file, true));
-		} catch (IOException e) {
-			logger.error("Could not create outfile.", e);
-			return;
-		}
+        ImportTask task = optional.get();
+        task.setStatus(TaskStatus.PROCESSING);
 
-		try (Stream<Path> paths = Files.walk(Paths.get(rootFolder))) {
-			paths.forEach(p -> {
-				if (Files.isRegularFile(p, LinkOption.NOFOLLOW_LINKS) && !p.getFileName().startsWith(".")) {
-					try {
-						storeFile(p.toFile(), task, writer);
-					} catch (JsonParseException e) {
-						logger.error("Could not store file " + p.getFileName(), e);
-					} catch (JsonMappingException e) {
-						logger.error("Could not store file " + p.getFileName(), e);
-					} catch (IOException e) {
-						logger.error("Could not store file " + p.getFileName(), e);
-					} catch (ClassCastException e) {
-						logger.error("Could not store file " + p.getFileName(), e);
-					} catch (ClassNotFoundException e) {
-						logger.error("Could not store file " + p.getFileName(), e);
-					}
-				}
-			});
-		}
-		
-		writer.close();
+        File file = new File(appdataPath + File.separator + "logs" + File.separator + task.getId() + ".txt");
+        try {
+            file.createNewFile();
+        } catch (IOException e) {
+            logger.error("Could not create outfile.", e);
+            return;
+        }
 
-		File metadataFile = new File(rootFolder + File.separator + metadataFilename);
-		CsvToBean<MetadataEntry> bean = new CsvToBeanBuilder(new FileReader(metadataFile)).withType(MetadataEntry.class)
-				.withIgnoreLeadingWhiteSpace(true).build();
+        BufferedWriter writer;
+        try {
+            writer = new BufferedWriter(new FileWriter(file, true));
+        } catch (IOException e) {
+            logger.error("Could not create outfile.", e);
+            return;
+        }
 
-		Iterator<MetadataEntry> it = bean.iterator();
-		while (it.hasNext()) {
-			MetadataEntry entry = it.next();
-			PublicationImpl pub = null;
-			if (entry.getSha() != null && !entry.getSha().isEmpty()) {
-				pub = pubRepo.findFirstByPaperId(entry.getSha());
-			}
-			if (pub == null && entry.getPmcid() != null && !entry.getPmcid().isEmpty()) {
-				pub = pubRepo.findFirstByPaperId(entry.getPmcid());
-			}
+        try (Stream<Path> paths = Files.walk(Paths.get(rootFolder))) {
+            paths.forEach(p -> {
+                if (Files.isRegularFile(p, LinkOption.NOFOLLOW_LINKS) && !p.getFileName().startsWith(".")) {
+                    try {
+                        storeFile(p.toFile(), task, writer);
+                    } catch (JsonParseException e) {
+                        logger.error("Could not store file " + p.getFileName(), e);
+                    } catch (JsonMappingException e) {
+                        logger.error("Could not store file " + p.getFileName(), e);
+                    } catch (IOException e) {
+                        logger.error("Could not store file " + p.getFileName(), e);
+                    } catch (ClassCastException e) {
+                        logger.error("Could not store file " + p.getFileName(), e);
+                    } catch (ClassNotFoundException e) {
+                        logger.error("Could not store file " + p.getFileName(), e);
+                    }
+                }
+            });
+        }
 
-			if (pub != null) {
-				pub.setHasPdfParse(entry.getHasPdfParse().equals("TRUE"));
-				pub.setCordId(entry.getCord_uid());
-				pub.setDoi(entry.getDoi());
-				pub.setHasPmcXmlParse(entry.getHasPmcXmlParse().equals("TRUE"));
-				pub.setJournal(entry.getJournal());
-				pub.setLicense(entry.getLicense());
-				pub.setMsAcademicPaperId(entry.getMsAcademicPaperId());
-				pub.setPmcid(entry.getPmcid());
-				pub.setPublishTime(entry.getPublishTime());
-				pub.setPubmedId(entry.getPubmed_id());
-				pub.setSha(entry.getSha());
-				pub.setSourceX(entry.getSourceX());
-				pub.setUrl(entry.getUrl());
-				pub.setWhoCovidence(entry.getWhoCov());
-				extractYear(pub);
-				pubRepo.save(pub);
-			}
-		}
+        writer.close();
 
-		task.setStatus(TaskStatus.DONE);
-		task.setDateEnded(OffsetDateTime.now());
-		taskRepo.save((ImportTaskImpl) task);
-	}
+        File metadataFile = new File(rootFolder + File.separator + metadataFilename);
+        CsvToBean<MetadataEntry> bean = new CsvToBeanBuilder(new FileReader(metadataFile)).withType(MetadataEntry.class)
+                .withIgnoreLeadingWhiteSpace(true).build();
 
-	private void storeFile(File f, ImportTask task, BufferedWriter writer)
-			throws JsonParseException, JsonMappingException, IOException, ClassCastException, ClassNotFoundException {
-		if (!f.getName().endsWith(".json")) {
-			return;
-		}
-		ObjectMapper mapper = new ObjectMapper();
-		PublicationImpl publication = mapper.readValue(f, PublicationImpl.class);
-		List<LocationMatch> invalidMatches = findLocations(publication);
-		for (LocationMatch match : invalidMatches) {
-			writer.newLine();
-			writer.write(match.getLocationName());
-			writer.flush();
-		}
-		pubRepo.save(publication);
-		task.setProcessed(task.getProcessed() + 1);
-		logger.debug("Stored: " + publication.getPaperId());
-	}
+        Iterator<MetadataEntry> it = bean.iterator();
+        while (it.hasNext()) {
+            MetadataEntry entry = it.next();
+            PublicationImpl pub = null;
+            if (entry.getSha() != null && !entry.getSha().isEmpty()) {
+                pub = pubRepo.findFirstByPaperId(entry.getSha());
+            }
+            if (pub == null && entry.getPmcid() != null && !entry.getPmcid().isEmpty()) {
+                pub = pubRepo.findFirstByPaperId(entry.getPmcid());
+            }
 
-	@Override
-	@Async
-	public void extractYears(String taskId) {
-		Optional<ImportTaskImpl> optional = taskRepo.findById(taskId);
-		if (!optional.isPresent()) {
-			return;
-			// FIXME: mark as failure
-		}
+            if (pub != null) {
+                pub.setHasPdfParse(entry.getHasPdfParse().equals("TRUE"));
+                pub.setCordId(entry.getCord_uid());
+                pub.setDoi(entry.getDoi());
+                pub.setHasPmcXmlParse(entry.getHasPmcXmlParse().equals("TRUE"));
+                pub.setJournal(entry.getJournal());
+                pub.setLicense(entry.getLicense());
+                pub.setMsAcademicPaperId(entry.getMsAcademicPaperId());
+                pub.setPmcid(entry.getPmcid());
+                pub.setPublishTime(entry.getPublishTime());
+                pub.setPubmedId(entry.getPubmed_id());
+                pub.setSha(entry.getSha());
+                pub.setSourceX(entry.getSourceX());
+                pub.setUrl(entry.getUrl());
+                pub.setWhoCovidence(entry.getWhoCov());
+                extractYear(pub);
+                pubRepo.save(pub);
+            }
+        }
 
-		ImportTask task = optional.get();
-		task.setStatus(TaskStatus.PROCESSING);
+        task.setStatus(TaskStatus.DONE);
+        task.setDateEnded(OffsetDateTime.now());
+        taskRepo.save((ImportTaskImpl) task);
+    }
 
-		try (CloseableIterator<PublicationImpl> docs = mongoTemplate.stream(new Query(), PublicationImpl.class)) {
-			while (docs.hasNext()) {
-				PublicationImpl pub = docs.next();
-				extractYear(pub);
-				pubRepo.save(pub);
-			}
-		}
+    private void storeFile(File f, ImportTask task, BufferedWriter writer)
+            throws JsonParseException, JsonMappingException, IOException, ClassCastException, ClassNotFoundException {
+        if (!f.getName().endsWith(".json")) {
+            return;
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        PublicationImpl publication = mapper.readValue(f, PublicationImpl.class);
+        List<LocationMatch> invalidMatches = findLocations(publication);
+        for (LocationMatch match : invalidMatches) {
+            writer.newLine();
+            writer.write(match.getLocationName());
+            writer.flush();
+        }
+        pubRepo.save(publication);
+        task.setProcessed(task.getProcessed() + 1);
+        logger.debug("Stored: " + publication.getPaperId());
+    }
 
-		task.setStatus(TaskStatus.DONE);
-		task.setDateEnded(OffsetDateTime.now());
-		taskRepo.save((ImportTaskImpl) task);
-	}
+    @Override
+    @Async
+    public void extractYears(String taskId) {
+        Optional<ImportTaskImpl> optional = taskRepo.findById(taskId);
+        if (!optional.isPresent()) {
+            return;
+            // FIXME: mark as failure
+        }
 
-	private void extractYear(Publication pub) {
-		if (pub.getPublishTime() != null && !pub.getPublishTime().isEmpty()) {
-			if (pub.getPublishTime().contains("-")) {
-				LocalDate date = LocalDate.parse(pub.getPublishTime());
-				pub.setPublishYear(date.getYear());
-			} else if (pub.getPublishTime().length() == 4) {
-				try {
-					pub.setPublishYear(new Integer(pub.getPublishTime()));
-				} catch (NumberFormatException e) {
-					// well too bad
-					logger.error("Couldn't parse date for " + pub.getPaperId() + ": " + pub.getPublishTime());
-				}
-			}
-		}
-	}
+        ImportTask task = optional.get();
+        task.setStatus(TaskStatus.PROCESSING);
 
-	@Override
-	@Async
-	public void extractLocations(String taskId) throws ClassCastException, ClassNotFoundException, IOException {
-		Optional<ImportTaskImpl> optional = taskRepo.findById(taskId);
-		if (!optional.isPresent()) {
-			return;
-			// FIXME: mark as failure
-		}
+        try (CloseableIterator<PublicationImpl> docs = mongoTemplate.stream(new Query(), PublicationImpl.class)) {
+            while (docs.hasNext()) {
+                PublicationImpl pub = docs.next();
+                extractYear(pub);
+                pubRepo.save(pub);
+            }
+        }
 
-		ImportTask task = optional.get();
-		task.setStatus(TaskStatus.PROCESSING);
+        task.setStatus(TaskStatus.DONE);
+        task.setDateEnded(OffsetDateTime.now());
+        taskRepo.save((ImportTaskImpl) task);
+    }
 
-		try (CloseableIterator<PublicationImpl> docs = mongoTemplate.stream(new Query(), PublicationImpl.class)) {
-			while (docs.hasNext()) {
-				PublicationImpl pub = docs.next();
-				findLocations(pub);
-				pubRepo.save(pub);
-			}
-		}
+    private void extractYear(Publication pub) {
+        if (pub.getPublishTime() != null && !pub.getPublishTime().isEmpty()) {
+            if (pub.getPublishTime().contains("-")) {
+                LocalDate date = LocalDate.parse(pub.getPublishTime());
+                pub.setPublishYear(date.getYear());
+            } else if (pub.getPublishTime().length() == 4) {
+                try {
+                    pub.setPublishYear(new Integer(pub.getPublishTime()));
+                } catch (NumberFormatException e) {
+                    // well too bad
+                    logger.error("Couldn't parse date for " + pub.getPaperId() + ": " + pub.getPublishTime());
+                }
+            }
+        }
+    }
 
-		task.setStatus(TaskStatus.DONE);
-		task.setDateEnded(OffsetDateTime.now());
-		taskRepo.save((ImportTaskImpl) task);
-	}
+    @Override
+    @Async
+    public void extractLocations(String taskId) throws ClassCastException, ClassNotFoundException, IOException {
+        Optional<ImportTaskImpl> optional = taskRepo.findById(taskId);
+        if (!optional.isPresent()) {
+            return;
+            // FIXME: mark as failure
+        }
 
-	private List<LocationMatch> findLocations(Publication pub) throws ClassCastException, ClassNotFoundException, IOException {
-		List<LocationMatch> inValidMatches = new ArrayList<>();
-		for (ParagraphImpl para : pub.getBodyText()) {
-			if (para.getLocationMatches() == null) {
-				para.setLocationMatches(new ArrayList<>());
-			}
-			String[] tokens = tokenize(para.getText());
-			Span nameSpans[] = nameFinder.find(tokens);
+        ImportTask task = optional.get();
+        task.setStatus(TaskStatus.PROCESSING);
 
-			for (Span span : nameSpans) {
-				LocationMatch match = createMatch(span, para, tokens);
-				if (match != null) {
-					if (isValid(match)) {
-						para.getLocationMatches().add(match);
-					} else {
-						inValidMatches.add(match);
-					}
-				}
-			}
-			nameFinder.clearAdaptiveData();
-		}
-		return inValidMatches;
-	}
+        try (CloseableIterator<PublicationImpl> docs = mongoTemplate.stream(new Query(), PublicationImpl.class)) {
+            while (docs.hasNext()) {
+                PublicationImpl pub = docs.next();
+                findLocations(pub);
+                pubRepo.save(pub);
+            }
+        }
 
-	private boolean isValid(LocationMatch match) {
-		if (match.getLocationName().isEmpty()) {
-			return false;
-		}
-		
-		// we do want only numbers
-		Pattern pattern = Pattern.compile("[0-9,\\.\\-\\:&\\W]+");
-		Matcher m = pattern.matcher(match.getLocationName());
-		if (m.matches()) {
-			return false;
-		}
+        task.setStatus(TaskStatus.DONE);
+        task.setDateEnded(OffsetDateTime.now());
+        taskRepo.save((ImportTaskImpl) task);
+    }
 
-		// let's exclude 2 letter words
-		if (match.getLocationName().length() <= 2) {
-			return false;
-		}
+    private List<LocationMatch> findLocations(Publication pub)
+            throws ClassCastException, ClassNotFoundException, IOException {
+        List<LocationMatch> inValidMatches = new ArrayList<>();
+        for (ParagraphImpl para : pub.getBodyText()) {
+            if (para.getLocationMatches() == null) {
+                para.setLocationMatches(new ArrayList<>());
+            }
+            String[] tokens = tokenize(para.getText());
+            Span nameSpans[] = nameFinder.find(tokens);
 
-		if (m.find()) {
-			// length of match
-			int matchLength = m.group().length();
-			// if the match is as long as rest of string, we assume it's not a location
-			if (matchLength >= match.getLocationName().length() - matchLength) {
-				return false;
-			}
-		}
+            for (Span span : nameSpans) {
+                LocationMatch match = createMatch(span, para, tokens);
+                if (match != null) {
+                    if (isValid(match)) {
+                        para.getLocationMatches().add(match);
+                    } else {
+                        inValidMatches.add(match);
+                    }
+                }
+            }
+            nameFinder.clearAdaptiveData();
+        }
+        return inValidMatches;
+    }
 
-		Pattern pattern2 = Pattern.compile("[A-Z]*[0-9,\\.\\-\\(\\)/]+[A-Z]*");
-		Matcher m2 = pattern2.matcher(match.getLocationName());
-		if (m2.matches()) {
-			return false;
-		}
+    private boolean isValid(LocationMatch match) {
+        if (match.getLocationName().isEmpty()) {
+            return false;
+        }
 
-		// exclude things like "A,T,M", "A/Anhui/1/2005"
-		Pattern p3 = Pattern.compile("[\\S]*[0-9/\\+,]+[\\S]*");
-		Matcher m3 = p3.matcher(match.getLocationName());
-		if (m3.matches()) {
-			return false;
-		}
+        // we do want only numbers
+        Pattern pattern = Pattern.compile("[0-9,\\.\\-\\:&\\W]+");
+        Matcher m = pattern.matcher(match.getLocationName());
+        if (m.matches()) {
+            return false;
+        }
 
-		// exclude things like ADP-ribose or ADPrs
-		Pattern p4 = Pattern.compile("[A-Z0-9\\+\\?]{2,}\\-+[a-z]{2,}");
-		Matcher m4 = p4.matcher(match.getLocationName());
-		if (m4.matches()) {
-			return false;
-		}
+        // let's exclude 2 letter words
+        if (match.getLocationName().length() <= 2) {
+            return false;
+        }
 
-		if (match.getLocationName().startsWith("Appendix") || match.getLocationName().startsWith("A-")) {
-			return false;
-		}
+        if (m.find()) {
+            // length of match
+            int matchLength = m.group().length();
+            // if the match is as long as rest of string, we assume it's not a location
+            if (matchLength >= match.getLocationName().length() - matchLength) {
+                return false;
+            }
+        }
 
-		// exclude names with multiple /
-		Pattern p5 = Pattern.compile("\\/");
-		Matcher m5 = p5.matcher(match.getLocationName());
-		int count = 0;
-		while (m5.find()) {
-			count++;
-		}
-		if (count > 1) {
-			return false;
-		}
-		
-//		if (match.getLocationName().equals("Wien") || match.getLocationName().equals("Zurich")) {
-//			System.out.println("test");
-//		}
+        Pattern pattern2 = Pattern.compile("[A-Z]*[0-9,\\.\\-\\(\\)/]+[A-Z]*");
+        Matcher m2 = pattern2.matcher(match.getLocationName());
+        if (m2.matches()) {
+            return false;
+        }
 
-		List<Wikientry> entries = searchElasticInTitle(match);
+        // exclude things like "A,T,M", "A/Anhui/1/2005"
+        Pattern p3 = Pattern.compile("[\\S]*[0-9/\\+,]+[\\S]*");
+        Matcher m3 = p3.matcher(match.getLocationName());
+        if (m3.matches()) {
+            return false;
+        }
 
-		if (entries.size() == 0) {
-			return false;
-		}
-		
-	    if (entries.size() > 0) {
-	    	List<String> placeIndicators = Arrays.asList("republic", "land", "state", "countr", "place", "cit", "park", "region", "continent",
-					"district", "metro", "town", "captial", "village", "settlement", "university");
-			
-	    	boolean isPlace = false;
-			// if one of the first x results seems to be a place, we assume it's one
-			for (Wikientry entry : entries) {
-				if (entry.getComplete_text().trim().toLowerCase().startsWith("#redirect") ) {
-					Wikientry redirectEntry = followRedirect(entry);
-					if (redirectEntry != null) {
-						entry = redirectEntry;
-					}
-				}
-				
-				isPlace = isPlace || entry.getCategories().stream()
-						.anyMatch(c -> placeIndicators.stream().anyMatch(p -> c.toLowerCase().contains(p)));
-			
-				if (entry.getCoordinates() != null && !entry.getCoordinates().trim().isEmpty()) {
-					isPlace = true;
-					addArticleToMatch(match, entry);
-				}
-			}
-			
-			if (!isPlace) {
-				return false;
-			}
-		}
+        // exclude things like ADP-ribose or ADPrs
+        Pattern p4 = Pattern.compile("[A-Z0-9\\+\\?]{2,}\\-+[a-z]{2,}");
+        Matcher m4 = p4.matcher(match.getLocationName());
+        if (m4.matches()) {
+            return false;
+        }
 
-		return true;
-	}
+        if (match.getLocationName().startsWith("Appendix") || match.getLocationName().startsWith("A-")) {
+            return false;
+        }
 
-	private void addArticleToMatch(LocationMatch match, Wikientry entry) {
-		if (match.getWikipediaArticles() == null) {
-			match.setWikipediaArticles(new ArrayList<>());
-		}
-		boolean exists = match.getWikipediaArticles().stream().anyMatch(a -> a.getTitle().equals(entry.getTitle()));
-			
-		if (!exists) {
-			WikipediaArticleImpl article = new WikipediaArticleImpl();
-			//article.setCompleteText(entry.getComplete_text());
-			article.setTitle(entry.getTitle());
-			article.setCoordinates(entry.getCoordinates());
-			match.getWikipediaArticles().add(article);
-		}
-	}
+        // exclude names with multiple /
+        Pattern p5 = Pattern.compile("\\/");
+        Matcher m5 = p5.matcher(match.getLocationName());
+        int count = 0;
+        while (m5.find()) {
+            count++;
+        }
+        if (count > 1) {
+            return false;
+        }
 
-	private List<Wikientry> searchElasticInTitle(LocationMatch match) {
-		PageRequest page = PageRequest.of(0, 10);
+        // if (match.getLocationName().equals("Wien") ||
+        // match.getLocationName().equals("Zurich")) {
+        // System.out.println("test");
+        // }
 
-		BoolQueryBuilder builder = QueryBuilders.boolQuery();
-		builder.must(QueryBuilders.queryStringQuery("title:" + prepareSearchTerm(match.getLocationName())));
-		NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
-		nativeSearchQueryBuilder.withQuery(builder);
-		nativeSearchQueryBuilder.withPageable(page);
-		NativeSearchQuery query = nativeSearchQueryBuilder.build();
-		List<Wikientry> entries = searchTemplate.queryForList(query, Wikientry.class);
-		return entries;
-	}
-	
-	private Wikientry followRedirect(Wikientry entry) {
-		Pattern redirectPattern = Pattern.compile("#([rR][eE][Dd][Ii][Rr][Ee][Cc][Tt]) \\[\\[(.+?)\\]\\]");
-		Matcher redirectMatcher = redirectPattern.matcher(entry.getComplete_text());
-		
-		if (redirectMatcher.find()) {
-			PageRequest redirectPage = PageRequest.of(0, 1);
-			String searchTerm = prepareSearchTerm(redirectMatcher.group(2));
+        List<Wikientry> entries = searchElasticInTitle(match);
 
-			BoolQueryBuilder redirectBuilder = QueryBuilders.boolQuery();
-			redirectBuilder.must(QueryBuilders.termQuery("title_keyword", searchTerm));
-			
-			NativeSearchQueryBuilder redirectQueryBuilder = new NativeSearchQueryBuilder();
-			redirectQueryBuilder.withQuery(redirectBuilder);
-			redirectQueryBuilder.withPageable(redirectPage);
-			NativeSearchQuery redirectQuery = redirectQueryBuilder.build();
-			List<Wikientry> redirectEntry = searchTemplate.queryForList(redirectQuery, Wikientry.class);
-			
-			if (redirectEntry.size() > 0) {
-				return redirectEntry.get(0);
-			}
-		}
-		
-		return null;
-	}
+        if (entries.size() == 0) {
+            return false;
+        }
 
-	private String prepareSearchTerm(String term) {
-		term = term.replace("/", " ").replace("(", " ").replace(")", " ");
-		term = term.replace("[", " ").replace("]", " ").replace(":", " ");
-		term = term.replace("{", " ").replace("}", " ").replace("~", " ");
-		term = term.replace("\"", "").replace("'", "").replace("^", "");
-		term = term.replace("!", "").replace("-", " ").replace(".", " ");
-		term = term.replace("_", " ");
-		term = term.replace(" OR", " ").replace(" OR ", " ");
-		term = term.replace(" AND", " ").replace(" AND ", " ");
-		return term;
-	}
+        if (entries.size() > 0) {
+            List<String> placeIndicators = Arrays.asList("republic", "land", "state", "countr", "place", "cit", "park",
+                    "region", "continent", "district", "metro", "town", "captial", "village", "settlement",
+                    "university");
 
-	@Override
-	@Async
-	public void removeUnvalid(String taskId) {
-		Optional<ImportTaskImpl> optional = taskRepo.findById(taskId);
-		if (!optional.isPresent()) {
-			return;
-			// FIXME: mark as failure
-		}
+            boolean isPlace = false;
+            // if one of the first x results seems to be a place, we assume it's one
+            for (Wikientry entry : entries) {
+                if (entry.getComplete_text().trim().toLowerCase().startsWith("#redirect")) {
+                    Wikientry redirectEntry = followRedirect(entry);
+                    if (redirectEntry != null) {
+                        entry = redirectEntry;
+                    }
+                }
 
-		ImportTask task = optional.get();
-		task.setStatus(TaskStatus.PROCESSING);
+                isPlace = isPlace || entry.getCategories().stream()
+                        .anyMatch(c -> placeIndicators.stream().anyMatch(p -> c.toLowerCase().contains(p)));
 
-		File file = new File(appdataPath + File.separator + "logs" + File.separator + task.getId() + ".txt");
-		try {
-			file.createNewFile();
-		} catch (IOException e) {
-			logger.error("Could not create outfile.", e);
-			return;
-		}
+                if (entry.getCoordinates() != null && !entry.getCoordinates().trim().isEmpty()) {
+                    isPlace = true;
+                    addArticleToMatch(match, entry);
+                }
+            }
 
-		BufferedWriter writer;
-		try {
-			writer = new BufferedWriter(new FileWriter(file, true));
-		} catch (IOException e) {
-			logger.error("Could not create outfile.", e);
-			return;
-		}
-		try (CloseableIterator<PublicationImpl> docs = mongoTemplate.stream(new Query(), PublicationImpl.class)) {
-			Set<String> nonValidMatches = new HashSet<>();
-			while (docs.hasNext()) {
-				PublicationImpl pub = docs.next();
-				logger.debug("Cleaning: " + pub.getPaperId());
-				for (ParagraphImpl para : pub.getBodyText()) {
-					Iterator<LocationMatch> it = para.getLocationMatches().iterator();
-					while (it.hasNext()) {
-						LocationMatch match = it.next();
-						if (nonValidMatches.contains(match.getLocationName()) || !isValid(match)) {
-							try {
-								nonValidMatches.add(match.getLocationName());
-								writer.newLine();
-								writer.write(match.getLocationName());
-								writer.flush();
-							} catch (IOException e) {
-								logger.error("Could not write to file.", e);
-							}
-							it.remove();
-						}
-					}
-				}
-				pubRepo.save(pub);
-			}
-		}
+            if (!isPlace) {
+                return false;
+            }
+        }
 
-		try {
-			writer.close();
-		} catch (IOException e) {
-			logger.error("Could not close file.", e);
-		}
+        return true;
+    }
 
-		task.setStatus(TaskStatus.DONE);
-		task.setDateEnded(OffsetDateTime.now());
-		taskRepo.save((ImportTaskImpl) task);
-	}
+    private void addArticleToMatch(LocationMatch match, Wikientry entry) {
+        if (match.getWikipediaArticles() == null) {
+            match.setWikipediaArticles(new ArrayList<>());
+        }
+        boolean exists = match.getWikipediaArticles().stream().anyMatch(a -> a.getTitle().equals(entry.getTitle()));
 
-	private LocationMatch createMatch(Span span, ParagraphImpl para, String[] tokens) {
-		StringBuilder sb = new StringBuilder();
-		for (int i = span.getStart(); i <= span.getEnd(); i++) {
-			if (tokens.length > i) {
-				String location = tokens[i];
-				Pattern pattern = Pattern.compile("[0-9,\\.\\-\\:&\\W]+");
-				Matcher m = pattern.matcher(location);
+        if (!exists) {
+            WikipediaArticleImpl article = new WikipediaArticleImpl();
+            // article.setCompleteText(entry.getComplete_text());
+            article.setTitle(entry.getTitle());
+            article.setCoordinates(entry.getCoordinates());
+            match.getWikipediaArticles().add(article);
+        }
+    }
 
-				Pattern pattern2 = Pattern.compile("[^A-Z].*");
-				Matcher m2 = pattern2.matcher(location);
-				if (!m.matches() && !m2.matches()) {
-					sb.append(" ");
-					sb.append(location);
-				}
-			}
-		}
-		if (sb.toString().trim().isEmpty()) {
-			return null;
-		}
+    private List<Wikientry> searchElasticInTitle(LocationMatch match) {
+        PageRequest page = PageRequest.of(0, 10);
 
-		LocationMatch match = new LocationMatchImpl();
-		match.setId(new ObjectId());
-		match.setStart(span.getStart());
-		match.setType(span.getType());
-		match.setSection(para.getSection());
-		match.setLocationName(sb.toString().trim());
-		match.setEnd(match.getStart() + match.getLocationName().length());
+        BoolQueryBuilder builder = QueryBuilders.boolQuery();
+        builder.must(QueryBuilders.queryStringQuery("title:" + prepareSearchTerm(match.getLocationName())));
+        NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
+        nativeSearchQueryBuilder.withQuery(builder);
+        nativeSearchQueryBuilder.withPageable(page);
+        NativeSearchQuery query = nativeSearchQueryBuilder.build();
+        List<Wikientry> entries = searchTemplate.queryForList(query, Wikientry.class);
+        return entries;
+    }
 
-		return match;
-	}
+    private Wikientry followRedirect(Wikientry entry) {
+        Pattern redirectPattern = Pattern.compile("#([rR][eE][Dd][Ii][Rr][Ee][Cc][Tt]) \\[\\[(.+?)\\]\\]");
+        Matcher redirectMatcher = redirectPattern.matcher(entry.getComplete_text());
 
-	public String[] tokenize(String sentence) throws IOException {
-		File r = new File(appdataPath + modelsFolderName + File.separator + "en-token.bin");
-		TokenizerModel tokenModel = new TokenizerModel(new FileInputStream(r));
+        if (redirectMatcher.find()) {
+            PageRequest redirectPage = PageRequest.of(0, 1);
+            String searchTerm = prepareSearchTerm(redirectMatcher.group(2));
 
-		TokenizerME tokenizer = new TokenizerME(tokenModel);
-		return tokenizer.tokenize(sentence);
-	}
+            BoolQueryBuilder redirectBuilder = QueryBuilders.boolQuery();
+            redirectBuilder.must(QueryBuilders.termQuery("title_keyword", searchTerm));
+
+            NativeSearchQueryBuilder redirectQueryBuilder = new NativeSearchQueryBuilder();
+            redirectQueryBuilder.withQuery(redirectBuilder);
+            redirectQueryBuilder.withPageable(redirectPage);
+            NativeSearchQuery redirectQuery = redirectQueryBuilder.build();
+            List<Wikientry> redirectEntry = searchTemplate.queryForList(redirectQuery, Wikientry.class);
+
+            if (redirectEntry.size() > 0) {
+                return redirectEntry.get(0);
+            }
+        }
+
+        return null;
+    }
+
+    private String prepareSearchTerm(String term) {
+        term = term.replace("/", " ").replace("(", " ").replace(")", " ");
+        term = term.replace("[", " ").replace("]", " ").replace(":", " ");
+        term = term.replace("{", " ").replace("}", " ").replace("~", " ");
+        term = term.replace("\"", "").replace("'", "").replace("^", "");
+        term = term.replace("!", "").replace("-", " ").replace(".", " ");
+        term = term.replace("_", " ");
+        term = term.replace(" OR", " ").replace(" OR ", " ");
+        term = term.replace(" AND", " ").replace(" AND ", " ");
+        return term;
+    }
+
+    @Override
+    @Async
+    public void removeUnvalid(String taskId) {
+        Optional<ImportTaskImpl> optional = taskRepo.findById(taskId);
+        if (!optional.isPresent()) {
+            return;
+            // FIXME: mark as failure
+        }
+
+        ImportTask task = optional.get();
+        task.setStatus(TaskStatus.PROCESSING);
+
+        File file = new File(appdataPath + File.separator + "logs" + File.separator + task.getId() + ".txt");
+        try {
+            file.createNewFile();
+        } catch (IOException e) {
+            logger.error("Could not create outfile.", e);
+            return;
+        }
+
+        BufferedWriter writer;
+        try {
+            writer = new BufferedWriter(new FileWriter(file, true));
+        } catch (IOException e) {
+            logger.error("Could not create outfile.", e);
+            return;
+        }
+        try (CloseableIterator<PublicationImpl> docs = mongoTemplate.stream(new Query(), PublicationImpl.class)) {
+            Set<String> nonValidMatches = new HashSet<>();
+            while (docs.hasNext()) {
+                PublicationImpl pub = docs.next();
+                logger.debug("Cleaning: " + pub.getPaperId());
+                for (ParagraphImpl para : pub.getBodyText()) {
+                    Iterator<LocationMatch> it = para.getLocationMatches().iterator();
+                    while (it.hasNext()) {
+                        LocationMatch match = it.next();
+                        if (nonValidMatches.contains(match.getLocationName()) || !isValid(match)) {
+                            try {
+                                nonValidMatches.add(match.getLocationName());
+                                writer.newLine();
+                                writer.write(match.getLocationName());
+                                writer.flush();
+                            } catch (IOException e) {
+                                logger.error("Could not write to file.", e);
+                            }
+                            it.remove();
+                        }
+                    }
+                }
+                pubRepo.save(pub);
+            }
+        }
+
+        try {
+            writer.close();
+        } catch (IOException e) {
+            logger.error("Could not close file.", e);
+        }
+
+        task.setStatus(TaskStatus.DONE);
+        task.setDateEnded(OffsetDateTime.now());
+        taskRepo.save((ImportTaskImpl) task);
+    }
+
+    private LocationMatch createMatch(Span span, ParagraphImpl para, String[] tokens) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = span.getStart(); i <= span.getEnd(); i++) {
+            if (tokens.length > i) {
+                String location = tokens[i];
+                Pattern pattern = Pattern.compile("[0-9,\\.\\-\\:&\\W]+");
+                Matcher m = pattern.matcher(location);
+
+                Pattern pattern2 = Pattern.compile("[^A-Z].*");
+                Matcher m2 = pattern2.matcher(location);
+                if (!m.matches() && !m2.matches()) {
+                    sb.append(" ");
+                    sb.append(location);
+                }
+            }
+        }
+        if (sb.toString().trim().isEmpty()) {
+            return null;
+        }
+
+        LocationMatch match = new LocationMatchImpl();
+        match.setId(new ObjectId());
+        match.setStart(span.getStart());
+        match.setType(span.getType());
+        match.setSection(para.getSection());
+        match.setLocationName(sb.toString().trim());
+        match.setEnd(match.getStart() + match.getLocationName().length());
+
+        return match;
+    }
+
+    public String[] tokenize(String sentence) throws IOException {
+        File r = new File(appdataPath + modelsFolderName + File.separator + "en-token.bin");
+        TokenizerModel tokenModel = new TokenizerModel(new FileInputStream(r));
+
+        TokenizerME tokenizer = new TokenizerME(tokenModel);
+        return tokenizer.tokenize(sentence);
+    }
 }

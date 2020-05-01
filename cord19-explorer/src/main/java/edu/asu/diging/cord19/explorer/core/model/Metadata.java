@@ -11,18 +11,15 @@ import edu.asu.diging.cord19.explorer.core.model.impl.ParagraphImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.PersonImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.RefEntryImpl;
 
-@JsonTypeInfo(
-	    use = JsonTypeInfo.Id.NAME,
-	    defaultImpl=MetadataImpl.class)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, defaultImpl = MetadataImpl.class)
 public interface Metadata {
 
-	String getTitle();
+    String getTitle();
 
-	void setTitle(String title);
+    void setTitle(String title);
 
-	List<PersonImpl> getAuthors();
+    List<PersonImpl> getAuthors();
 
-	void setAuthors(List<PersonImpl> authors);
-
+    void setAuthors(List<PersonImpl> authors);
 
 }

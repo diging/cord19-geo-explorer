@@ -6,24 +6,24 @@ import edu.asu.diging.cord19.explorer.core.model.task.impl.TaskStatus;
 
 public interface ImportTask {
 
-	String getId();
+    String getId();
 
-	void setId(String id);
+    void setId(String id);
 
-	long getProcessed();
+    long getProcessed();
 
-	void setProcessed(long processed);
+    void setProcessed(long processed);
 
-	OffsetDateTime getDateStarted();
+    OffsetDateTime getDateStarted();
 
-	void setDateStarted(OffsetDateTime dateStarted);
+    void setDateStarted(OffsetDateTime dateStarted);
 
-	OffsetDateTime getDateEnded();
+    OffsetDateTime getDateEnded();
 
-	void setDateEnded(OffsetDateTime dateEnded);
+    void setDateEnded(OffsetDateTime dateEnded);
 
-	void setStatus(TaskStatus status);
+    void setStatus(TaskStatus status);
 
-	TaskStatus getStatus();
+    TaskStatus getStatus();
 
 }

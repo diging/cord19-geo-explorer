@@ -8,45 +8,43 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import edu.asu.diging.cord19.explorer.core.model.impl.BibEntryImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.PersonImpl;
 
-@JsonTypeInfo(
-	    use = JsonTypeInfo.Id.NAME,
-	    defaultImpl=BibEntryImpl.class)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, defaultImpl = BibEntryImpl.class)
 public interface BibEntry {
 
-	String getRefId();
+    String getRefId();
 
-	void setRefId(String refId);
+    void setRefId(String refId);
 
-	String getTitle();
+    String getTitle();
 
-	void setTitle(String title);
+    void setTitle(String title);
 
-	List<PersonImpl> getAuthors();
+    List<PersonImpl> getAuthors();
 
-	void setAuthors(List<PersonImpl> authors);
+    void setAuthors(List<PersonImpl> authors);
 
-	int getYear();
+    int getYear();
 
-	void setYear(int year);
+    void setYear(int year);
 
-	String getVenue();
+    String getVenue();
 
-	void setVenue(String venue);
+    void setVenue(String venue);
 
-	String getVolume();
+    String getVolume();
 
-	void setVolume(String volume);
+    void setVolume(String volume);
 
-	String getIssn();
+    String getIssn();
 
-	void setIssn(String issn);
+    void setIssn(String issn);
 
-	String getPages();
+    String getPages();
 
-	void setPages(String pages);
+    void setPages(String pages);
 
-	Map<String, List<String>> getOtherIds();
+    Map<String, List<String>> getOtherIds();
 
-	void setOtherIds(Map<String, List<String>> otherIds);
+    void setOtherIds(Map<String, List<String>> otherIds);
 
 }

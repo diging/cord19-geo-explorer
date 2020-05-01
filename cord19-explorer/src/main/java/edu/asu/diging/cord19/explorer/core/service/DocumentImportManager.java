@@ -4,12 +4,12 @@ import java.io.IOException;
 
 public interface DocumentImportManager {
 
-	String startImport(String path) throws IOException;
+    String startImport(String path) throws IOException;
 
-	String startYearExtraction();
+    String startYearExtraction();
 
-	String startLocationExtraction() throws ClassCastException, ClassNotFoundException, IOException;
+    String startLocationExtraction() throws ClassCastException, ClassNotFoundException, IOException;
 
-	String startLocationMatchCleaning();
+    String startLocationMatchCleaning();
 
 }

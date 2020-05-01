@@ -9,36 +9,36 @@ import edu.asu.diging.cord19.explorer.core.model.impl.WikipediaArticleImpl;
 
 public interface LocationMatch {
 
-	String getLocationName();
+    String getLocationName();
 
-	void setLocationName(String locationName);
+    void setLocationName(String locationName);
 
-	int getStart();
+    int getStart();
 
-	void setStart(int start);
+    void setStart(int start);
 
-	int getEnd();
+    int getEnd();
 
-	void setEnd(int end);
+    void setEnd(int end);
 
-	double getProbability();
+    double getProbability();
 
-	void setProbability(double probability);
+    void setProbability(double probability);
 
-	String getType();
+    String getType();
 
-	void setType(String type);
+    void setType(String type);
 
-	void setSection(String section);
+    void setSection(String section);
 
-	String getSection();
+    String getSection();
 
-	void setId(ObjectId id);
+    void setId(ObjectId id);
 
-	ObjectId getId();
+    ObjectId getId();
 
-	void setWikipediaArticles(List<WikipediaArticleImpl> wikipediaArticles);
+    void setWikipediaArticles(List<WikipediaArticleImpl> wikipediaArticles);
 
-	List<WikipediaArticleImpl> getWikipediaArticles();
+    List<WikipediaArticleImpl> getWikipediaArticles();
 
 }

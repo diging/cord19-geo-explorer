@@ -6,33 +6,31 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import edu.asu.diging.cord19.explorer.core.model.impl.AffiliationImpl;
 
-@JsonTypeInfo(
-	    use = JsonTypeInfo.Id.NAME,
-	    defaultImpl=AffiliationImpl.class)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, defaultImpl = AffiliationImpl.class)
 public interface Affiliation {
 
-	String getLaboratory();
+    String getLaboratory();
 
-	void setLaboratory(String laboratory);
+    void setLaboratory(String laboratory);
 
-	String getInstitution();
+    String getInstitution();
 
-	void setInstitution(String institution);
+    void setInstitution(String institution);
 
-	String getLocationSettlement();
+    String getLocationSettlement();
 
-	void setLocationSettlement(String locationSettlement);
+    void setLocationSettlement(String locationSettlement);
 
-	String getLocationRegion();
+    String getLocationRegion();
 
-	void setLocationRegion(String locationRegion);
+    void setLocationRegion(String locationRegion);
 
-	String getLocationCountry();
+    String getLocationCountry();
 
-	void setLocationCountry(String locationCountry);
+    void setLocationCountry(String locationCountry);
 
-	Map<String, Object> getOther();
+    Map<String, Object> getOther();
 
-	void setOther(Map<String, Object> other);
+    void setOther(Map<String, Object> other);
 
 }

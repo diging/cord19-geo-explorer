@@ -24,33 +24,33 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
 @PropertySource({ "classpath:config.properties", "${appConfigFile:classpath:}/app.properties" })
 public class ElasticConfig extends ElasticsearchConfigurationSupport {
 
-	@Value("${elasticsearch.indexName}")
-	private String indexName;
-	
-	@Bean
-	public String indexName() {
-		return indexName;
-	}
-	
-	@Bean
-	public Client elasticsearchClient() throws UnknownHostException {
-		Settings settings = Settings.builder().put("cluster.name", "elasticsearch").build();
-		TransportClient client = new PreBuiltTransportClient(settings);
-		client.addTransportAddress(new TransportAddress(InetAddress.getByName("127.0.0.1"), 9300));
-		return client;
-	}
+    @Value("${elasticsearch.indexName}")
+    private String indexName;
 
-	@Bean(name = { "elasticsearchOperations", "elasticsearchTemplate" })
-	public ElasticsearchTemplate elasticsearchTemplate() throws UnknownHostException {
-		return new ElasticsearchTemplate(elasticsearchClient(), entityMapper());
-	}
+    @Bean
+    public String indexName() {
+        return indexName;
+    }
 
-	@Bean
-	@Override
-	public EntityMapper entityMapper() {
-		ElasticsearchEntityMapper entityMapper = new ElasticsearchEntityMapper(elasticsearchMappingContext(),
-				new DefaultConversionService());
-		entityMapper.setConversions(elasticsearchCustomConversions());
-		return entityMapper;
-	}
+    @Bean
+    public Client elasticsearchClient() throws UnknownHostException {
+        Settings settings = Settings.builder().put("cluster.name", "elasticsearch").build();
+        TransportClient client = new PreBuiltTransportClient(settings);
+        client.addTransportAddress(new TransportAddress(InetAddress.getByName("127.0.0.1"), 9300));
+        return client;
+    }
+
+    @Bean(name = { "elasticsearchOperations", "elasticsearchTemplate" })
+    public ElasticsearchTemplate elasticsearchTemplate() throws UnknownHostException {
+        return new ElasticsearchTemplate(elasticsearchClient(), entityMapper());
+    }
+
+    @Bean
+    @Override
+    public EntityMapper entityMapper() {
+        ElasticsearchEntityMapper entityMapper = new ElasticsearchEntityMapper(elasticsearchMappingContext(),
+                new DefaultConversionService());
+        entityMapper.setConversions(elasticsearchCustomConversions());
+        return entityMapper;
+    }
 }

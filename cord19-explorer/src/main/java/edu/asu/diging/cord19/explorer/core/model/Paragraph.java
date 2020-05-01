@@ -7,32 +7,30 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import edu.asu.diging.cord19.explorer.core.model.impl.ParagraphImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.SpanImpl;
 
-@JsonTypeInfo(
-	    use = JsonTypeInfo.Id.NAME,
-	    defaultImpl=ParagraphImpl.class)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, defaultImpl = ParagraphImpl.class)
 public interface Paragraph {
 
-	String getText();
+    String getText();
 
-	void setText(String text);
+    void setText(String text);
 
-	List<SpanImpl> getCiteSpans();
+    List<SpanImpl> getCiteSpans();
 
-	void setCiteSpans(List<SpanImpl> citeSpans);
+    void setCiteSpans(List<SpanImpl> citeSpans);
 
-	List<SpanImpl> getRefSpans();
+    List<SpanImpl> getRefSpans();
 
-	void setRefSpans(List<SpanImpl> refSpans);
+    void setRefSpans(List<SpanImpl> refSpans);
 
-	List<SpanImpl> getEqSpans();
+    List<SpanImpl> getEqSpans();
 
-	void setEqSpans(List<SpanImpl> eqSpans);
+    void setEqSpans(List<SpanImpl> eqSpans);
 
-	String getSection();
+    String getSection();
 
-	void setSection(String section);
+    void setSection(String section);
 
-	void setLocationMatches(List<LocationMatch> locationMatches);
+    void setLocationMatches(List<LocationMatch> locationMatches);
 
-	List<LocationMatch> getLocationMatches();
+    List<LocationMatch> getLocationMatches();
 }

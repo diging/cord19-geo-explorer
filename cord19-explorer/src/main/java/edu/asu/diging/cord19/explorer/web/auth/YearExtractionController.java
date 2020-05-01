@@ -10,19 +10,19 @@ import edu.asu.diging.cord19.explorer.core.service.DocumentImportManager;
 @Controller
 public class YearExtractionController {
 
-	@Autowired
-	private DocumentImportManager importManager;
+    @Autowired
+    private DocumentImportManager importManager;
 
-	@RequestMapping(value = "/auth/extract/years", method=RequestMethod.GET)
-	public String show() {
-		
-		return "auth/extractYears";
-	}
-	
-	@RequestMapping(value = "/auth/extract/years", method=RequestMethod.POST)
-	public String start() {
-		importManager.startYearExtraction();
-		
-		return "redirect:/";
-	}
+    @RequestMapping(value = "/auth/extract/years", method = RequestMethod.GET)
+    public String show() {
+
+        return "auth/extractYears";
+    }
+
+    @RequestMapping(value = "/auth/extract/years", method = RequestMethod.POST)
+    public String start() {
+        importManager.startYearExtraction();
+
+        return "redirect:/";
+    }
 }

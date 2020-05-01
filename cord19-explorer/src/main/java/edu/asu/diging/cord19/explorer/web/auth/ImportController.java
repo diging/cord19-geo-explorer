@@ -12,21 +12,21 @@ import edu.asu.diging.cord19.explorer.core.service.DocumentImportManager;
 
 @Controller
 public class ImportController {
-	
-	@Autowired
-	private DocumentImportManager importManager;
 
-	@RequestMapping(value = "/auth/import", method=RequestMethod.GET)
-	public String show() {
-		
-		return "auth/import";
-	}
-	
-	@RequestMapping(value = "/auth/import", method=RequestMethod.POST)
-	public String startImport(@RequestParam("rootFolder") String rootFolder) throws IOException {
-		importManager.startImport(rootFolder);
-		
-		return "auth/importStarted";
-	}
-	
+    @Autowired
+    private DocumentImportManager importManager;
+
+    @RequestMapping(value = "/auth/import", method = RequestMethod.GET)
+    public String show() {
+
+        return "auth/import";
+    }
+
+    @RequestMapping(value = "/auth/import", method = RequestMethod.POST)
+    public String startImport(@RequestParam("rootFolder") String rootFolder) throws IOException {
+        importManager.startImport(rootFolder);
+
+        return "auth/importStarted";
+    }
+
 }

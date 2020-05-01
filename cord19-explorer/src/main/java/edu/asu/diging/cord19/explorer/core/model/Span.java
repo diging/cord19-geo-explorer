@@ -4,29 +4,27 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import edu.asu.diging.cord19.explorer.core.model.impl.SpanImpl;
 
-@JsonTypeInfo(
-	    use = JsonTypeInfo.Id.NAME,
-	    defaultImpl=SpanImpl.class)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, defaultImpl = SpanImpl.class)
 public interface Span {
 
-	int getStart();
+    int getStart();
 
-	void setStart(int start);
+    void setStart(int start);
 
-	int getEnd();
+    int getEnd();
 
-	void setEnd(int end);
+    void setEnd(int end);
 
-	String getText();
+    String getText();
 
-	void setText(String text);
+    void setText(String text);
 
-	String getRefId();
+    String getRefId();
 
-	void setRefId(String refId);
+    void setRefId(String refId);
 
-	void setMention(String mention);
+    void setMention(String mention);
 
-	String getMention();
+    String getMention();
 
 }

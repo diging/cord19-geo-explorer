@@ -15,19 +15,19 @@ import edu.asu.diging.cord19.explorer.core.mongo.PublicationRepository;
 @Controller
 public class LocationController {
 
-	@Autowired
-	private PublicationRepository pubRepo;
+    @Autowired
+    private PublicationRepository pubRepo;
 
-	@RequestMapping("/location/{location}")
-	public String findPublications(@PathVariable("location") String location, Model model) {
-		List<PublicationImpl> pubs = pubRepo.findByBodyTextLocationMatchesLocationName(location);
-		for (PublicationImpl pub : pubs) {
-			pub.setBodyText(pub.getBodyText().stream()
-					.filter(p -> p.getLocationMatches().stream().anyMatch(m -> m.getLocationName().equals(location)))
-					.collect(Collectors.toList()));
-		}
-		model.addAttribute("publications", pubs);
-		model.addAttribute("location", location);
-		return "location";
-	}
+    @RequestMapping("/location/{location}")
+    public String findPublications(@PathVariable("location") String location, Model model) {
+        List<PublicationImpl> pubs = pubRepo.findByBodyTextLocationMatchesLocationName(location);
+        for (PublicationImpl pub : pubs) {
+            pub.setBodyText(pub.getBodyText().stream()
+                    .filter(p -> p.getLocationMatches().stream().anyMatch(m -> m.getLocationName().equals(location)))
+                    .collect(Collectors.toList()));
+        }
+        model.addAttribute("publications", pubs);
+        model.addAttribute("location", location);
+        return "location";
+    }
 }

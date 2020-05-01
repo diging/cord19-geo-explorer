@@ -14,20 +14,20 @@ import org.hibernate.type.LongType;
 import org.hibernate.type.Type;
 
 public class IdGenerator extends SequenceStyleGenerator implements IdentifierGenerator, Configurable {
-	
-	private String prefix;
-	private String numberFormat;
 
-	@Override
-	public void configure(Type type, Properties properties, ServiceRegistry sr) throws MappingException {
-		super.configure(LongType.INSTANCE, properties, sr);
-		prefix = properties.getProperty("prefix");
+    private String prefix;
+    private String numberFormat;
+
+    @Override
+    public void configure(Type type, Properties properties, ServiceRegistry sr) throws MappingException {
+        super.configure(LongType.INSTANCE, properties, sr);
+        prefix = properties.getProperty("prefix");
         numberFormat = "%d";
-	}
+    }
 
-	@Override
-	public Serializable generate(SharedSessionContractImplementor session, Object obj) throws HibernateException {
-	    return prefix + String.format(numberFormat, super.generate(session, obj));
-	}
+    @Override
+    public Serializable generate(SharedSessionContractImplementor session, Object obj) throws HibernateException {
+        return prefix + String.format(numberFormat, super.generate(session, obj));
+    }
 
 }

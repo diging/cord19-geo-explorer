@@ -12,19 +12,19 @@ import edu.asu.diging.cord19.explorer.core.service.DocumentImportManager;
 @Controller
 public class LocationExtractionController {
 
-	@Autowired
-	private DocumentImportManager importManager;
+    @Autowired
+    private DocumentImportManager importManager;
 
-	@RequestMapping(value = "/auth/extract/locations", method=RequestMethod.GET)
-	public String show() {
-		
-		return "auth/extractLocations";
-	}
-	
-	@RequestMapping(value = "/auth/extract/locations", method=RequestMethod.POST)
-	public String start() throws ClassCastException, ClassNotFoundException, IOException {
-		importManager.startLocationMatchCleaning();
-		
-		return "redirect:/";
-	}
+    @RequestMapping(value = "/auth/extract/locations", method = RequestMethod.GET)
+    public String show() {
+
+        return "auth/extractLocations";
+    }
+
+    @RequestMapping(value = "/auth/extract/locations", method = RequestMethod.POST)
+    public String start() throws ClassCastException, ClassNotFoundException, IOException {
+        importManager.startLocationMatchCleaning();
+
+        return "redirect:/";
+    }
 }

@@ -4,10 +4,20 @@ import java.util.List;
 
 public interface PublicationDao {
 
-	List<String> getCountries();
+    List<String> getCountries();
 
-	List<Integer> getYears();
+    List<Integer> getYears();
 
-	List<String> getCountriesInText();
+    List<String> getCountriesInText();
+
+    long getAffiliationCount();
+
+    long getPublicationCount();
+
+    long getYearCount();
+
+    List<String> getJournals();
+
+    long getJournalCount();
 
 }

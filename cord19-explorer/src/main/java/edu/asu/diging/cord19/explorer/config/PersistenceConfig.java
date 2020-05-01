@@ -1,4 +1,5 @@
 package edu.asu.diging.cord19.explorer.config;
+
 import java.util.Properties;
 
 import javax.persistence.EntityManagerFactory;
@@ -24,7 +25,8 @@ import com.zaxxer.hikari.HikariDataSource;
 @Configuration
 @PropertySource("classpath:config.properties")
 @EnableTransactionManagement
-@EnableJpaRepositories(basePackages = { "edu.asu.diging.cord19.explorer.core.data", "edu.asu.diging.simpleusers.core.data" })
+@EnableJpaRepositories(basePackages = { "edu.asu.diging.cord19.explorer.core.data",
+        "edu.asu.diging.simpleusers.core.data" })
 public class PersistenceConfig {
 
     @Autowired
@@ -45,7 +47,8 @@ public class PersistenceConfig {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(dataSource());
-        em.setPackagesToScan(new String[] { "edu.asu.diging.cord19.explorer.core.model","edu.asu.diging.simpleusers.core.model" });
+        em.setPackagesToScan(
+                new String[] { "edu.asu.diging.cord19.explorer.core.model", "edu.asu.diging.simpleusers.core.model" });
 
         JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);

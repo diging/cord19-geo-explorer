@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import com.mongodb.client.DistinctIterable;
@@ -18,46 +18,88 @@ import edu.asu.diging.cord19.explorer.core.mongo.PublicationDao;
 @Service
 public class PublicationDaoImpl implements PublicationDao {
 
-	@Autowired
-	private MongoTemplate mongoTemplate;
+    @Autowired
+    private MongoTemplate mongoTemplate;
 
-	/* (non-Javadoc)
-	 * @see edu.asu.diging.cord19.explorer.core.mongo.impl.PublicationDao#getCountries()
-	 */
-	@Override
-	public List<String> getCountries() {
-		String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
-		DistinctIterable<String> output = mongoTemplate.getCollection(collection).distinct("metadata.authors.affiliation.locationCountry", String.class);
-		List<String> results = new ArrayList<>();
-		MongoCursor<String> it = output.iterator();
-		while (it.hasNext()) {
-			results.add(it.next());
-		}
-		return results;
-	}
-	
-	@Override
-	public List<Integer> getYears() {
-		String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
-		DistinctIterable<Integer> output = mongoTemplate.getCollection(collection).distinct("publishYear", Integer.class);
-		List<Integer> results = new ArrayList<>();
-		MongoCursor<Integer> it = output.iterator();
-		while (it.hasNext()) {
-			results.add(it.next());
-		}
-		return results;
-	}
-	
-	@Override
-	public List<String> getCountriesInText() {
-		String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
-		DistinctIterable<String> output = mongoTemplate.getCollection(collection).distinct("bodyText.locationMatches.locationName", String.class);
-		List<String> results = new ArrayList<>();
-		MongoCursor<String> it = output.iterator();
-		while (it.hasNext()) {
-			results.add(it.next());
-		}
-		return results;
-	}
-	
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * edu.asu.diging.cord19.explorer.core.mongo.impl.PublicationDao#getCountries()
+     */
+    @Override
+    public List<String> getCountries() {
+        String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
+        DistinctIterable<String> output = mongoTemplate.getCollection(collection)
+                .distinct("metadata.authors.affiliation.locationCountry", String.class);
+        List<String> results = new ArrayList<>();
+        MongoCursor<String> it = output.iterator();
+        while (it.hasNext()) {
+            results.add(it.next());
+        }
+        return results;
+    }
+
+    @Override
+    public long getPublicationCount() {
+        String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
+        return mongoTemplate.getCollection(collection).countDocuments();
+    }
+
+    @Override
+    public long getAffiliationCount() {
+        Query query = new Query(Criteria.where("metadata.authors.affiliation.locationCountry").ne(null));
+        return mongoTemplate.count(query, PublicationImpl.class);
+    }
+
+    @Override
+    public long getYearCount() {
+        Query query = new Query(Criteria.where("publishYear").ne(0));
+        return mongoTemplate.count(query, PublicationImpl.class);
+    }
+
+    @Override
+    public long getJournalCount() {
+        Query query = new Query(Criteria.where("journal").ne(null));
+        return mongoTemplate.count(query, PublicationImpl.class);
+    }
+
+    @Override
+    public List<Integer> getYears() {
+        String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
+        DistinctIterable<Integer> output = mongoTemplate.getCollection(collection).distinct("publishYear",
+                Integer.class);
+        List<Integer> results = new ArrayList<>();
+        MongoCursor<Integer> it = output.iterator();
+        while (it.hasNext()) {
+            results.add(it.next());
+        }
+        return results;
+    }
+
+    @Override
+    public List<String> getJournals() {
+        String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
+        DistinctIterable<String> output = mongoTemplate.getCollection(collection).distinct("journal", String.class);
+        List<String> results = new ArrayList<>();
+        MongoCursor<String> it = output.iterator();
+        while (it.hasNext()) {
+            results.add(it.next());
+        }
+        return results;
+    }
+
+    @Override
+    public List<String> getCountriesInText() {
+        String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
+        DistinctIterable<String> output = mongoTemplate.getCollection(collection)
+                .distinct("bodyText.locationMatches.locationName", String.class);
+        List<String> results = new ArrayList<>();
+        MongoCursor<String> it = output.iterator();
+        while (it.hasNext()) {
+            results.add(it.next());
+        }
+        return results;
+    }
+
 }

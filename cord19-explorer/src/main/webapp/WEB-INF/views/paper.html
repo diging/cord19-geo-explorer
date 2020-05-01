@@ -24,7 +24,7 @@
 	      $(function() {
 	      	[# th:each="match : ${para.locationMatches}" ]
 	      	[# th:if="${match != null}" ]
-	      	$("#[(${#ids.next('para')})]").mark("[(${match.locationName})]")	
+	      	$("#[(${#ids.next('para')})]").mark("[(${match.locationName})]", { "separateWordSearch": false})	
 	      	[/]
 	      	[/]
 	      });

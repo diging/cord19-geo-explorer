@@ -20,7 +20,7 @@
    	<div class="row">
    		<div th:each="pub : ${publications}">
    		  
-		    <b>[[${pub.metadata.title}]]</b>
+		    <b><a th:href="@{'/paper/' + ${pub.paperId}}">[[${pub.metadata.title}]]</a></b>
 		    <ul>
 		      <li th:each="para : ${pub.bodyText}">
 		      	<i th:text="*{para.section != ''} ? *{para.section}: 'No Section title'"></i>

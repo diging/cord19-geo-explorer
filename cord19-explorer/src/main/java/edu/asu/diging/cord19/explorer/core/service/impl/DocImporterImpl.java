@@ -370,11 +370,6 @@ public class DocImporterImpl implements DocImporter {
             return false;
         }
 
-        // if (match.getLocationName().equals("Wien") ||
-        // match.getLocationName().equals("Zurich")) {
-        // System.out.println("test");
-        // }
-
         List<Wikientry> entries = searchElasticInTitle(match);
 
         if (entries.size() == 0) {

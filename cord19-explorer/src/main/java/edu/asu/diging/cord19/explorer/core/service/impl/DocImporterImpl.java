@@ -14,9 +14,11 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -119,12 +121,28 @@ public class DocImporterImpl implements DocImporter {
 
 		ImportTask task = optional.get();
 		task.setStatus(TaskStatus.PROCESSING);
+		
+		File file = new File(appdataPath + File.separator + "logs" + File.separator + task.getId() + ".txt");
+		try {
+			file.createNewFile();
+		} catch (IOException e) {
+			logger.error("Could not create outfile.", e);
+			return;
+		}
+		
+		BufferedWriter writer;
+		try {
+			writer = new BufferedWriter(new FileWriter(file, true));
+		} catch (IOException e) {
+			logger.error("Could not create outfile.", e);
+			return;
+		}
 
 		try (Stream<Path> paths = Files.walk(Paths.get(rootFolder))) {
 			paths.forEach(p -> {
 				if (Files.isRegularFile(p, LinkOption.NOFOLLOW_LINKS) && !p.getFileName().startsWith(".")) {
 					try {
-						storeFile(p.toFile(), task);
+						storeFile(p.toFile(), task, writer);
 					} catch (JsonParseException e) {
 						logger.error("Could not store file " + p.getFileName(), e);
 					} catch (JsonMappingException e) {
@@ -139,6 +157,8 @@ public class DocImporterImpl implements DocImporter {
 				}
 			});
 		}
+		
+		writer.close();
 
 		File metadataFile = new File(rootFolder + File.separator + metadataFilename);
 		CsvToBean<MetadataEntry> bean = new CsvToBeanBuilder(new FileReader(metadataFile)).withType(MetadataEntry.class)
@@ -180,14 +200,19 @@ public class DocImporterImpl implements DocImporter {
 		taskRepo.save((ImportTaskImpl) task);
 	}
 
-	private void storeFile(File f, ImportTask task)
+	private void storeFile(File f, ImportTask task, BufferedWriter writer)
 			throws JsonParseException, JsonMappingException, IOException, ClassCastException, ClassNotFoundException {
 		if (!f.getName().endsWith(".json")) {
 			return;
 		}
 		ObjectMapper mapper = new ObjectMapper();
 		PublicationImpl publication = mapper.readValue(f, PublicationImpl.class);
-		findLocations(publication);
+		List<LocationMatch> invalidMatches = findLocations(publication);
+		for (LocationMatch match : invalidMatches) {
+			writer.newLine();
+			writer.write(match.getLocationName());
+			writer.flush();
+		}
 		pubRepo.save(publication);
 		task.setProcessed(task.getProcessed() + 1);
 		logger.debug("Stored: " + publication.getPaperId());
@@ -259,7 +284,8 @@ public class DocImporterImpl implements DocImporter {
 		taskRepo.save((ImportTaskImpl) task);
 	}
 
-	private void findLocations(Publication pub) throws ClassCastException, ClassNotFoundException, IOException {
+	private List<LocationMatch> findLocations(Publication pub) throws ClassCastException, ClassNotFoundException, IOException {
+		List<LocationMatch> inValidMatches = new ArrayList<>();
 		for (ParagraphImpl para : pub.getBodyText()) {
 			if (para.getLocationMatches() == null) {
 				para.setLocationMatches(new ArrayList<>());
@@ -269,12 +295,17 @@ public class DocImporterImpl implements DocImporter {
 
 			for (Span span : nameSpans) {
 				LocationMatch match = createMatch(span, para, tokens);
-				if (match != null && isValid(match)) {
-					para.getLocationMatches().add(match);
+				if (match != null) {
+					if (isValid(match)) {
+						para.getLocationMatches().add(match);
+					} else {
+						inValidMatches.add(match);
+					}
 				}
 			}
 			nameFinder.clearAdaptiveData();
 		}
+		return inValidMatches;
 	}
 
 	private boolean isValid(LocationMatch match) {
@@ -337,69 +368,37 @@ public class DocImporterImpl implements DocImporter {
 		if (count > 1) {
 			return false;
 		}
+		
+//		if (match.getLocationName().equals("Wien") || match.getLocationName().equals("Zurich")) {
+//			System.out.println("test");
+//		}
 
-		PageRequest page = PageRequest.of(0, 10);
+		List<Wikientry> entries = searchElasticInTitle(match);
 
-		BoolQueryBuilder builder = QueryBuilders.boolQuery();
-		builder.must(QueryBuilders.queryStringQuery("title:" + prepareSearchTerm(match.getLocationName())));
-		NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
-		nativeSearchQueryBuilder.withQuery(builder);
-		nativeSearchQueryBuilder.withPageable(page);
-		NativeSearchQuery query = nativeSearchQueryBuilder.build();
-		List<Wikientry> entries = searchTemplate.queryForList(query, Wikientry.class);
-
-		List<String> placeIndicators = Arrays.asList("republic", "land", "state", "countr", "place", "cit", "park", "region", "continent",
-				"district", "metro", "town", "captial");
 		if (entries.size() == 0) {
 			return false;
 		}
 		
 	    if (entries.size() > 0) {
-			boolean isPlace = false;
+	    	List<String> placeIndicators = Arrays.asList("republic", "land", "state", "countr", "place", "cit", "park", "region", "continent",
+					"district", "metro", "town", "captial", "village", "settlement", "university");
+			
+	    	boolean isPlace = false;
 			// if one of the first x results seems to be a place, we assume it's one
 			for (Wikientry entry : entries) {
 				if (entry.getComplete_text().trim().toLowerCase().startsWith("#redirect") ) {
-					Pattern redirectPattern = Pattern.compile("#(redirect|REDIRECT) \\[\\[(.+?)\\]\\]");
-					Matcher redirectMatcher = redirectPattern.matcher(entry.getComplete_text());
-					
-					if (redirectMatcher.find()) {
-						PageRequest redirectPage = PageRequest.of(0, 1);
-						String searchTerm = prepareSearchTerm(redirectMatcher.group(2));
-
-						BoolQueryBuilder redirectBuilder = QueryBuilders.boolQuery();
-						redirectBuilder.must(QueryBuilders.termQuery("title_keyword", searchTerm));
-						
-						NativeSearchQueryBuilder redirectQueryBuilder = new NativeSearchQueryBuilder();
-						redirectQueryBuilder.withQuery(redirectBuilder);
-						redirectQueryBuilder.withPageable(redirectPage);
-						NativeSearchQuery redirectQuery = redirectQueryBuilder.build();
-						List<Wikientry> redirectEntry = searchTemplate.queryForList(redirectQuery, Wikientry.class);
-						
-						if (redirectEntry.size() > 0) {
-							entry = redirectEntry.get(0);
-						}
+					Wikientry redirectEntry = followRedirect(entry);
+					if (redirectEntry != null) {
+						entry = redirectEntry;
 					}
-					
-
 				}
+				
 				isPlace = isPlace || entry.getCategories().stream()
 						.anyMatch(c -> placeIndicators.stream().anyMatch(p -> c.toLowerCase().contains(p)));
 			
 				if (entry.getCoordinates() != null && !entry.getCoordinates().trim().isEmpty()) {
-					final Wikientry finalEntry = entry;
 					isPlace = true;
-					if (match.getWikipediaArticles() == null) {
-						match.setWikipediaArticles(new ArrayList<>());
-					}
-					boolean exists = match.getWikipediaArticles().stream().anyMatch(a -> a.getTitle().equals(finalEntry.getTitle()));
-						
-					if (!exists) {
-						WikipediaArticleImpl article = new WikipediaArticleImpl();
-						//article.setCompleteText(entry.getComplete_text());
-						article.setTitle(entry.getTitle());
-						article.setCoordinates(entry.getCoordinates());
-						match.getWikipediaArticles().add(article);
-					}
+					addArticleToMatch(match, entry);
 				}
 			}
 			
@@ -409,6 +408,59 @@ public class DocImporterImpl implements DocImporter {
 		}
 
 		return true;
+	}
+
+	private void addArticleToMatch(LocationMatch match, Wikientry entry) {
+		if (match.getWikipediaArticles() == null) {
+			match.setWikipediaArticles(new ArrayList<>());
+		}
+		boolean exists = match.getWikipediaArticles().stream().anyMatch(a -> a.getTitle().equals(entry.getTitle()));
+			
+		if (!exists) {
+			WikipediaArticleImpl article = new WikipediaArticleImpl();
+			//article.setCompleteText(entry.getComplete_text());
+			article.setTitle(entry.getTitle());
+			article.setCoordinates(entry.getCoordinates());
+			match.getWikipediaArticles().add(article);
+		}
+	}
+
+	private List<Wikientry> searchElasticInTitle(LocationMatch match) {
+		PageRequest page = PageRequest.of(0, 10);
+
+		BoolQueryBuilder builder = QueryBuilders.boolQuery();
+		builder.must(QueryBuilders.queryStringQuery("title:" + prepareSearchTerm(match.getLocationName())));
+		NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
+		nativeSearchQueryBuilder.withQuery(builder);
+		nativeSearchQueryBuilder.withPageable(page);
+		NativeSearchQuery query = nativeSearchQueryBuilder.build();
+		List<Wikientry> entries = searchTemplate.queryForList(query, Wikientry.class);
+		return entries;
+	}
+	
+	private Wikientry followRedirect(Wikientry entry) {
+		Pattern redirectPattern = Pattern.compile("#([rR][eE][Dd][Ii][Rr][Ee][Cc][Tt]) \\[\\[(.+?)\\]\\]");
+		Matcher redirectMatcher = redirectPattern.matcher(entry.getComplete_text());
+		
+		if (redirectMatcher.find()) {
+			PageRequest redirectPage = PageRequest.of(0, 1);
+			String searchTerm = prepareSearchTerm(redirectMatcher.group(2));
+
+			BoolQueryBuilder redirectBuilder = QueryBuilders.boolQuery();
+			redirectBuilder.must(QueryBuilders.termQuery("title_keyword", searchTerm));
+			
+			NativeSearchQueryBuilder redirectQueryBuilder = new NativeSearchQueryBuilder();
+			redirectQueryBuilder.withQuery(redirectBuilder);
+			redirectQueryBuilder.withPageable(redirectPage);
+			NativeSearchQuery redirectQuery = redirectQueryBuilder.build();
+			List<Wikientry> redirectEntry = searchTemplate.queryForList(redirectQuery, Wikientry.class);
+			
+			if (redirectEntry.size() > 0) {
+				return redirectEntry.get(0);
+			}
+		}
+		
+		return null;
 	}
 
 	private String prepareSearchTerm(String term) {
@@ -451,6 +503,7 @@ public class DocImporterImpl implements DocImporter {
 			return;
 		}
 		try (CloseableIterator<PublicationImpl> docs = mongoTemplate.stream(new Query(), PublicationImpl.class)) {
+			Set<String> nonValidMatches = new HashSet<>();
 			while (docs.hasNext()) {
 				PublicationImpl pub = docs.next();
 				logger.debug("Cleaning: " + pub.getPaperId());
@@ -458,8 +511,9 @@ public class DocImporterImpl implements DocImporter {
 					Iterator<LocationMatch> it = para.getLocationMatches().iterator();
 					while (it.hasNext()) {
 						LocationMatch match = it.next();
-						if (!isValid(match)) {
+						if (nonValidMatches.contains(match.getLocationName()) || !isValid(match)) {
 							try {
+								nonValidMatches.add(match.getLocationName());
 								writer.newLine();
 								writer.write(match.getLocationName());
 								writer.flush();

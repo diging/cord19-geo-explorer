@@ -31,7 +31,7 @@ public class PublicationDaoImpl implements PublicationDao {
     public List<String> getCountries() {
         String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
         DistinctIterable<String> output = mongoTemplate.getCollection(collection)
-                .distinct("metadata.authors.affiliation.locationCountry", String.class);
+                .distinct("metadata.authors.affiliation.institution", String.class);
         List<String> results = new ArrayList<>();
         MongoCursor<String> it = output.iterator();
         while (it.hasNext()) {
@@ -48,7 +48,7 @@ public class PublicationDaoImpl implements PublicationDao {
 
     @Override
     public long getAffiliationCount() {
-        Query query = new Query(Criteria.where("metadata.authors.affiliation.locationCountry").ne(null));
+        Query query = new Query(Criteria.where("metadata.authors.affiliation.institution").ne(null));
         return mongoTemplate.count(query, PublicationImpl.class);
     }
 

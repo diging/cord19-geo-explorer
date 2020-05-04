@@ -1,10 +1,12 @@
 package edu.asu.diging.cord19.explorer.core.model;
 
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import edu.asu.diging.cord19.explorer.core.model.impl.AffiliationImpl;
+import edu.asu.diging.cord19.explorer.core.model.impl.WikipediaArticleImpl;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, defaultImpl = AffiliationImpl.class)
 public interface Affiliation {
@@ -32,5 +34,9 @@ public interface Affiliation {
     Map<String, Object> getOther();
 
     void setOther(Map<String, Object> other);
+
+    void setWikiarticles(List<WikipediaArticleImpl> wikiarticles);
+
+    List<WikipediaArticleImpl> getWikiarticles();
 
 }

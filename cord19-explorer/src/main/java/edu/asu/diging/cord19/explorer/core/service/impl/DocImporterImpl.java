@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -33,11 +34,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.util.CloseableIterator;
 import org.springframework.scheduling.annotation.Async;
@@ -50,12 +53,14 @@ import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 
 import edu.asu.diging.cord19.explorer.core.data.TaskRepository;
-import edu.asu.diging.cord19.explorer.core.elastic.data.WikipediaSearchRepository;
 import edu.asu.diging.cord19.explorer.core.elastic.model.impl.Wikientry;
+import edu.asu.diging.cord19.explorer.core.model.Affiliation;
 import edu.asu.diging.cord19.explorer.core.model.LocationMatch;
 import edu.asu.diging.cord19.explorer.core.model.Publication;
+import edu.asu.diging.cord19.explorer.core.model.impl.AffiliationImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.LocationMatchImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.ParagraphImpl;
+import edu.asu.diging.cord19.explorer.core.model.impl.PersonImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.WikipediaArticleImpl;
 import edu.asu.diging.cord19.explorer.core.model.task.ImportTask;
@@ -70,7 +75,7 @@ import opennlp.tools.tokenize.TokenizerModel;
 import opennlp.tools.util.Span;
 
 @Component
-@PropertySource({ "classpath:config.properties", "${appConfigFile:classpath:}/app.properties" })
+@PropertySource({ "classpath:config.properties", "${appConfigFile:classpath:}/app.properties", "classpath:/states.txt" })
 public class DocImporterImpl implements DocImporter {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -83,15 +88,15 @@ public class DocImporterImpl implements DocImporter {
 
     @Value("${models.folder.name}")
     private String modelsFolderName;
+    
+    @Autowired
+    private Environment env;
 
     @Autowired
     private TaskRepository taskRepo;
 
     @Autowired
     private PublicationRepository pubRepo;
-
-    @Autowired
-    private WikipediaSearchRepository searchRepo;
 
     @Autowired
     private ElasticsearchTemplate searchTemplate;
@@ -213,9 +218,74 @@ public class DocImporterImpl implements DocImporter {
             writer.write(match.getLocationName());
             writer.flush();
         }
+        processAffiliation(publication);
         pubRepo.save(publication);
         task.setProcessed(task.getProcessed() + 1);
         logger.debug("Stored: " + publication.getPaperId());
+    }
+    
+    @Override
+    @Async
+    public void cleanAffiliations(String taskId) {
+        Optional<ImportTaskImpl> optional = taskRepo.findById(taskId);
+        if (!optional.isPresent()) {
+            return;
+            // FIXME: mark as failure
+        }
+
+        ImportTask task = optional.get();
+        task.setStatus(TaskStatus.PROCESSING);
+
+        Query query = new Query(Criteria.where("metadata.authors.affiliation").exists(true).and("metadata.authors.affiliation.wikiarticles").exists(false));
+        try (CloseableIterator<PublicationImpl> docs = mongoTemplate.stream(query.noCursorTimeout(), PublicationImpl.class)) {
+            while (docs.hasNext()) {
+                PublicationImpl pub = docs.next();
+                logger.info("Cleaning affiliations for: " + pub.getPaperId());
+                processAffiliation(pub);
+                pubRepo.save(pub);
+            }
+        }
+
+        task.setStatus(TaskStatus.DONE);
+        task.setDateEnded(OffsetDateTime.now());
+        taskRepo.save((ImportTaskImpl) task);
+    }
+    
+    private void processAffiliation(Publication pub) {
+        if (pub.getMetadata() == null || pub.getMetadata().getAuthors() == null) {
+            return;
+        } 
+        for (PersonImpl author : pub.getMetadata().getAuthors()) {
+            if (author.getAffiliation() == null) {
+                continue;
+            }
+            
+            Affiliation affiliation = author.getAffiliation();
+            affiliation.setWikiarticles(new ArrayList<>());
+            List<Wikientry> wikientries = null;
+            if (affiliation.getInstitution() != null && !affiliation.getInstitution().trim().isEmpty()) {
+                wikientries = searchElasticInTitle(affiliation.getInstitution());
+                findWikiarticles(affiliation, wikientries, this::addArticleToAffiliation);
+            }
+            String locationRegion = affiliation.getLocationRegion();
+            String country = affiliation.getLocationCountry();
+            if (locationRegion != null && locationRegion.length() == 2) {
+                if (country != null && (country.trim().equals("USA") || country.contains("United States") || country.trim().equals("US"))) {
+                    String state = env.getProperty(locationRegion);
+                    if (state != null && !state.trim().isEmpty()) {
+                        locationRegion = state;
+                    }
+                }
+            }
+            if (affiliation.getLocationRegion() != null && !affiliation.getLocationRegion().trim().isEmpty()) {
+                wikientries = searchElasticInTitle(locationRegion);
+                findWikiarticles(affiliation, wikientries, this::addArticleToAffiliation);
+            }
+            if (affiliation.getLocationCountry() != null && !affiliation.getLocationCountry().trim().isEmpty()) {
+                wikientries = searchElasticInTitle(affiliation.getLocationCountry());
+                findWikiarticles(affiliation, wikientries, this::addArticleToAffiliation);
+            }
+        }
     }
 
     @Override
@@ -370,35 +440,14 @@ public class DocImporterImpl implements DocImporter {
             return false;
         }
 
-        List<Wikientry> entries = searchElasticInTitle(match);
+        List<Wikientry> entries = searchElasticInTitle(match.getLocationName());
 
         if (entries.size() == 0) {
             return false;
         }
 
         if (entries.size() > 0) {
-            List<String> placeIndicators = Arrays.asList("republic", "land", "state", "countr", "place", "cit", "park",
-                    "region", "continent", "district", "metro", "town", "captial", "village", "settlement",
-                    "university");
-
-            boolean isPlace = false;
-            // if one of the first x results seems to be a place, we assume it's one
-            for (Wikientry entry : entries) {
-                if (entry.getComplete_text().trim().toLowerCase().startsWith("#redirect")) {
-                    Wikientry redirectEntry = followRedirect(entry);
-                    if (redirectEntry != null) {
-                        entry = redirectEntry;
-                    }
-                }
-
-                isPlace = isPlace || entry.getCategories().stream()
-                        .anyMatch(c -> placeIndicators.stream().anyMatch(p -> c.toLowerCase().contains(p)));
-
-                if (entry.getCoordinates() != null && !entry.getCoordinates().trim().isEmpty()) {
-                    isPlace = true;
-                    addArticleToMatch(match, entry);
-                }
-            }
+            boolean isPlace = findWikiarticles(match, entries, this::addArticleToMatch);
 
             if (!isPlace) {
                 return false;
@@ -408,7 +457,34 @@ public class DocImporterImpl implements DocImporter {
         return true;
     }
 
-    private void addArticleToMatch(LocationMatch match, Wikientry entry) {
+    private boolean findWikiarticles(Object match, List<Wikientry> entries, BiConsumer<Object, Wikientry> attachMethod) {
+        List<String> placeIndicators = Arrays.asList("republic", "land", "state", "countr", "place", "cit", "park",
+                "region", "continent", "district", "metro", "town", "captial", "village", "settlement",
+                "university");
+
+        boolean isPlace = false;
+        // if one of the first x results seems to be a place, we assume it's one
+        for (Wikientry entry : entries) {
+            if (entry.getComplete_text().trim().toLowerCase().startsWith("#redirect")) {
+                Wikientry redirectEntry = followRedirect(entry);
+                if (redirectEntry != null) {
+                    entry = redirectEntry;
+                }
+            }
+
+            isPlace = isPlace || entry.getCategories().stream()
+                    .anyMatch(c -> placeIndicators.stream().anyMatch(p -> c.toLowerCase().contains(p)));
+
+            if (entry.getCoordinates() != null && !entry.getCoordinates().trim().isEmpty()) {
+                isPlace = true;
+                attachMethod.accept(match, entry);
+            }
+        }
+        return isPlace;
+    }
+
+    private void addArticleToMatch(Object matchObject, Wikientry entry) {
+        LocationMatch match = (LocationMatch) matchObject;
         if (match.getWikipediaArticles() == null) {
             match.setWikipediaArticles(new ArrayList<>());
         }
@@ -422,12 +498,29 @@ public class DocImporterImpl implements DocImporter {
             match.getWikipediaArticles().add(article);
         }
     }
+    
+    private void addArticleToAffiliation(Object affiliationObject, Wikientry entry) {
+        Affiliation affiliation = (AffiliationImpl) affiliationObject;
+        boolean exists = affiliation.getWikiarticles().stream().anyMatch(a -> a.getTitle().equals(entry.getTitle()));
 
-    private List<Wikientry> searchElasticInTitle(LocationMatch match) {
+        if (!exists) {
+            WikipediaArticleImpl article = new WikipediaArticleImpl();
+            // article.setCompleteText(entry.getComplete_text());
+            article.setTitle(entry.getTitle());
+            article.setCoordinates(entry.getCoordinates());
+            affiliation.getWikiarticles().add(article);
+        }
+    }
+
+    private List<Wikientry> searchElasticInTitle(String location) {
         PageRequest page = PageRequest.of(0, 10);
 
         BoolQueryBuilder builder = QueryBuilders.boolQuery();
-        builder.must(QueryBuilders.queryStringQuery("title:" + prepareSearchTerm(match.getLocationName())));
+        String searchTerm = prepareSearchTerm(location);
+        if (searchTerm.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+        builder.must(QueryBuilders.queryStringQuery("title:" + searchTerm));
         NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
         nativeSearchQueryBuilder.withQuery(builder);
         nativeSearchQueryBuilder.withPageable(page);
@@ -443,6 +536,10 @@ public class DocImporterImpl implements DocImporter {
         if (redirectMatcher.find()) {
             PageRequest redirectPage = PageRequest.of(0, 1);
             String searchTerm = prepareSearchTerm(redirectMatcher.group(2));
+            
+            if (searchTerm.trim().isEmpty()) {
+                return null;
+            }
 
             BoolQueryBuilder redirectBuilder = QueryBuilders.boolQuery();
             redirectBuilder.must(QueryBuilders.termQuery("title_keyword", searchTerm));
@@ -470,6 +567,11 @@ public class DocImporterImpl implements DocImporter {
         term = term.replace("_", " ");
         term = term.replace(" OR", " ").replace(" OR ", " ");
         term = term.replace(" AND", " ").replace(" AND ", " ");
+        
+        // FIXME: check against US states
+        if (term.trim().equals("OR") || term.trim().equals("AND")) {
+            return "";
+        }
         return term;
     }
 

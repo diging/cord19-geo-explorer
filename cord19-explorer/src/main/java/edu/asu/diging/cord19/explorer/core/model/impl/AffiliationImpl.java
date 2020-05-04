@@ -1,6 +1,7 @@
 package edu.asu.diging.cord19.explorer.core.model.impl;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -16,6 +17,8 @@ public class AffiliationImpl implements Affiliation {
     private String locationRegion;
     private String locationCountry;
     private Map<String, Object> other;
+    
+    private List<WikipediaArticleImpl> wikiarticles;
 
     @JsonProperty("location")
     private void unpackLocation(Map<String, Object> location) {
@@ -168,6 +171,16 @@ public class AffiliationImpl implements Affiliation {
     @Override
     public void setOther(Map<String, Object> other) {
         this.other = other;
+    }
+
+    @Override
+    public List<WikipediaArticleImpl> getWikiarticles() {
+        return wikiarticles;
+    }
+
+    @Override
+    public void setWikiarticles(List<WikipediaArticleImpl> wikiarticles) {
+        this.wikiarticles = wikiarticles;
     }
 
 }

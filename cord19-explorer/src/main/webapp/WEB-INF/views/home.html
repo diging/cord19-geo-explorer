@@ -9,7 +9,7 @@
    		<div class="col-md-3">
    		<h4>Countries in affiliation field (total [[${affiliationCount}]])</h4>
    		 <div th:each="country : ${countries}">
-	      [[${country}]]
+	      <a th:href="@{'/affiliation?name=' + ${#uris.escapeQueryParam(country)}}">[[${country}]]</a>
 	      </div>
    		</div>
    		<div class="col-md-3">

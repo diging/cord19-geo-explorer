@@ -2,8 +2,7 @@ package edu.asu.diging.cord19.explorer.core.model.impl;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
+import edu.asu.diging.cord19.explorer.core.model.Affiliation;
 import edu.asu.diging.cord19.explorer.core.model.Person;
 
 public class PersonImpl implements Person {
@@ -108,7 +107,7 @@ public class PersonImpl implements Person {
      * @see edu.asu.diging.cord19.explorer.core.model.impl.Person#getAffiliation()
      */
     @Override
-    public AffiliationImpl getAffiliation() {
+    public Affiliation getAffiliation() {
         return affiliation;
     }
 
@@ -120,8 +119,8 @@ public class PersonImpl implements Person {
      * util.List)
      */
     @Override
-    public void setAffiliation(AffiliationImpl affiliation) {
-        this.affiliation = affiliation;
+    public void setAffiliation(Affiliation affiliation) {
+        this.affiliation = (AffiliationImpl)affiliation;
     }
 
     /*

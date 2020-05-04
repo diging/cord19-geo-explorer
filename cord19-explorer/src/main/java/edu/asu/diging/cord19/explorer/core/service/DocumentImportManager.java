@@ -12,4 +12,6 @@ public interface DocumentImportManager {
 
     String startLocationMatchCleaning();
 
+    String startAffiliationCleaning();
+
 }

@@ -1,0 +1,29 @@
+<html layout:decorate="~{layouts/main}">
+  <head>
+    <title>CORD19 Geo Explorer</title>
+  </head>
+  <body>
+   <div layout:fragment="content">
+  
+   <h3>[[${institution}]]</h3>
+   	<div class="row">
+   		<div th:each="pub : ${publications}">
+   		  <b>[[${pub.metadata.title}]]</b><br>
+   		  <ul>
+   		  <li th:each="author : ${pub.metadata.authors}">
+   		  [[${author.affiliation.institution}]], [[${author.affiliation.locationSettlement}]], [[${author.affiliation.locationRegion}]], [[${author.affiliation.locationCountry}]]
+   		  <br>
+   		  <ul>
+   		  	<li th:each="wiki : ${author.affiliation?.wikiarticles}">
+   		  	[[${wiki.title}]]
+   		  	</li>
+   		  </ul>
+   		  </li>
+   		  </ul>
+		    
+	    </div>
+   	</div>
+     
+   </div>
+  </body>
+</html>

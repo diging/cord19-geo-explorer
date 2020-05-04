@@ -10,4 +10,6 @@ public interface PublicationDao {
 
 	List<String> getCountriesInText();
 
+    String getCollection();
+
 }

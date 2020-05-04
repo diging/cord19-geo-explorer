@@ -60,4 +60,11 @@ public class PublicationDaoImpl implements PublicationDao {
 		return results;
 	}
 	
+	@Override
+    public String getCollection() {
+        String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
+        
+        return collection;
+    }
+	
 }

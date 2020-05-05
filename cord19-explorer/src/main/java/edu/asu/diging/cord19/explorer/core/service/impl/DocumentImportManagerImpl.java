@@ -78,13 +78,13 @@ public class DocumentImportManagerImpl implements DocumentImportManager {
     }
     
     @Override
-    public String startAffiliationCleaning() {
+    public String startAffiliationCleaning(boolean reprocess) {
         ImportTaskImpl task = new ImportTaskImpl();
         task.setDateStarted(OffsetDateTime.now());
         task.setProcessed(0);
         task = taskRepo.save(task);
 
-        importer.cleanAffiliations(task.getId());
+        importer.cleanAffiliations(task.getId(), reprocess);
 
         return task.getId();
     }

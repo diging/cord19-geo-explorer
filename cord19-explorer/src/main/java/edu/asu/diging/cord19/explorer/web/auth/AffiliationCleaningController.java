@@ -23,7 +23,7 @@ public class AffiliationCleaningController {
 
     @RequestMapping(value = "/auth/extract/affiliations", method = RequestMethod.POST)
     public String start() throws ClassCastException, ClassNotFoundException, IOException {
-        importManager.startAffiliationCleaning();
+        importManager.startAffiliationCleaning(true);
 
         return "redirect:/";
     }

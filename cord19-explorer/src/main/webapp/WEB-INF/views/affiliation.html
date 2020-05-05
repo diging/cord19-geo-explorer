@@ -8,7 +8,7 @@
    <h3>[[${institution}]]</h3>
    	<div class="row">
    		<div th:each="pub : ${publications}">
-   		  <b>[[${pub.metadata.title}]]</b><br>
+   		  <b><a th:href="@{'/paper/' + ${pub.paperId}}">[[${pub.metadata.title}]]</a></b><br>
    		  <ul>
    		  <li th:each="author : ${pub.metadata.authors}">
    		  [[${author.affiliation.institution}]], [[${author.affiliation.locationSettlement}]], [[${author.affiliation.locationRegion}]], [[${author.affiliation.locationCountry}]]

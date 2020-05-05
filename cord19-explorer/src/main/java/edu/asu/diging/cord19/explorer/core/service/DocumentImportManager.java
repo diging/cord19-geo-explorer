@@ -12,6 +12,6 @@ public interface DocumentImportManager {
 
     String startLocationMatchCleaning();
 
-    String startAffiliationCleaning();
+    String startAffiliationCleaning(boolean reprocess);
 
 }

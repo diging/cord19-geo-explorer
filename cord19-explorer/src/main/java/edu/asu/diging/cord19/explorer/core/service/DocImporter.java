@@ -12,6 +12,6 @@ public interface DocImporter {
 
     void removeUnvalid(String taskId);
 
-    void cleanAffiliations(String taskId);
+    void cleanAffiliations(String taskId, boolean reprocess);
 
 }

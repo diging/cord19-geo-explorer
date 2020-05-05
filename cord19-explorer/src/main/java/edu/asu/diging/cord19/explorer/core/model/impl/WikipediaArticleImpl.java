@@ -5,6 +5,7 @@ public class WikipediaArticleImpl {
     private String title;
     private String completeText;
     private String coordinates;
+    private LocationType locationType;
 
     public String getTitle() {
         return title;
@@ -28,6 +29,14 @@ public class WikipediaArticleImpl {
 
     public void setCoordinates(String coordinates) {
         this.coordinates = coordinates;
+    }
+
+    public LocationType getLocationType() {
+        return locationType;
+    }
+
+    public void setLocationType(LocationType locationType) {
+        this.locationType = locationType;
     }
 
 }

@@ -19,13 +19,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BiConsumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.logging.log4j.util.TriConsumer;
 import org.bson.types.ObjectId;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -59,6 +59,7 @@ import edu.asu.diging.cord19.explorer.core.model.LocationMatch;
 import edu.asu.diging.cord19.explorer.core.model.Publication;
 import edu.asu.diging.cord19.explorer.core.model.impl.AffiliationImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.LocationMatchImpl;
+import edu.asu.diging.cord19.explorer.core.model.impl.LocationType;
 import edu.asu.diging.cord19.explorer.core.model.impl.ParagraphImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.PersonImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
@@ -226,7 +227,7 @@ public class DocImporterImpl implements DocImporter {
     
     @Override
     @Async
-    public void cleanAffiliations(String taskId) {
+    public void cleanAffiliations(String taskId, boolean reprocess) {
         Optional<ImportTaskImpl> optional = taskRepo.findById(taskId);
         if (!optional.isPresent()) {
             return;
@@ -236,13 +237,22 @@ public class DocImporterImpl implements DocImporter {
         ImportTask task = optional.get();
         task.setStatus(TaskStatus.PROCESSING);
 
-        Query query = new Query(Criteria.where("metadata.authors.affiliation").exists(true).and("metadata.authors.affiliation.wikiarticles").exists(false));
+        Query query;
+        if (reprocess) {
+            query = new Query();
+        } else {
+            query = new Query(Criteria.where("metadata.authors.affiliation").exists(true).and("metadata.authors.affiliation.wikiarticles").exists(false));
+        }
+    
+        long total = mongoTemplate.count(query, PublicationImpl.class);
+        long counter = 1;
         try (CloseableIterator<PublicationImpl> docs = mongoTemplate.stream(query.noCursorTimeout(), PublicationImpl.class)) {
             while (docs.hasNext()) {
                 PublicationImpl pub = docs.next();
-                logger.info("Cleaning affiliations for: " + pub.getPaperId());
+                logger.info(String.format("Cleaning affiliations %d of %d for: %s", counter, total, pub.getPaperId()));
                 processAffiliation(pub);
                 pubRepo.save(pub);
+                counter++;
             }
         }
 
@@ -265,7 +275,11 @@ public class DocImporterImpl implements DocImporter {
             List<Wikientry> wikientries = null;
             if (affiliation.getInstitution() != null && !affiliation.getInstitution().trim().isEmpty()) {
                 wikientries = searchElasticInTitle(affiliation.getInstitution());
-                findWikiarticles(affiliation, wikientries, this::addArticleToAffiliation);
+                findWikiarticles(affiliation, wikientries, LocationType.INSTITUTION, this::addArticleToAffiliation);
+            }
+            if (affiliation.getLocationSettlement() != null && !affiliation.getLocationSettlement().trim().isEmpty()) {
+                wikientries = searchElasticInTitle(affiliation.getLocationSettlement());
+                findWikiarticles(affiliation, wikientries, LocationType.CITY, this::addArticleToAffiliation);
             }
             String locationRegion = affiliation.getLocationRegion();
             String country = affiliation.getLocationCountry();
@@ -279,11 +293,11 @@ public class DocImporterImpl implements DocImporter {
             }
             if (affiliation.getLocationRegion() != null && !affiliation.getLocationRegion().trim().isEmpty()) {
                 wikientries = searchElasticInTitle(locationRegion);
-                findWikiarticles(affiliation, wikientries, this::addArticleToAffiliation);
+                findWikiarticles(affiliation, wikientries, LocationType.REGION, this::addArticleToAffiliation);
             }
             if (affiliation.getLocationCountry() != null && !affiliation.getLocationCountry().trim().isEmpty()) {
                 wikientries = searchElasticInTitle(affiliation.getLocationCountry());
-                findWikiarticles(affiliation, wikientries, this::addArticleToAffiliation);
+                findWikiarticles(affiliation, wikientries, LocationType.COUNTRY, this::addArticleToAffiliation);
             }
         }
     }
@@ -447,7 +461,7 @@ public class DocImporterImpl implements DocImporter {
         }
 
         if (entries.size() > 0) {
-            boolean isPlace = findWikiarticles(match, entries, this::addArticleToMatch);
+            boolean isPlace = findWikiarticles(match, entries, LocationType.OTHER, this::addArticleToMatch);
 
             if (!isPlace) {
                 return false;
@@ -457,7 +471,7 @@ public class DocImporterImpl implements DocImporter {
         return true;
     }
 
-    private boolean findWikiarticles(Object match, List<Wikientry> entries, BiConsumer<Object, Wikientry> attachMethod) {
+    private boolean findWikiarticles(Object match, List<Wikientry> entries, LocationType type, TriConsumer<Object, Wikientry, LocationType> attachMethod) {
         List<String> placeIndicators = Arrays.asList("republic", "land", "state", "countr", "place", "cit", "park",
                 "region", "continent", "district", "metro", "town", "captial", "village", "settlement",
                 "university");
@@ -477,13 +491,13 @@ public class DocImporterImpl implements DocImporter {
 
             if (entry.getCoordinates() != null && !entry.getCoordinates().trim().isEmpty()) {
                 isPlace = true;
-                attachMethod.accept(match, entry);
+                attachMethod.accept(match, entry, type);
             }
         }
         return isPlace;
     }
 
-    private void addArticleToMatch(Object matchObject, Wikientry entry) {
+    private void addArticleToMatch(Object matchObject, Wikientry entry, LocationType type) {
         LocationMatch match = (LocationMatch) matchObject;
         if (match.getWikipediaArticles() == null) {
             match.setWikipediaArticles(new ArrayList<>());
@@ -495,11 +509,12 @@ public class DocImporterImpl implements DocImporter {
             // article.setCompleteText(entry.getComplete_text());
             article.setTitle(entry.getTitle());
             article.setCoordinates(entry.getCoordinates());
+            article.setLocationType(type);
             match.getWikipediaArticles().add(article);
         }
     }
     
-    private void addArticleToAffiliation(Object affiliationObject, Wikientry entry) {
+    private void addArticleToAffiliation(Object affiliationObject, Wikientry entry, LocationType type) {
         Affiliation affiliation = (AffiliationImpl) affiliationObject;
         boolean exists = affiliation.getWikiarticles().stream().anyMatch(a -> a.getTitle().equals(entry.getTitle()));
 
@@ -508,6 +523,7 @@ public class DocImporterImpl implements DocImporter {
             // article.setCompleteText(entry.getComplete_text());
             article.setTitle(entry.getTitle());
             article.setCoordinates(entry.getCoordinates());
+            article.setLocationType(type);
             affiliation.getWikiarticles().add(article);
         }
     }

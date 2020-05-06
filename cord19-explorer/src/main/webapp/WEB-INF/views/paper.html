@@ -11,9 +11,17 @@
 	    color: black;
 	}
    </style>
-   <h3>[[${publication.metadata.title}]]</h3>
    
+   <h3>[[${publication.metadata.title}]] <span th:if="${publication.publishYear != ''}">([[${publication.publishYear}]])</span></h3>
+   		
    	<div class="row">
+   		<div class="col-sm-12">
+   		by
+   		<span th:each="author, iterstat : ${publication.metadata.authors}">
+   		[[${author.first}]] [[${#strings.listJoin(author.middle,',')}]] [[${author.last}]]<span th:if="${not iterstat.last}">,</span>
+   		</span>
+   		</div>
+   		
    		  <div class="col-sm-12">
 		   
 	      <div th:each="section : ${sections}">

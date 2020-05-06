@@ -25,6 +25,8 @@ import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.similarity.JaroWinklerSimilarity;
 import org.apache.logging.log4j.util.TriConsumer;
 import org.bson.types.ObjectId;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -57,7 +59,6 @@ import edu.asu.diging.cord19.explorer.core.elastic.model.impl.Wikientry;
 import edu.asu.diging.cord19.explorer.core.model.Affiliation;
 import edu.asu.diging.cord19.explorer.core.model.LocationMatch;
 import edu.asu.diging.cord19.explorer.core.model.Publication;
-import edu.asu.diging.cord19.explorer.core.model.impl.AffiliationImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.LocationMatchImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.LocationType;
 import edu.asu.diging.cord19.explorer.core.model.impl.ParagraphImpl;
@@ -76,7 +77,8 @@ import opennlp.tools.tokenize.TokenizerModel;
 import opennlp.tools.util.Span;
 
 @Component
-@PropertySource({ "classpath:config.properties", "${appConfigFile:classpath:}/app.properties", "classpath:/states.txt" })
+@PropertySource({ "classpath:config.properties", "${appConfigFile:classpath:}/app.properties",
+        "classpath:/states.txt" })
 public class DocImporterImpl implements DocImporter {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -89,7 +91,7 @@ public class DocImporterImpl implements DocImporter {
 
     @Value("${models.folder.name}")
     private String modelsFolderName;
-    
+
     @Autowired
     private Environment env;
 
@@ -224,7 +226,7 @@ public class DocImporterImpl implements DocImporter {
         task.setProcessed(task.getProcessed() + 1);
         logger.debug("Stored: " + publication.getPaperId());
     }
-    
+
     @Override
     @Async
     public void cleanAffiliations(String taskId, boolean reprocess) {
@@ -241,12 +243,13 @@ public class DocImporterImpl implements DocImporter {
         if (reprocess) {
             query = new Query();
         } else {
-            query = new Query(Criteria.where("metadata.authors.affiliation").exists(true).and("metadata.authors.affiliation.wikiarticles").exists(false));
+            query = new Query(Criteria.where("metadata.authors.affiliation.selectedWikiarticle").exists(false));
         }
-    
+
         long total = mongoTemplate.count(query, PublicationImpl.class);
         long counter = 1;
-        try (CloseableIterator<PublicationImpl> docs = mongoTemplate.stream(query.noCursorTimeout(), PublicationImpl.class)) {
+        try (CloseableIterator<PublicationImpl> docs = mongoTemplate.stream(query.noCursorTimeout(),
+                PublicationImpl.class)) {
             while (docs.hasNext()) {
                 PublicationImpl pub = docs.next();
                 logger.info(String.format("Cleaning affiliations %d of %d for: %s", counter, total, pub.getPaperId()));
@@ -260,16 +263,16 @@ public class DocImporterImpl implements DocImporter {
         task.setDateEnded(OffsetDateTime.now());
         taskRepo.save((ImportTaskImpl) task);
     }
-    
+
     private void processAffiliation(Publication pub) {
         if (pub.getMetadata() == null || pub.getMetadata().getAuthors() == null) {
             return;
-        } 
+        }
         for (PersonImpl author : pub.getMetadata().getAuthors()) {
             if (author.getAffiliation() == null) {
                 continue;
             }
-            
+
             Affiliation affiliation = author.getAffiliation();
             affiliation.setWikiarticles(new ArrayList<>());
             List<Wikientry> wikientries = null;
@@ -284,7 +287,7 @@ public class DocImporterImpl implements DocImporter {
             String locationRegion = affiliation.getLocationRegion();
             String country = affiliation.getLocationCountry();
             if (locationRegion != null && locationRegion.length() == 2) {
-                if (country != null && (country.trim().equals("USA") || country.contains("United States") || country.trim().equals("US"))) {
+                if (isCountryUSA(country)) {
                     String state = env.getProperty(locationRegion);
                     if (state != null && !state.trim().isEmpty()) {
                         locationRegion = state;
@@ -299,7 +302,111 @@ public class DocImporterImpl implements DocImporter {
                 wikientries = searchElasticInTitle(affiliation.getLocationCountry());
                 findWikiarticles(affiliation, wikientries, LocationType.COUNTRY, this::addArticleToAffiliation);
             }
+            
+            selectArticle(affiliation);
         }
+    }
+
+    private void selectArticle(Affiliation affiliation) {
+        for (WikipediaArticleImpl article : affiliation.getWikiarticles()) {
+            String articleTitle = article.getTitle();
+            // if the institution is exactly the same, we assume it's the right article
+            if (affiliation.getInstitution() != null && articleTitle.equals(affiliation.getInstitution())) {
+                affiliation.setSelectedWikiarticle(article);
+                article.setSelectedOn(OffsetDateTime.now().toString());
+                return;
+            }
+
+            // e.g. Worcester, Massachusetts
+            String city = affiliation.getLocationSettlement();
+            String state = getState(affiliation.getLocationRegion(), affiliation.getLocationCountry());
+            if (!StringUtils.isBlank(city) && !StringUtils.isBlank(state)
+                    && article.getLocationType().equals(LocationType.CITY)) {
+                if (consistsOfTwoPlaces(articleTitle, city, state)) {
+                    affiliation.setSelectedWikiarticle(article);
+                    article.setSelectedOn(OffsetDateTime.now().toString());
+                    return;
+                }
+            }
+
+            // e.g. Panama City, Panama
+            String country = getCountry(affiliation.getLocationCountry());
+            if (!StringUtils.isBlank(city) && !StringUtils.isBlank(country)) {
+                if (consistsOfTwoPlaces(articleTitle, city, country)) {
+                    affiliation.setSelectedWikiarticle(article);
+                    article.setSelectedOn(OffsetDateTime.now().toString());
+                    return;
+                }
+            }
+
+            // city or state equals article title
+            if ((!StringUtils.isBlank(city) && articleTitle.equals(city.trim()))
+                    || (!StringUtils.isBlank(state) && articleTitle.equals(state.trim()))) {
+                affiliation.setSelectedWikiarticle(article);
+                article.setSelectedOn(OffsetDateTime.now().toString());
+                return;
+            }
+            
+            if (!StringUtils.isBlank(affiliation.getInstitution())) {
+                JaroWinklerSimilarity sim = new JaroWinklerSimilarity();
+                Double similarity = sim.apply(articleTitle, affiliation.getInstitution());
+                if (similarity > 0.8) {
+                    affiliation.setSelectedWikiarticle(article);
+                    article.setSelectedOn(OffsetDateTime.now().toString());
+                    return; 
+                }
+            }
+
+            if (!StringUtils.isBlank(country) && articleTitle.equals(country.trim())) {
+                affiliation.setSelectedWikiarticle(article);
+                article.setSelectedOn(OffsetDateTime.now().toString());
+                return;
+            }
+        }
+    }
+
+    private boolean consistsOfTwoPlaces(String title, String place1, String place2) {
+        if (title.contains(place1.trim()) && title.contains(place2.trim())
+                && title.length() >= (place1.trim().length() + place2.trim().length() + 1)
+                && title.length() <= (place1.trim().length() + place2.trim().length() + 5)) {
+            return true;
+        }
+        return false;
+    }
+
+    private String getState(String state, String country) {
+        if (state != null && state.trim().length() == 2 && isCountryUSA(country)) {
+            String stateName = env.getProperty(state);
+            if (!StringUtils.isBlank(stateName)) {
+                return stateName.trim();
+            }
+        }
+        return state;
+    }
+    
+    private String getCountry(String country) {
+        if (StringUtils.isBlank(country)) {
+            return "";
+        }
+        
+        switch (country.trim()) {
+        case "US":
+            return "United States";
+        case "USA":
+            return "United States";
+        case "UK":
+            return "United Kingdom";
+        }
+        
+        return country;
+    }
+
+    private boolean isCountryUSA(String country) {
+        if (country != null && (country.equals("USA") || country.equals("United States") || country.equals("US")
+                || country.equals("United States of America"))) {
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -471,10 +578,10 @@ public class DocImporterImpl implements DocImporter {
         return true;
     }
 
-    private boolean findWikiarticles(Object match, List<Wikientry> entries, LocationType type, TriConsumer<Object, Wikientry, LocationType> attachMethod) {
+    private boolean findWikiarticles(Object match, List<Wikientry> entries, LocationType type,
+            TriConsumer<Object, Wikientry, LocationType> attachMethod) {
         List<String> placeIndicators = Arrays.asList("republic", "land", "state", "countr", "place", "cit", "park",
-                "region", "continent", "district", "metro", "town", "captial", "village", "settlement",
-                "university");
+                "region", "continent", "district", "metro", "town", "captial", "village", "settlement", "university");
 
         boolean isPlace = false;
         // if one of the first x results seems to be a place, we assume it's one
@@ -513,9 +620,9 @@ public class DocImporterImpl implements DocImporter {
             match.getWikipediaArticles().add(article);
         }
     }
-    
+
     private void addArticleToAffiliation(Object affiliationObject, Wikientry entry, LocationType type) {
-        Affiliation affiliation = (AffiliationImpl) affiliationObject;
+        Affiliation affiliation = (Affiliation) affiliationObject;
         boolean exists = affiliation.getWikiarticles().stream().anyMatch(a -> a.getTitle().equals(entry.getTitle()));
 
         if (!exists) {
@@ -552,7 +659,7 @@ public class DocImporterImpl implements DocImporter {
         if (redirectMatcher.find()) {
             PageRequest redirectPage = PageRequest.of(0, 1);
             String searchTerm = prepareSearchTerm(redirectMatcher.group(2));
-            
+
             if (searchTerm.trim().isEmpty()) {
                 return null;
             }
@@ -583,7 +690,7 @@ public class DocImporterImpl implements DocImporter {
         term = term.replace("_", " ");
         term = term.replace(" OR", " ").replace(" OR ", " ");
         term = term.replace(" AND", " ").replace(" AND ", " ");
-        
+
         // FIXME: check against US states
         if (term.trim().equals("OR") || term.trim().equals("AND")) {
             return "";

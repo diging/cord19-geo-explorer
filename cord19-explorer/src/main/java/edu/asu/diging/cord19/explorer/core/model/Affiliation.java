@@ -39,4 +39,8 @@ public interface Affiliation {
 
     List<WikipediaArticleImpl> getWikiarticles();
 
+    void setSelectedWikiarticle(WikipediaArticleImpl selectedWikiarticle);
+
+    WikipediaArticleImpl getSelectedWikiarticle();
+
 }

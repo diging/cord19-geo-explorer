@@ -19,6 +19,7 @@ public class AffiliationImpl implements Affiliation {
     private Map<String, Object> other;
     
     private List<WikipediaArticleImpl> wikiarticles;
+    private WikipediaArticleImpl selectedWikiarticle;
 
     @JsonProperty("location")
     private void unpackLocation(Map<String, Object> location) {
@@ -181,6 +182,16 @@ public class AffiliationImpl implements Affiliation {
     @Override
     public void setWikiarticles(List<WikipediaArticleImpl> wikiarticles) {
         this.wikiarticles = wikiarticles;
+    }
+
+    @Override
+    public WikipediaArticleImpl getSelectedWikiarticle() {
+        return selectedWikiarticle;
+    }
+
+    @Override
+    public void setSelectedWikiarticle(WikipediaArticleImpl selectedWikiarticle) {
+        this.selectedWikiarticle = selectedWikiarticle;
     }
 
 }

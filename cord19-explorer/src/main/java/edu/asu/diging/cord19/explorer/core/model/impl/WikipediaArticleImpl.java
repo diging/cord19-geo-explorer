@@ -6,6 +6,7 @@ public class WikipediaArticleImpl {
     private String completeText;
     private String coordinates;
     private LocationType locationType;
+    private String selectedOn;
 
     public String getTitle() {
         return title;
@@ -37,6 +38,14 @@ public class WikipediaArticleImpl {
 
     public void setLocationType(LocationType locationType) {
         this.locationType = locationType;
+    }
+
+    public String getSelectedOn() {
+        return selectedOn;
+    }
+
+    public void setSelectedOn(String selectedOn) {
+        this.selectedOn = selectedOn;
     }
 
 }

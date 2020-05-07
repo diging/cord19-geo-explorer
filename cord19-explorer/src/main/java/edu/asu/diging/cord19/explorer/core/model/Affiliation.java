@@ -33,4 +33,8 @@ public interface Affiliation {
 
     void setOther(Map<String, Object> other);
 
+    String getSelectedWikiArticle();
+    
+    String getCoordinates();
+
 }

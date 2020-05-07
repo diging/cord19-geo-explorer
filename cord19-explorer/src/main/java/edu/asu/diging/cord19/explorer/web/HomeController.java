@@ -6,12 +6,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import edu.asu.diging.cord19.explorer.core.mongo.PublicationDao;
+import edu.asu.diging.cord19.explorer.core.service.impl.CleanCoordinatesImpl;
 
 @Controller
 public class HomeController {
 
     @Autowired
     private PublicationDao pubDao;
+    
+
 
     @RequestMapping(value = "/")
     public String home(Model model) {

@@ -34,7 +34,7 @@ public class ElasticConfig extends ElasticsearchConfigurationSupport {
 
     @Bean
     public Client elasticsearchClient() throws UnknownHostException {
-        Settings settings = Settings.builder().put("cluster.name", "elasticsearch").build();
+        Settings settings = Settings.builder().put("cluster.name", "elasticsearch_taylorquinn").build();
         TransportClient client = new PreBuiltTransportClient(settings);
         client.addTransportAddress(new TransportAddress(InetAddress.getByName("127.0.0.1"), 9300));
         return client;

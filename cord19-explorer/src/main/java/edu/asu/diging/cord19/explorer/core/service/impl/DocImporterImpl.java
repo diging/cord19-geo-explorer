@@ -487,6 +487,7 @@ public class DocImporterImpl implements DocImporter {
 
         File file = new File(appdataPath + File.separator + "logs" + File.separator + task.getId() + ".txt");
         try {
+           logger.info(file.getAbsolutePath());
             file.createNewFile();
         } catch (IOException e) {
             logger.error("Could not create outfile.", e);

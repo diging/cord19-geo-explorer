@@ -567,5 +567,6 @@ public class PublicationImpl implements Publication {
     public void setBackMatter(List<ParagraphImpl> backMatter) {
         this.backMatter = backMatter;
     }
+    
 
 }

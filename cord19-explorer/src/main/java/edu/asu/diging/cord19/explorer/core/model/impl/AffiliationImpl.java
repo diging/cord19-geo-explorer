@@ -16,6 +16,8 @@ public class AffiliationImpl implements Affiliation {
     private String locationRegion;
     private String locationCountry;
     private Map<String, Object> other;
+    private String selectedWikiarticle;
+    private String coordinates;
 
     @JsonProperty("location")
     private void unpackLocation(Map<String, Object> location) {
@@ -168,6 +170,28 @@ public class AffiliationImpl implements Affiliation {
     @Override
     public void setOther(Map<String, Object> other) {
         this.other = other;
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * edu.asu.diging.cord19.explorer.core.model.impl.getSelectedWikiArticle()
+     */
+    @Override
+    public String getSelectedWikiArticle() {
+        return selectedWikiarticle;
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * edu.asu.diging.cord19.explorer.core.model.impl.getSelectedWikiArticle()
+     */
+    @Override
+    public String getCoordinates() {
+        return coordinates;
     }
 
 }

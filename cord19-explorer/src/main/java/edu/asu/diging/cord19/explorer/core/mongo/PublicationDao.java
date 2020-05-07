@@ -20,4 +20,10 @@ public interface PublicationDao {
 
     long getJournalCount();
 
+    List<String> getDistinctAffiliations();
+
+    long getDistinctAffiliationCount();
+
+    long getCountriesInTextCount();
+
 }

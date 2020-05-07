@@ -10,21 +10,20 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import edu.asu.diging.cord19.explorer.core.service.DocumentImportManager;
 
 @Controller
-public class LocationExtractionController {
+public class AffiliationCleaningController {
 
     @Autowired
     private DocumentImportManager importManager;
 
-    @RequestMapping(value = "/auth/extract/locations", method = RequestMethod.GET)
+    @RequestMapping(value = "/auth/extract/affiliations", method = RequestMethod.GET)
     public String show() {
 
-        return "auth/extractLocations";
+        return "auth/extractAffiliations";
     }
 
-    @RequestMapping(value = "/auth/extract/locations", method = RequestMethod.POST)
+    @RequestMapping(value = "/auth/extract/affiliations", method = RequestMethod.POST)
     public String start() throws ClassCastException, ClassNotFoundException, IOException {
-        //importManager.startLocationMatchCleaning();
-        importManager.startLocationMatchSelection();
+        importManager.startAffiliationCleaning(true);
 
         return "redirect:/";
     }

@@ -11,4 +11,12 @@ public interface PublicationRepository extends MongoRepository<PublicationImpl, 
     PublicationImpl findFirstByPaperId(String paperId);
 
     List<PublicationImpl> findByBodyTextLocationMatchesLocationName(String location);
+    
+    List<PublicationImpl> findByMetadataAuthorsAffiliationInstitution(String institution);
+    
+    List<PublicationImpl> findByMetadataAuthorsAffiliationLocationSettlement(String settlement);
+    
+    List<PublicationImpl> findByMetadataAuthorsAffiliationLocationRegion(String region);
+    
+    List<PublicationImpl> findByMetadataAuthorsAffiliationLocationCountry(String country);
 }

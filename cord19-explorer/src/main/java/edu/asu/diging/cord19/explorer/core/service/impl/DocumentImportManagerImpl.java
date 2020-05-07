@@ -78,6 +78,18 @@ public class DocumentImportManagerImpl implements DocumentImportManager {
     }
     
     @Override
+    public String startLocationMatchSelection() {
+        ImportTaskImpl task = new ImportTaskImpl();
+        task.setDateStarted(OffsetDateTime.now());
+        task.setProcessed(0);
+        task = taskRepo.save(task);
+
+        importer.selectLocationMatches(task.getId());
+
+        return task.getId();
+    }
+    
+    @Override
     public String startAffiliationCleaning(boolean reprocess) {
         ImportTaskImpl task = new ImportTaskImpl();
         task.setDateStarted(OffsetDateTime.now());

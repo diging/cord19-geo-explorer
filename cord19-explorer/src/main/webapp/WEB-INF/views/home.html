@@ -25,7 +25,7 @@
 	     </div>
    		</div>
    		<div class="col-md-2">
-   		<h4>Countries in text</h4>
+   		<h4>Countries in text ([[${textCountriesCount}]])</h4>
    		<div th:each="country : ${textCountries}">
 	      <a th:href="@{'/location?name=' + ${#uris.escapeQueryParam(country)}}">[[${country}]]</a>
 	     </div>

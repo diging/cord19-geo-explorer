@@ -22,11 +22,30 @@
    		</span>
    		</div>
    		
-   		  <div class="col-sm-12">
-		   
+   		  <div style="padding-top: 20px;" class="col-sm-12">
+   		  
+   		  <div class="list-group">
+	      <div th:each="section : ${sections}" th:remove="tag">
+   		  <div th:if="${section.paragraphs != null}" th:remove="tag">
+	      <span th:each="para : ${section.paragraphs}" th:remove="tag">
+	      <span th:if="${para.locationMatches != null}" th:remove="tag">
+	      
+	      <a href="#" class="list-group-item" th:each="match : ${para.locationMatches}" th:classappend="${match.selectedArticle != null} ? '' : disabled">
+		    <p class="list-group-item-text">
+		    <b>[[${match.locationName}]]</b><br>
+		    [[${match.selectedArticle?.title}]] <span th:if="${match.selectedArticle != null}" th:remove="tag">([[${match.selectedArticle?.coordinates}]])</span>
+		    </p>
+		  </a>
+	      
+		  </span>
+	      </span>
+	      </div>
+	      </div>
+		  </div>
+	      
+	      
 	      <div th:each="section : ${sections}">
 	      <h3 th:text="*{section.title != ''} ? *{section.title}: 'No Section title'"></h3>
-	      
 	      <span th:each="para : ${section.paragraphs}">
 	      <script th:inline="javascript" th:if="${not #lists.isEmpty(para.locationMatches)}">
 	      $(function() {

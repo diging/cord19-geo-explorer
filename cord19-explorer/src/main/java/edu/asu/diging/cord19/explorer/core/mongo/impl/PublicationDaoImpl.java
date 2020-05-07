@@ -112,10 +112,20 @@ public class PublicationDaoImpl implements PublicationDao {
     }
 
     @Override
+    public long getCountriesInTextCount() {
+        Query query = new Query(Criteria.where("bodyText.locationMatches.selectedArticle").ne(null));
+        return mongoTemplate.count(query, PublicationImpl.class);
+    }
+    
+    @Override
     public List<String> getCountriesInText() {
         String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
+        Criteria criteria = Criteria.where("bodyText.locationMatches.selectedArticle").ne(null);
+        Query query = new Query();
+        query.addCriteria(criteria);
+        
         DistinctIterable<String> output = mongoTemplate.getCollection(collection)
-                .distinct("bodyText.locationMatches.locationName", String.class);
+                .distinct("bodyText.locationMatches.locationName", query.getQueryObject(), String.class);
         List<String> results = new ArrayList<>();
         MongoCursor<String> it = output.iterator();
         while (it.hasNext()) {

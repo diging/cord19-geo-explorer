@@ -25,6 +25,7 @@ public class HomeController {
         model.addAttribute("yearCount", pubDao.getYearCount());
         model.addAttribute("journals", pubDao.getJournals());
         model.addAttribute("journalCount", pubDao.getJournalCount());
+        model.addAttribute("textCountriesCount", pubDao.getCountriesInTextCount());
         return "home";
     }
 }

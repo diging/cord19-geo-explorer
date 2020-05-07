@@ -14,4 +14,6 @@ public interface DocImporter {
 
     void cleanAffiliations(String taskId, boolean reprocess);
 
+    void selectLocationMatches(String taskId);
+
 }

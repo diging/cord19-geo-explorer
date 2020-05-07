@@ -24,4 +24,6 @@ public interface PublicationDao {
 
     long getDistinctAffiliationCount();
 
+    long getCountriesInTextCount();
+
 }

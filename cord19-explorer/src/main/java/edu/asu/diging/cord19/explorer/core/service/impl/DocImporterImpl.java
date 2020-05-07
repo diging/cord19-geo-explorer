@@ -14,9 +14,11 @@ import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -216,12 +218,13 @@ public class DocImporterImpl implements DocImporter {
         ObjectMapper mapper = new ObjectMapper();
         PublicationImpl publication = mapper.readValue(f, PublicationImpl.class);
         List<LocationMatch> invalidMatches = findLocations(publication);
+        processLocationMatches(publication);
         for (LocationMatch match : invalidMatches) {
             writer.newLine();
             writer.write(match.getLocationName());
             writer.flush();
         }
-        processAffiliation(publication);
+        processAffiliations(publication);
         pubRepo.save(publication);
         task.setProcessed(task.getProcessed() + 1);
         logger.debug("Stored: " + publication.getPaperId());
@@ -253,7 +256,38 @@ public class DocImporterImpl implements DocImporter {
             while (docs.hasNext()) {
                 PublicationImpl pub = docs.next();
                 logger.info(String.format("Cleaning affiliations %d of %d for: %s", counter, total, pub.getPaperId()));
-                processAffiliation(pub);
+                processAffiliations(pub);
+                pubRepo.save(pub);
+                counter++;
+            }
+        }
+
+        task.setStatus(TaskStatus.DONE);
+        task.setDateEnded(OffsetDateTime.now());
+        taskRepo.save((ImportTaskImpl) task);
+    }
+    
+    @Override
+    @Async
+    public void selectLocationMatches(String taskId) {
+        Optional<ImportTaskImpl> optional = taskRepo.findById(taskId);
+        if (!optional.isPresent()) {
+            return;
+            // FIXME: mark as failure
+        }
+
+        ImportTask task = optional.get();
+        task.setStatus(TaskStatus.PROCESSING);
+
+        Query query = new Query();
+        long total = mongoTemplate.count(query, PublicationImpl.class);
+        long counter = 1;
+        try (CloseableIterator<PublicationImpl> docs = mongoTemplate.stream(query.noCursorTimeout(),
+                PublicationImpl.class)) {
+            while (docs.hasNext()) {
+                PublicationImpl pub = docs.next();
+                logger.info(String.format("Cleaning affiliations %d of %d for: %s", counter, total, pub.getPaperId()));
+                processLocationMatches(pub);
                 pubRepo.save(pub);
                 counter++;
             }
@@ -264,7 +298,7 @@ public class DocImporterImpl implements DocImporter {
         taskRepo.save((ImportTaskImpl) task);
     }
 
-    private void processAffiliation(Publication pub) {
+    private void processAffiliations(Publication pub) {
         if (pub.getMetadata() == null || pub.getMetadata().getAuthors() == null) {
             return;
         }
@@ -304,6 +338,22 @@ public class DocImporterImpl implements DocImporter {
             }
             
             selectArticle(affiliation);
+        }
+    }
+    
+    private void processLocationMatches(Publication pub) {
+        if (pub.getBodyText() == null) {
+            return;
+        }
+        for (ParagraphImpl paragraph : pub.getBodyText()) {
+            if (paragraph.getLocationMatches() == null) {
+                continue;
+            }
+            for (LocationMatch match : paragraph.getLocationMatches()) {
+                if (match != null) {
+                    selectArticle(match);
+                }
+            }
         }
     }
 
@@ -362,6 +412,29 @@ public class DocImporterImpl implements DocImporter {
                 article.setSelectedOn(OffsetDateTime.now().toString());
                 return;
             }
+        }
+    }
+    
+    private void selectArticle(LocationMatch match) {
+        if (match.getWikipediaArticles() == null) {
+            return;
+        }
+        Map<Double, WikipediaArticleImpl> similarities = new HashMap<Double, WikipediaArticleImpl>();
+        for (WikipediaArticleImpl article : match.getWikipediaArticles()) {
+            String articleTitle = article.getTitle();
+            if (!StringUtils.isBlank(match.getLocationName())) {
+                JaroWinklerSimilarity sim = new JaroWinklerSimilarity();
+                Double similarity = sim.apply(articleTitle, match.getLocationName());
+                if (similarity > 0.8) {
+                    similarities.put(similarity, article);
+                }
+            }
+        }
+        
+        Optional<Double> max = similarities.keySet().stream().max(Double::compareTo);
+        if (max.isPresent()) {
+            match.setSelectedArticle(similarities.get(max.get()));
+            match.getSelectedArticle().setSelectedOn(OffsetDateTime.now().toString());
         }
     }
 

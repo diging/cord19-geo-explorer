@@ -1,6 +1,9 @@
 package edu.asu.diging.cord19.explorer.web.auth;
 
 import java.io.IOException;
+import java.sql.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.asu.diging.cord19.explorer.core.model.impl.PersonImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
+import edu.asu.diging.cord19.explorer.core.model.impl.WikipediaArticleImpl;
 import edu.asu.diging.cord19.explorer.core.mongo.PublicationRepository;
 
 
@@ -47,12 +51,71 @@ public class CoordinateCleaningController {
                 PublicationImpl pub = docs.next();
                 List<PersonImpl> authors = pub.getMetadata().getAuthors();
                 for(PersonImpl author : authors) {
-                    if(author.getAffiliation().getSelectedWikiArticle() != null) {
-                       String article = author.getAffiliation().getSelectedWikiArticle();
-                        ObjectMapper mapper = new ObjectMapper();
-                         JsonNode js = mapper.readTree(article);
+                    List<String> coords = new ArrayList();
+                    List<Double> formattedCoords = new ArrayList();
+                    if(author.getAffiliation().getSelectedWikiarticle() != null) {
+                       WikipediaArticleImpl article = author.getAffiliation().getSelectedWikiarticle();
+                       String [] splitted =  article.getCoordinates().split("\\|");
+                       // split on pipes then use Ordinals to gather Degree, Mins, Secs then compute Decimal Degrees
+                       //Refactor into function
+                       for (String s: splitted) {      
+                            if(s.matches("-?\\d+(\\.\\d+)?")) {
+                                System.out.println(s);
+                                coords.add(s);
+                                
+                            } else if(s.equals("N") || s.equals("E")){
+                                if(coords.size() == 3) {
+                                    float d = Float.parseFloat(coords.get(0));
+                                    float m = Float.parseFloat(coords.get(1));
+                                    float se = Float.parseFloat(coords.get(2));
+                                    double dd = Math.signum(d) * (Math.abs(d) + (m / 60.0) + (se / 3600.0));
+                                    formattedCoords.add(dd);
+                                    coords.clear();
+                                }
+                                if(coords.size() == 2) {
+                                    float d = Float.parseFloat(coords.get(0));
+                                    float m = Float.parseFloat(coords.get(1));
+                                    double dd = Math.signum(d) * (Math.abs(d) + (m / 60.0));
+                                    formattedCoords.add(dd);
+                                    coords.clear();
+                                }
+                                if(coords.size() == 1) {
+                                    Double doubleCoord = Double.parseDouble(coords.get(0));
+                                    formattedCoords.add(doubleCoord);
+                                    coords.clear();
+                                }
+                               
+                            } else if(s.equals("S") || s.equals("W")) {
+                                // handle negative coords
+                                if(coords.size() == 3) {
+                                    float d = Float.parseFloat(coords.get(0));
+                                    float m = Float.parseFloat(coords.get(1));
+                                    float se = Float.parseFloat(coords.get(2));
+                                    double dd = Math.signum(d) * (Math.abs(d) + (m / 60.0) + (se / 3600.0));
+                                    dd = dd *-1;
+                                    formattedCoords.add(dd);
+                                    coords.clear();
+                                }
+                                if(coords.size() == 2) {
+                                    float d = Float.parseFloat(coords.get(0));
+                                    float m = Float.parseFloat(coords.get(1));
+                                    double dd = Math.signum(d) * (Math.abs(d) + (m / 60.0));
+                                    dd = dd *-1;
+                                    formattedCoords.add(dd);
+                                    coords.clear();
+                                }
+                                if(coords.size() == 1) {                
+                                    Double doubleCoord = Double.parseDouble(coords.get(0)) * -1;
+                                    formattedCoords.add(doubleCoord);
+                                    coords.clear();
+                                }
+                            }
+                       }
+                       String coordString = formattedCoords.toString();
+                       article.setCleanedCoords(coordString);
                     }
                 }
+                pubRepo.save(pub);   
             }
         }
         

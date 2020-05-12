@@ -1,5 +1,7 @@
 package edu.asu.diging.cord19.explorer.core.model.impl;
 
+
+
 public class WikipediaArticleImpl {
 
     private String title;
@@ -7,6 +9,7 @@ public class WikipediaArticleImpl {
     private String coordinates;
     private LocationType locationType;
     private String selectedOn;
+    private String cleanedCoords;
 
     public String getTitle() {
         return title;
@@ -46,6 +49,14 @@ public class WikipediaArticleImpl {
 
     public void setSelectedOn(String selectedOn) {
         this.selectedOn = selectedOn;
+    }
+    
+    public void setCleanedCoords(String cleanedCoords) {
+        this.cleanedCoords = cleanedCoords;
+    }
+    
+    public String getCleanedCoords() {
+        return cleanedCoords;
     }
 
 }

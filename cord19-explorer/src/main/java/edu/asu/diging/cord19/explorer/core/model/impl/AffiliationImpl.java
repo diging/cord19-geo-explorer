@@ -173,28 +173,7 @@ public class AffiliationImpl implements Affiliation {
     public void setOther(Map<String, Object> other) {
         this.other = other;
     }
-    
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * edu.asu.diging.cord19.explorer.core.model.impl.getSelectedWikiArticle()
-     */
-    @Override
-    public String getSelectedWikiArticle() {
-        return selectedWikiarticle;
-    }
-    
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * edu.asu.diging.cord19.explorer.core.model.impl.getSelectedWikiArticle()
-     */
-    @Override
-    public String getCoordinates() {
-        return coordinates;
-    }
+   
 
     @Override
     public List<WikipediaArticleImpl> getWikiarticles() {

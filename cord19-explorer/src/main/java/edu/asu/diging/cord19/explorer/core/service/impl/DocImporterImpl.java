@@ -36,11 +36,12 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -106,8 +107,9 @@ public class DocImporterImpl implements DocImporter {
     @Autowired
     private PublicationRepository pubRepo;
 
+    @Qualifier("elasticsearchTemplate")
     @Autowired
-    private ElasticsearchTemplate searchTemplate;
+    private ElasticsearchOperations searchTemplate;
 
     @Autowired
     private MongoTemplate mongoTemplate;

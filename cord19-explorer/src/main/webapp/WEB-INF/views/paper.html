@@ -7,19 +7,34 @@
    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js"></script>
    <style>
 	mark{
-	    background: #f7ceff;
+	    background: #efd489;
 	    color: black;
+	}
+	
+	mark.locationNotFound {
+		background: #e4dae6;
+	    color: #111111;
 	}
    </style>
    
-   <h3>[[${publication.metadata.title}]] <span th:if="${publication.publishYear != ''}">([[${publication.publishYear}]])</span></h3>
+   <h3>[[${#strings.defaultString(publication.metadata.title, 'No title available')}]] <span th:if="${publication.publishYear != '' && publication.publishYear > 0}">([[${publication.publishYear}]])</span></h3>
    		
    	<div class="row">
    		<div class="col-sm-12">
-   		by
-   		<span th:each="author, iterstat : ${publication.metadata.authors}">
-   		[[${author.first}]] [[${#strings.listJoin(author.middle,',')}]] [[${author.last}]]<span th:if="${not iterstat.last}">,</span>
+   		by:
+   		<div th:each="author, iterstat : ${publication.metadata.authors}" style="padding-bottom: 10px;">
+   		<b>[[${author.first}]] [[${#strings.listJoin(author.middle,',')}]] [[${author.last}]]</b>
+   		<span th:if="${author.affiliation != null}" th:remove="tag">
+   		<span th:if="${author.affiliation.institution != null || author.affiliation.locationSettlement != null || author.affiliation.locationRegion != null || author.affiliation.locationCountry != null}" th:remove="tag"> 
+   		<br>
+   		<span th:if="${author.affiliation.institution != null}">[[${author.affiliation.institution}]],</span> 
+   		 <span th:if="${author.affiliation.locationSettlement != null}" th:remove="tag">[[${author.affiliation.locationSettlement}]],</span> 
+   		 <span th:if="${author.affiliation.locationRegion != null}" th:remove="tag">[[${author.affiliation.locationRegion}]],</span> 
+   		 <span th:if="${author.affiliation.locationCountry != null}" th:remove="tag">[[${author.affiliation.locationCountry}]]</span>
+   		 <span th:if="${author.affiliation.selectedWikiarticle != null}"><span class="label label-info">matched</span> <i>[[${author.affiliation.selectedWikiarticle.title}]]</i> ([[${author.affiliation.selectedWikiarticle.coordinates}]])</span>
+   		 </span>
    		</span>
+   		</div>
    		</div>
    		
    		  <div style="padding-top: 20px;" class="col-sm-12">
@@ -50,9 +65,12 @@
 	      <script th:inline="javascript" th:if="${not #lists.isEmpty(para.locationMatches)}">
 	      $(function() {
 	      	[# th:each="match : ${para.locationMatches}" ]
-	      	[# th:if="${match != null}" ]
+	      	[# th:if="${match != null && match.selectedArticle != null}" ]
 	      	$("#[(${#ids.next('para')})]").mark("[(${match.locationName})]", { "separateWordSearch": false})	
 	      	[/]
+	      	[# th:if="${match != null && match.selectedArticle == null}" ]
+		    $("#[(${#ids.next('para')})]").mark("[(${match.locationName})]", { "separateWordSearch": false, "className": "locationNotFound"})	
+		    [/]
 	      	[/]
 	      });
 	      </script>

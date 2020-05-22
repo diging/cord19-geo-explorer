@@ -88,6 +88,9 @@ public class DocImporterImpl implements DocImporter {
     @Value("${metadata.filename}")
     private String metadataFilename;
 
+    @Value("${metadata.filename.msid}")
+    private String metadataFilenameMsId;
+
     @Value("${app.data.path}")
     private String appdataPath;
 
@@ -148,60 +151,69 @@ public class DocImporterImpl implements DocImporter {
             return;
         }
 
+        long counter = 1;
         try (Stream<Path> paths = Files.walk(Paths.get(rootFolder))) {
-            paths.forEach(p -> {
-                if (Files.isRegularFile(p, LinkOption.NOFOLLOW_LINKS) && !p.getFileName().startsWith(".")) {
+            Iterator<Path> pathIterator = paths.iterator();
+            while(pathIterator.hasNext()) {
+                Path path = pathIterator.next();
+                if (Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS) && !path.getFileName().startsWith(".")) {
                     try {
-                        storeFile(p.toFile(), task, writer);
+                        storeFile(path.toFile(), task, writer);
+                        logger.info("Processing file #" + counter);
                     } catch (JsonParseException e) {
-                        logger.error("Could not store file " + p.getFileName(), e);
+                        logger.error("Could not store file " + path.getFileName(), e);
                     } catch (JsonMappingException e) {
-                        logger.error("Could not store file " + p.getFileName(), e);
+                        logger.error("Could not store file " + path.getFileName(), e);
                     } catch (IOException e) {
-                        logger.error("Could not store file " + p.getFileName(), e);
+                        logger.error("Could not store file " + path.getFileName(), e);
                     } catch (ClassCastException e) {
-                        logger.error("Could not store file " + p.getFileName(), e);
+                        logger.error("Could not store file " + path.getFileName(), e);
                     } catch (ClassNotFoundException e) {
-                        logger.error("Could not store file " + p.getFileName(), e);
+                        logger.error("Could not store file " + path.getFileName(), e);
                     }
+                    counter++;
                 }
-            });
+            };
         }
 
         writer.close();
 
-        File metadataFile = new File(rootFolder + File.separator + metadataFilename);
-        CsvToBean<MetadataEntry> bean = new CsvToBeanBuilder(new FileReader(metadataFile)).withType(MetadataEntry.class)
-                .withIgnoreLeadingWhiteSpace(true).build();
+        File metadataFileBase = new File(rootFolder + File.separator + metadataFilename);
+        //File metadataFileMsId = new File(rootFolder + File.separator + metadataFilenameMsId);
 
-        Iterator<MetadataEntry> it = bean.iterator();
-        while (it.hasNext()) {
-            MetadataEntry entry = it.next();
-            PublicationImpl pub = null;
-            if (entry.getSha() != null && !entry.getSha().isEmpty()) {
-                pub = pubRepo.findFirstByPaperId(entry.getSha());
-            }
-            if (pub == null && entry.getPmcid() != null && !entry.getPmcid().isEmpty()) {
-                pub = pubRepo.findFirstByPaperId(entry.getPmcid());
-            }
+        for (File metadataFile : Arrays.asList(metadataFileBase)) {
+            CsvToBean<MetadataEntry> bean = new CsvToBeanBuilder(new FileReader(metadataFile))
+                    .withType(MetadataEntry.class).withIgnoreLeadingWhiteSpace(true).build();
 
-            if (pub != null) {
-                pub.setHasPdfParse(entry.getHasPdfParse().equals("TRUE"));
-                pub.setCordId(entry.getCord_uid());
-                pub.setDoi(entry.getDoi());
-                pub.setHasPmcXmlParse(entry.getHasPmcXmlParse().equals("TRUE"));
-                pub.setJournal(entry.getJournal());
-                pub.setLicense(entry.getLicense());
-                pub.setMsAcademicPaperId(entry.getMsAcademicPaperId());
-                pub.setPmcid(entry.getPmcid());
-                pub.setPublishTime(entry.getPublishTime());
-                pub.setPubmedId(entry.getPubmed_id());
-                pub.setSha(entry.getSha());
-                pub.setSourceX(entry.getSourceX());
-                pub.setUrl(entry.getUrl());
-                pub.setWhoCovidence(entry.getWhoCov());
-                extractYear(pub);
-                pubRepo.save(pub);
+            Iterator<MetadataEntry> it = bean.iterator();
+            while (it.hasNext()) {
+                MetadataEntry entry = it.next();
+                PublicationImpl pub = null;
+                if (entry.getSha() != null && !entry.getSha().isEmpty()) {
+                    pub = pubRepo.findFirstByPaperId(entry.getSha());
+                }
+                if (pub == null && entry.getPmcid() != null && !entry.getPmcid().isEmpty()) {
+                    pub = pubRepo.findFirstByPaperId(entry.getPmcid());
+                }
+
+                if (pub != null) {
+                    pub.setHasPdfParse(entry.getHasPdfParse().equals("TRUE"));
+                    pub.setCordId(entry.getCord_uid());
+                    pub.setDoi(entry.getDoi());
+                    pub.setHasPmcXmlParse(entry.getHasPmcXmlParse().equals("TRUE"));
+                    pub.setJournal(entry.getJournal());
+                    pub.setLicense(entry.getLicense());
+                    pub.setMsAcademicPaperId(entry.getMsAcademicPaperId());
+                    pub.setPmcid(entry.getPmcid());
+                    pub.setPublishTime(entry.getPublishTime());
+                    pub.setPubmedId(entry.getPubmed_id());
+                    pub.setSha(entry.getSha());
+                    pub.setSourceX(entry.getSourceX());
+                    pub.setUrl(entry.getUrl());
+                    pub.setWhoCovidence(entry.getWhoCov());
+                    extractYear(pub);
+                    pubRepo.save(pub);
+                }
             }
         }
 
@@ -217,6 +229,13 @@ public class DocImporterImpl implements DocImporter {
         }
         ObjectMapper mapper = new ObjectMapper();
         PublicationImpl publication = mapper.readValue(f, PublicationImpl.class);
+        
+        // do not reimport existing publications
+        PublicationImpl storedPub = pubRepo.findFirstByPaperId(publication.getPaperId());
+        if (storedPub != null) {
+           return;
+        }
+        
         List<LocationMatch> invalidMatches = findLocations(publication);
         processLocationMatches(publication);
         for (LocationMatch match : invalidMatches) {
@@ -266,7 +285,7 @@ public class DocImporterImpl implements DocImporter {
         task.setDateEnded(OffsetDateTime.now());
         taskRepo.save((ImportTaskImpl) task);
     }
-    
+
     @Override
     @Async
     public void selectLocationMatches(String taskId) {
@@ -336,11 +355,11 @@ public class DocImporterImpl implements DocImporter {
                 wikientries = searchElasticInTitle(affiliation.getLocationCountry());
                 findWikiarticles(affiliation, wikientries, LocationType.COUNTRY, this::addArticleToAffiliation);
             }
-            
+
             selectArticle(affiliation);
         }
     }
-    
+
     private void processLocationMatches(Publication pub) {
         if (pub.getBodyText() == null) {
             return;
@@ -396,14 +415,14 @@ public class DocImporterImpl implements DocImporter {
                 article.setSelectedOn(OffsetDateTime.now().toString());
                 return;
             }
-            
+
             if (!StringUtils.isBlank(affiliation.getInstitution())) {
                 JaroWinklerSimilarity sim = new JaroWinklerSimilarity();
                 Double similarity = sim.apply(articleTitle, affiliation.getInstitution());
                 if (similarity > 0.8) {
                     affiliation.setSelectedWikiarticle(article);
                     article.setSelectedOn(OffsetDateTime.now().toString());
-                    return; 
+                    return;
                 }
             }
 
@@ -414,7 +433,7 @@ public class DocImporterImpl implements DocImporter {
             }
         }
     }
-    
+
     private void selectArticle(LocationMatch match) {
         if (match.getWikipediaArticles() == null) {
             return;
@@ -430,7 +449,7 @@ public class DocImporterImpl implements DocImporter {
                 }
             }
         }
-        
+
         Optional<Double> max = similarities.keySet().stream().max(Double::compareTo);
         if (max.isPresent()) {
             match.setSelectedArticle(similarities.get(max.get()));
@@ -456,12 +475,12 @@ public class DocImporterImpl implements DocImporter {
         }
         return state;
     }
-    
+
     private String getCountry(String country) {
         if (StringUtils.isBlank(country)) {
             return "";
         }
-        
+
         switch (country.trim()) {
         case "US":
             return "United States";
@@ -470,7 +489,7 @@ public class DocImporterImpl implements DocImporter {
         case "UK":
             return "United Kingdom";
         }
-        
+
         return country;
     }
 
@@ -755,14 +774,14 @@ public class DocImporterImpl implements DocImporter {
     }
 
     private String prepareSearchTerm(String term) {
-        term = term.replace("/", " ").replace("(", " ").replace(")", " ");
-        term = term.replace("[", " ").replace("]", " ").replace(":", " ");
-        term = term.replace("{", " ").replace("}", " ").replace("~", " ");
-        term = term.replace("\"", "").replace("'", "").replace("^", "");
-        term = term.replace("!", "").replace("-", " ").replace(".", " ");
-        term = term.replace("_", " ");
-        term = term.replace(" OR", " ").replace(" OR ", " ");
-        term = term.replace(" AND", " ").replace(" AND ", " ");
+        term = term.replaceAll("/", " ").replaceAll("\\(", " ").replaceAll("\\)", " ");
+        term = term.replaceAll("\\[", " ").replaceAll("\\]", " ").replaceAll(":", " ");
+        term = term.replaceAll("\\{", " ").replaceAll("\\}", " ").replaceAll("~", " ");
+        term = term.replaceAll("\"", "").replaceAll("'", "").replaceAll("\\^", "");
+        term = term.replaceAll("!", "").replaceAll("\\-", " ").replaceAll("\\.", " ");
+        term = term.replaceAll("_", " ").replaceAll("\\\\", " ").replaceAll("\\+", " ");
+        term = term.replaceAll("|",  " ").replaceAll(" OR", " ").replaceAll(" OR ", " ");
+        term = term.replaceAll(" AND", " ").replaceAll(" AND ", " ");
 
         // FIXME: check against US states
         if (term.trim().equals("OR") || term.trim().equals("AND")) {

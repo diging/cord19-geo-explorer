@@ -3,9 +3,6 @@ package edu.asu.diging.cord19.explorer.core.mongo.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bson.conversions.Bson;
-import org.elasticsearch.search.aggregations.Aggregation;
-import org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;

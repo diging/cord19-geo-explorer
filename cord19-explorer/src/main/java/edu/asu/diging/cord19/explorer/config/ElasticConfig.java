@@ -33,6 +33,9 @@ public class ElasticConfig extends ElasticsearchConfigurationSupport {
 
     @Value("${elasticsearch.password}")
     private String password;
+    
+    @Value("${elasticsearch.path.prefix}")
+    private String pathPrefix;
 
     @Bean
     public String indexName() {
@@ -46,6 +49,9 @@ public class ElasticConfig extends ElasticsearchConfigurationSupport {
                 //.usingSsl();
         if (user != null && !user.trim().isEmpty()) {
             builder.withBasicAuth(user, password); 
+        }
+        if (pathPrefix != null && !pathPrefix.trim().isEmpty()) {
+            builder.withPathPrefix(pathPrefix);
         }
         final ClientConfiguration clientConfiguration = builder.build();
         return RestClients.create(clientConfiguration).rest();

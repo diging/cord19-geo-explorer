@@ -33,6 +33,7 @@
 		<elasticsearch.host>localhost:9200</elasticsearch.host>
 		<elasticsearch.user></elasticsearch.user>
 		<elasticsearch.password></elasticsearch.password>
+		<elasticsearch.path.prefix></elasticsearch.path.prefix>
 
 		<file.upload.path></file.upload.path>
 		<app.data.path></app.data.path>

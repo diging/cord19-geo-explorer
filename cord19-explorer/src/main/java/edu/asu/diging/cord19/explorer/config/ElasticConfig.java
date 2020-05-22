@@ -3,6 +3,8 @@ package edu.asu.diging.cord19.explorer.config;
 import java.net.UnknownHostException;
 
 import org.elasticsearch.client.RestHighLevelClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +23,8 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
 @EnableElasticsearchRepositories(basePackages = { "edu.asu.diging.cord19.explorer.core.elastic.data" })
 @PropertySource({ "classpath:config.properties", "${appConfigFile:classpath:}/app.properties" })
 public class ElasticConfig extends ElasticsearchConfigurationSupport {
+    
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Value("${elasticsearch.indexName}")
     private String indexName;
@@ -44,13 +48,16 @@ public class ElasticConfig extends ElasticsearchConfigurationSupport {
     
     @Bean
     public RestHighLevelClient elasticsearchRestClient() {
+        logger.info("Connecting to ES at: " + host);
         TerminalClientConfigurationBuilder builder = ClientConfiguration.builder()
                 .connectedTo(host);
                 //.usingSsl();
         if (user != null && !user.trim().isEmpty()) {
+            logger.info("Using user info: " + user);
             builder.withBasicAuth(user, password); 
         }
         if (pathPrefix != null && !pathPrefix.trim().isEmpty()) {
+            logger.info("Using path prefix: " + pathPrefix);
             builder.withPathPrefix(pathPrefix);
         }
         final ClientConfiguration clientConfiguration = builder.build();

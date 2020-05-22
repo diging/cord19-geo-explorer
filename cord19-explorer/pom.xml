@@ -33,6 +33,10 @@
 		<app.data.path></app.data.path>
 
 		<log.level>info</log.level>
+		
+		<tomcat.deploy.path></tomcat.deploy.path>
+        <tomcat.app.name>cord19-geo-explorer</tomcat.app.name>
+        <tomcat.server.id>TomcatServer</tomcat.server.id>
 	</properties>
 
 	<dependencyManagement>
@@ -263,7 +267,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>cord19-explorer</finalName>
+		<finalName>cord19-geo-explorer</finalName>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
@@ -305,6 +309,16 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
+			<plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <url>${tomcat.deploy.path}</url>
+                    <server>${tomcat.server.id}</server>
+                    <path>/${tomcat.app.name}</path>
+                </configuration>
+            </plugin>
 		</plugins>
 	</build>
 

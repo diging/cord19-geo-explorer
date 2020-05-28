@@ -34,6 +34,8 @@
 		<elasticsearch.user></elasticsearch.user>
 		<elasticsearch.password></elasticsearch.password>
 		<elasticsearch.path.prefix></elasticsearch.path.prefix>
+		<!-- in ms (10000ms = 10s) -->
+		<elasticsearch.connect.timeout>10000</elasticsearch.connect.timeout>
 
 		<file.upload.path></file.upload.path>
 		<app.data.path></app.data.path>

@@ -40,6 +40,9 @@ public class ElasticConfig extends ElasticsearchConfigurationSupport {
     
     @Value("${elasticsearch.path.prefix}")
     private String pathPrefix;
+    
+    @Value("${elasticsearch.connect.timeout}")
+    private long connectTimeout;
 
     @Bean
     public String indexName() {
@@ -50,7 +53,7 @@ public class ElasticConfig extends ElasticsearchConfigurationSupport {
     public RestHighLevelClient elasticsearchRestClient() {
         logger.info("Connecting to ES at: " + host);
         TerminalClientConfigurationBuilder builder = ClientConfiguration.builder()
-                .connectedTo(host);
+                .connectedTo(host).withConnectTimeout(connectTimeout);
                 //.usingSsl();
         if (user != null && !user.trim().isEmpty()) {
             logger.info("Using user info: " + user);

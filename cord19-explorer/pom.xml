@@ -25,8 +25,8 @@
 		<mongo.database.name>cord19ds</mongo.database.name>
 		<mongo.database.host>localhost</mongo.database.host>
 		<mongo.database.port>27017</mongo.database.port>
-		<mongo.database.user>admin</mongo.database.user>
-		<mongo.database.password>admin</mongo.database.password>
+		<mongo.database.user></mongo.database.user>
+		<mongo.database.password></mongo.database.password>
 		<mongo.database.authdb>admin</mongo.database.authdb>
 		
 		<elasticsearch.index>wikipedia_complete</elasticsearch.index>
@@ -35,7 +35,7 @@
 		<elasticsearch.password></elasticsearch.password>
 		<elasticsearch.path.prefix></elasticsearch.path.prefix>
 		<!-- in ms (10000ms = 10s) -->
-		<elasticsearch.connect.timeout>10000</elasticsearch.connect.timeout>
+		<elasticsearch.connect.timeout>60000</elasticsearch.connect.timeout>
 
 		<file.upload.path></file.upload.path>
 		<app.data.path></app.data.path>

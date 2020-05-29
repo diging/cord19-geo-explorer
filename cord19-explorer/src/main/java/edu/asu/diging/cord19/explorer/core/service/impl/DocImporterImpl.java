@@ -782,7 +782,7 @@ public class DocImporterImpl implements DocImporter {
         term = term.replaceAll("\"", "").replaceAll("'", "").replaceAll("\\^", "");
         term = term.replaceAll("!", "").replaceAll("\\-", " ").replaceAll("\\.", " ");
         term = term.replaceAll("_", " ").replaceAll("\\\\", " ").replaceAll("\\+", " ");
-        term = term.replaceAll("|",  " ").replaceAll(" OR", " ").replaceAll(" OR ", " ");
+        term = term.replaceAll("\\|",  " ").replaceAll(" OR", " ").replaceAll(" OR ", " ");
         term = term.replaceAll(" AND", " ").replaceAll(" AND ", " ");
 
         // FIXME: check against US states

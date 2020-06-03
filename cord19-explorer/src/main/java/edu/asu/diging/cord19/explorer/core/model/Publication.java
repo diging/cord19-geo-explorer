@@ -6,13 +6,14 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import edu.asu.diging.cord19.explorer.core.model.impl.BibEntryImpl;
-import edu.asu.diging.cord19.explorer.core.model.impl.LocationMatchImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.ParagraphImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.RefEntryImpl;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, defaultImpl = PublicationImpl.class)
 public interface Publication {
+    
+    final static String DATABASE_ARXIV = "arxiv";
 
     String getCordId();
 
@@ -105,4 +106,8 @@ public interface Publication {
     List<ParagraphImpl> getBackMatter();
 
     void setBackMatter(List<ParagraphImpl> backMatter);
+
+    void setDatabase(String database);
+
+    String getDatabase();
 }

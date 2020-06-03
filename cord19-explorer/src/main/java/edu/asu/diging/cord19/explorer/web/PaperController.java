@@ -9,8 +9,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import edu.asu.diging.cord19.explorer.core.model.Publication;
 import edu.asu.diging.cord19.explorer.core.model.impl.ParagraphImpl;
-import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
 import edu.asu.diging.cord19.explorer.core.mongo.PublicationRepository;
 import edu.asu.diging.cord19.explorer.web.model.Section;
 
@@ -22,7 +22,7 @@ public class PaperController {
 
     @RequestMapping("/paper/{paperId}")
     public String findPublications(@PathVariable("paperId") String paperId, Model model) {
-        PublicationImpl pub = pubRepo.findFirstByPaperId(paperId);
+        Publication pub = pubRepo.findFirstByPaperId(paperId);
         model.addAttribute("publication", pub);
         List<Section> sections = new ArrayList<Section>();
         Section currentSection = new Section();

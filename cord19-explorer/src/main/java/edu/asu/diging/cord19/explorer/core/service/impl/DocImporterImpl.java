@@ -233,7 +233,7 @@ public class DocImporterImpl implements DocImporter {
         PublicationImpl publication = mapper.readValue(f, PublicationImpl.class);
         
         // do not reimport existing publications
-        PublicationImpl storedPub = pubRepo.findFirstByPaperId(publication.getPaperId());
+        Publication storedPub = pubRepo.findFirstByPaperId(publication.getPaperId());
         if (storedPub != null) {
            return;
         }

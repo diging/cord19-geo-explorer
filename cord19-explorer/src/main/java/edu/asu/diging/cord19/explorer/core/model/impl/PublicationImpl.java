@@ -36,6 +36,8 @@ public class PublicationImpl implements Publication {
     private String fulltextFile;
     private String url;
     private String whoCovidence;
+    
+    private String database;
 
     @JsonProperty("abstract")
     private List<ParagraphImpl> abstracts;
@@ -456,6 +458,16 @@ public class PublicationImpl implements Publication {
     @Override
     public void setWhoCovidence(String whoCovidence) {
         this.whoCovidence = whoCovidence;
+    }
+
+    @Override
+    public String getDatabase() {
+        return database;
+    }
+
+    @Override
+    public void setDatabase(String database) {
+        this.database = database;
     }
 
     /*

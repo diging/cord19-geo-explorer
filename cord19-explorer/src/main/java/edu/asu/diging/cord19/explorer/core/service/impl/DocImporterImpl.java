@@ -778,7 +778,7 @@ public class DocImporterImpl implements DocImporter {
     private String prepareSearchTerm(String term) {
         term = term.replaceAll("/", " ").replaceAll("\\(", " ").replaceAll("\\)", " ");
         term = term.replaceAll("\\[", " ").replaceAll("\\]", " ").replaceAll(":", " ");
-        term = term.replaceAll("\\{", " ").replaceAll("\\}", " ").replaceAll("~", " ");
+        term = term.replaceAll("\\{", " ").replaceAll("\\}", " ").replaceAll("~", " ").replaceAll("\\*",  " ");
         term = term.replaceAll("\"", "").replaceAll("'", "").replaceAll("\\^", "");
         term = term.replaceAll("!", "").replaceAll("\\-", " ").replaceAll("\\.", " ");
         term = term.replaceAll("_", " ").replaceAll("\\\\", " ").replaceAll("\\+", " ");

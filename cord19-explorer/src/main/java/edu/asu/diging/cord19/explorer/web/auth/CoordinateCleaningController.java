@@ -1,15 +1,11 @@
 package edu.asu.diging.cord19.explorer.web.auth;
 
 import java.io.IOException;
-import java.sql.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.util.CloseableIterator;
@@ -17,9 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import edu.asu.diging.cord19.explorer.core.model.impl.CleanedCoordinatesImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.PersonImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.WikipediaArticleImpl;
@@ -68,7 +62,12 @@ public class CoordinateCleaningController {
                                     float d = Float.parseFloat(coords.get(0));
                                     float m = Float.parseFloat(coords.get(1));
                                     float se = Float.parseFloat(coords.get(2));
-                                    double dd = Math.signum(d) * (Math.abs(d) + (m / 60.0) + (se / 3600.0));
+                                    double dd = 0;
+                                    if(d == 0) {
+                                        dd = ((m / 60.0) + (se / 3600.0));
+                                    } else {
+                                        dd = Math.signum(d) * (Math.abs(d) + (m / 60.0) + (se / 3600.0));
+                                    }
                                     formattedCoords.add(dd);
                                     coords.clear();
                                 }
@@ -91,7 +90,12 @@ public class CoordinateCleaningController {
                                     float d = Float.parseFloat(coords.get(0));
                                     float m = Float.parseFloat(coords.get(1));
                                     float se = Float.parseFloat(coords.get(2));
-                                    double dd = Math.signum(d) * (Math.abs(d) + (m / 60.0) + (se / 3600.0));
+                                    double dd = 0;
+                                    if(d == 0) {
+                                        dd = ((m / 60.0) + (se / 3600.0));
+                                    } else {
+                                        dd = Math.signum(d) * (Math.abs(d) + (m / 60.0) + (se / 3600.0));
+                                    }
                                     dd = dd *-1;
                                     formattedCoords.add(dd);
                                     coords.clear();
@@ -111,8 +115,11 @@ public class CoordinateCleaningController {
                                 }
                             }
                        }
-                       String coordString = formattedCoords.toString();
-                       article.setCleanedCoords(coordString);
+                       CleanedCoordinatesImpl cleanedCoords = new CleanedCoordinatesImpl();
+                       cleanedCoords.setType("Point");
+                       cleanedCoords.setCoordinates(formattedCoords);
+                       article.setCleanedCoords(cleanedCoords);
+                       System.out.println(pub.getPaperId());
                     }
                 }
                 pubRepo.save(pub);   

@@ -61,11 +61,11 @@ import edu.asu.diging.cord19.explorer.core.data.TaskRepository;
 import edu.asu.diging.cord19.explorer.core.elastic.model.impl.Wikientry;
 import edu.asu.diging.cord19.explorer.core.model.Affiliation;
 import edu.asu.diging.cord19.explorer.core.model.LocationMatch;
+import edu.asu.diging.cord19.explorer.core.model.Person;
 import edu.asu.diging.cord19.explorer.core.model.Publication;
 import edu.asu.diging.cord19.explorer.core.model.impl.LocationMatchImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.LocationType;
 import edu.asu.diging.cord19.explorer.core.model.impl.ParagraphImpl;
-import edu.asu.diging.cord19.explorer.core.model.impl.PersonImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.WikipediaArticleImpl;
 import edu.asu.diging.cord19.explorer.core.model.task.ImportTask;
@@ -323,7 +323,7 @@ public class DocImporterImpl implements DocImporter {
         if (pub.getMetadata() == null || pub.getMetadata().getAuthors() == null) {
             return;
         }
-        for (PersonImpl author : pub.getMetadata().getAuthors()) {
+        for (Person author : pub.getMetadata().getAuthors()) {
             if (author.getAffiliation() == null) {
                 continue;
             }

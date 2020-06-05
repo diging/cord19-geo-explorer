@@ -35,6 +35,8 @@ public class PublicationImpl implements Publication {
     private boolean hasPmcXmlParse;
     private String fulltextFile;
     private String url;
+    private String documentUrl;
+    private String documentType;
     private String whoCovidence;
     
     private String database;
@@ -49,6 +51,10 @@ public class PublicationImpl implements Publication {
     private Map<String, RefEntryImpl> refEntries;
     @JsonProperty("back_matter")
     private List<ParagraphImpl> backMatter;
+    
+    private List<CategoryImpl> categories;
+    private CategoryImpl primaryCategory;
+    private String comment;
 
     public ObjectId getId() {
         return id;
@@ -437,6 +443,26 @@ public class PublicationImpl implements Publication {
         this.url = url;
     }
 
+    @Override
+    public String getDocumentUrl() {
+        return documentUrl;
+    }
+
+    @Override
+    public void setDocumentUrl(String documentUrl) {
+        this.documentUrl = documentUrl;
+    }
+
+    @Override
+    public String getDocumentType() {
+        return documentType;
+    }
+
+    @Override
+    public void setDocumentType(String documentType) {
+        this.documentType = documentType;
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -578,6 +604,36 @@ public class PublicationImpl implements Publication {
     @Override
     public void setBackMatter(List<ParagraphImpl> backMatter) {
         this.backMatter = backMatter;
+    }
+
+    @Override
+    public List<CategoryImpl> getCategories() {
+        return categories;
+    }
+
+    @Override
+    public void setCategories(List<CategoryImpl> categories) {
+        this.categories = categories;
+    }
+
+    @Override
+    public CategoryImpl getPrimaryCategory() {
+        return primaryCategory;
+    }
+
+    @Override
+    public void setPrimaryCategory(CategoryImpl primaryCategory) {
+        this.primaryCategory = primaryCategory;
+    }
+
+    @Override
+    public String getComment() {
+        return comment;
+    }
+
+    @Override
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
 }

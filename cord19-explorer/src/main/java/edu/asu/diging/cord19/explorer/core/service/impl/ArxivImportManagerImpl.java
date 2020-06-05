@@ -30,7 +30,7 @@ public class ArxivImportManagerImpl implements ArxivImportManager {
         task.setProcessed(0);
         task = taskRepo.save(task);
 
-        importer.importMetadata(searchTerm);
+        importer.importMetadata(task.getId(), searchTerm);
 
         return task.getId();
     }

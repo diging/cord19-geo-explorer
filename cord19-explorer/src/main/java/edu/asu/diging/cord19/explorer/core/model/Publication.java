@@ -6,6 +6,7 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import edu.asu.diging.cord19.explorer.core.model.impl.BibEntryImpl;
+import edu.asu.diging.cord19.explorer.core.model.impl.CategoryImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.ParagraphImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.RefEntryImpl;
@@ -110,4 +111,24 @@ public interface Publication {
     void setDatabase(String database);
 
     String getDatabase();
+
+    void setDocumentType(String documentType);
+
+    String getDocumentType();
+
+    void setDocumentUrl(String documentUrl);
+
+    String getDocumentUrl();
+
+    void setCategories(List<CategoryImpl> categories);
+
+    List<CategoryImpl> getCategories();
+
+    void setComment(String comment);
+
+    String getComment();
+
+    void setPrimaryCategory(CategoryImpl primaryCategory);
+
+    CategoryImpl getPrimaryCategory();
 }

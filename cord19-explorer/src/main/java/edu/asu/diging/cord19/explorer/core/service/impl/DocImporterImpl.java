@@ -2,7 +2,6 @@ package edu.asu.diging.cord19.explorer.core.service.impl;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -12,38 +11,19 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import javax.annotation.PostConstruct;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.text.similarity.JaroWinklerSimilarity;
-import org.apache.logging.log4j.util.TriConsumer;
-import org.bson.types.ObjectId;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.Environment;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
-import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -58,26 +38,17 @@ import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 
 import edu.asu.diging.cord19.explorer.core.data.TaskRepository;
-import edu.asu.diging.cord19.explorer.core.elastic.model.impl.Wikientry;
-import edu.asu.diging.cord19.explorer.core.model.Affiliation;
 import edu.asu.diging.cord19.explorer.core.model.LocationMatch;
 import edu.asu.diging.cord19.explorer.core.model.Publication;
-import edu.asu.diging.cord19.explorer.core.model.impl.LocationMatchImpl;
-import edu.asu.diging.cord19.explorer.core.model.impl.LocationType;
 import edu.asu.diging.cord19.explorer.core.model.impl.ParagraphImpl;
-import edu.asu.diging.cord19.explorer.core.model.impl.PersonImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
-import edu.asu.diging.cord19.explorer.core.model.impl.WikipediaArticleImpl;
 import edu.asu.diging.cord19.explorer.core.model.task.ImportTask;
 import edu.asu.diging.cord19.explorer.core.model.task.impl.ImportTaskImpl;
 import edu.asu.diging.cord19.explorer.core.model.task.impl.TaskStatus;
 import edu.asu.diging.cord19.explorer.core.mongo.PublicationRepository;
+import edu.asu.diging.cord19.explorer.core.service.AffiliationCleaner;
 import edu.asu.diging.cord19.explorer.core.service.DocImporter;
-import opennlp.tools.namefind.NameFinderME;
-import opennlp.tools.namefind.TokenNameFinderModel;
-import opennlp.tools.tokenize.TokenizerME;
-import opennlp.tools.tokenize.TokenizerModel;
-import opennlp.tools.util.Span;
+import edu.asu.diging.cord19.explorer.core.service.TextLocationMatcher;
 
 @Component
 @PropertySource({ "classpath:config.properties", "${appConfigFile:classpath:}/app.properties",
@@ -91,15 +62,10 @@ public class DocImporterImpl implements DocImporter {
 
     @Value("${metadata.filename.msid}")
     private String metadataFilenameMsId;
-
+    
     @Value("${app.data.path}")
     private String appdataPath;
 
-    @Value("${models.folder.name}")
-    private String modelsFolderName;
-
-    @Autowired
-    private Environment env;
 
     @Autowired
     private TaskRepository taskRepo;
@@ -107,23 +73,14 @@ public class DocImporterImpl implements DocImporter {
     @Autowired
     private PublicationRepository pubRepo;
 
-    @Qualifier("elasticsearchTemplate")
     @Autowired
-    private ElasticsearchOperations searchTemplate;
-
+    private AffiliationCleaner affCleaner;
+    
+    @Autowired
+    private TextLocationMatcher locMatcher;
+   
     @Autowired
     private MongoTemplate mongoTemplate;
-
-    private TokenNameFinderModel model;
-
-    private NameFinderME nameFinder;
-
-    @PostConstruct
-    public void init() throws ClassCastException, ClassNotFoundException, IOException {
-        File r = new File(appdataPath + modelsFolderName + File.separator + "en-ner-location.bin");
-        model = new TokenNameFinderModel(new FileInputStream(r));
-        nameFinder = new NameFinderME(model);
-    }
 
     @Override
     @Async
@@ -156,7 +113,7 @@ public class DocImporterImpl implements DocImporter {
         long counter = 1;
         try (Stream<Path> paths = Files.walk(Paths.get(rootFolder))) {
             Iterator<Path> pathIterator = paths.iterator();
-            while(pathIterator.hasNext()) {
+            while (pathIterator.hasNext()) {
                 Path path = pathIterator.next();
                 if (Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS) && !path.getFileName().startsWith(".")) {
                     try {
@@ -175,13 +132,15 @@ public class DocImporterImpl implements DocImporter {
                     }
                     counter++;
                 }
-            };
+            }
+            ;
         }
 
         writer.close();
 
         File metadataFileBase = new File(rootFolder + File.separator + metadataFilename);
-        //File metadataFileMsId = new File(rootFolder + File.separator + metadataFilenameMsId);
+        // File metadataFileMsId = new File(rootFolder + File.separator +
+        // metadataFilenameMsId);
 
         for (File metadataFile : Arrays.asList(metadataFileBase)) {
             CsvToBean<MetadataEntry> bean = new CsvToBeanBuilder(new FileReader(metadataFile))
@@ -213,6 +172,7 @@ public class DocImporterImpl implements DocImporter {
                     pub.setSourceX(entry.getSourceX());
                     pub.setUrl(entry.getUrl());
                     pub.setWhoCovidence(entry.getWhoCov());
+                    pub.setArxivId(entry.getArxivId());
                     extractYear(pub);
                     pubRepo.save(pub);
                 }
@@ -231,21 +191,21 @@ public class DocImporterImpl implements DocImporter {
         }
         ObjectMapper mapper = new ObjectMapper();
         PublicationImpl publication = mapper.readValue(f, PublicationImpl.class);
-        
+
         // do not reimport existing publications
-        PublicationImpl storedPub = pubRepo.findFirstByPaperId(publication.getPaperId());
+        Publication storedPub = pubRepo.findFirstByPaperId(publication.getPaperId());
         if (storedPub != null) {
-           return;
+            return;
         }
-        
-        List<LocationMatch> invalidMatches = findLocations(publication);
+
+        List<LocationMatch> invalidMatches = locMatcher.findLocations(publication);
         processLocationMatches(publication);
         for (LocationMatch match : invalidMatches) {
             writer.newLine();
             writer.write(match.getLocationName());
             writer.flush();
         }
-        processAffiliations(publication);
+        affCleaner.processAffiliations(publication);
         pubRepo.save(publication);
         task.setProcessed(task.getProcessed() + 1);
         logger.debug("Stored: " + publication.getPaperId());
@@ -277,7 +237,7 @@ public class DocImporterImpl implements DocImporter {
             while (docs.hasNext()) {
                 PublicationImpl pub = docs.next();
                 logger.info(String.format("Cleaning affiliations %d of %d for: %s", counter, total, pub.getPaperId()));
-                processAffiliations(pub);
+                affCleaner.processAffiliations(pub);
                 pubRepo.save(pub);
                 counter++;
             }
@@ -319,49 +279,6 @@ public class DocImporterImpl implements DocImporter {
         taskRepo.save((ImportTaskImpl) task);
     }
 
-    private void processAffiliations(Publication pub) {
-        if (pub.getMetadata() == null || pub.getMetadata().getAuthors() == null) {
-            return;
-        }
-        for (PersonImpl author : pub.getMetadata().getAuthors()) {
-            if (author.getAffiliation() == null) {
-                continue;
-            }
-
-            Affiliation affiliation = author.getAffiliation();
-            affiliation.setWikiarticles(new ArrayList<>());
-            List<Wikientry> wikientries = null;
-            if (affiliation.getInstitution() != null && !affiliation.getInstitution().trim().isEmpty()) {
-                wikientries = searchElasticInTitle(affiliation.getInstitution());
-                findWikiarticles(affiliation, wikientries, LocationType.INSTITUTION, this::addArticleToAffiliation);
-            }
-            if (affiliation.getLocationSettlement() != null && !affiliation.getLocationSettlement().trim().isEmpty()) {
-                wikientries = searchElasticInTitle(affiliation.getLocationSettlement());
-                findWikiarticles(affiliation, wikientries, LocationType.CITY, this::addArticleToAffiliation);
-            }
-            String locationRegion = affiliation.getLocationRegion();
-            String country = affiliation.getLocationCountry();
-            if (locationRegion != null && locationRegion.length() == 2) {
-                if (isCountryUSA(country)) {
-                    String state = env.getProperty(locationRegion);
-                    if (state != null && !state.trim().isEmpty()) {
-                        locationRegion = state;
-                    }
-                }
-            }
-            if (affiliation.getLocationRegion() != null && !affiliation.getLocationRegion().trim().isEmpty()) {
-                wikientries = searchElasticInTitle(locationRegion);
-                findWikiarticles(affiliation, wikientries, LocationType.REGION, this::addArticleToAffiliation);
-            }
-            if (affiliation.getLocationCountry() != null && !affiliation.getLocationCountry().trim().isEmpty()) {
-                wikientries = searchElasticInTitle(affiliation.getLocationCountry());
-                findWikiarticles(affiliation, wikientries, LocationType.COUNTRY, this::addArticleToAffiliation);
-            }
-
-            selectArticle(affiliation);
-        }
-    }
-
     private void processLocationMatches(Publication pub) {
         if (pub.getBodyText() == null) {
             return;
@@ -372,137 +289,13 @@ public class DocImporterImpl implements DocImporter {
             }
             for (LocationMatch match : paragraph.getLocationMatches()) {
                 if (match != null) {
-                    selectArticle(match);
+                    locMatcher.selectArticle(match);
                 }
             }
         }
     }
 
-    private void selectArticle(Affiliation affiliation) {
-        for (WikipediaArticleImpl article : affiliation.getWikiarticles()) {
-            String articleTitle = article.getTitle();
-            // if the institution is exactly the same, we assume it's the right article
-            if (affiliation.getInstitution() != null && articleTitle.equals(affiliation.getInstitution())) {
-                affiliation.setSelectedWikiarticle(article);
-                article.setSelectedOn(OffsetDateTime.now().toString());
-                return;
-            }
-
-            // e.g. Worcester, Massachusetts
-            String city = affiliation.getLocationSettlement();
-            String state = getState(affiliation.getLocationRegion(), affiliation.getLocationCountry());
-            if (!StringUtils.isBlank(city) && !StringUtils.isBlank(state)
-                    && article.getLocationType().equals(LocationType.CITY)) {
-                if (consistsOfTwoPlaces(articleTitle, city, state)) {
-                    affiliation.setSelectedWikiarticle(article);
-                    article.setSelectedOn(OffsetDateTime.now().toString());
-                    return;
-                }
-            }
-
-            // e.g. Panama City, Panama
-            String country = getCountry(affiliation.getLocationCountry());
-            if (!StringUtils.isBlank(city) && !StringUtils.isBlank(country)) {
-                if (consistsOfTwoPlaces(articleTitle, city, country)) {
-                    affiliation.setSelectedWikiarticle(article);
-                    article.setSelectedOn(OffsetDateTime.now().toString());
-                    return;
-                }
-            }
-
-            // city or state equals article title
-            if ((!StringUtils.isBlank(city) && articleTitle.equals(city.trim()))
-                    || (!StringUtils.isBlank(state) && articleTitle.equals(state.trim()))) {
-                affiliation.setSelectedWikiarticle(article);
-                article.setSelectedOn(OffsetDateTime.now().toString());
-                return;
-            }
-
-            if (!StringUtils.isBlank(affiliation.getInstitution())) {
-                JaroWinklerSimilarity sim = new JaroWinklerSimilarity();
-                Double similarity = sim.apply(articleTitle, affiliation.getInstitution());
-                if (similarity > 0.8) {
-                    affiliation.setSelectedWikiarticle(article);
-                    article.setSelectedOn(OffsetDateTime.now().toString());
-                    return;
-                }
-            }
-
-            if (!StringUtils.isBlank(country) && articleTitle.equals(country.trim())) {
-                affiliation.setSelectedWikiarticle(article);
-                article.setSelectedOn(OffsetDateTime.now().toString());
-                return;
-            }
-        }
-    }
-
-    private void selectArticle(LocationMatch match) {
-        if (match.getWikipediaArticles() == null) {
-            return;
-        }
-        Map<Double, WikipediaArticleImpl> similarities = new HashMap<Double, WikipediaArticleImpl>();
-        for (WikipediaArticleImpl article : match.getWikipediaArticles()) {
-            String articleTitle = article.getTitle();
-            if (!StringUtils.isBlank(match.getLocationName())) {
-                JaroWinklerSimilarity sim = new JaroWinklerSimilarity();
-                Double similarity = sim.apply(articleTitle, match.getLocationName());
-                if (similarity > 0.8) {
-                    similarities.put(similarity, article);
-                }
-            }
-        }
-
-        Optional<Double> max = similarities.keySet().stream().max(Double::compareTo);
-        if (max.isPresent()) {
-            match.setSelectedArticle(similarities.get(max.get()));
-            match.getSelectedArticle().setSelectedOn(OffsetDateTime.now().toString());
-        }
-    }
-
-    private boolean consistsOfTwoPlaces(String title, String place1, String place2) {
-        if (title.contains(place1.trim()) && title.contains(place2.trim())
-                && title.length() >= (place1.trim().length() + place2.trim().length() + 1)
-                && title.length() <= (place1.trim().length() + place2.trim().length() + 5)) {
-            return true;
-        }
-        return false;
-    }
-
-    private String getState(String state, String country) {
-        if (state != null && state.trim().length() == 2 && isCountryUSA(country)) {
-            String stateName = env.getProperty(state);
-            if (!StringUtils.isBlank(stateName)) {
-                return stateName.trim();
-            }
-        }
-        return state;
-    }
-
-    private String getCountry(String country) {
-        if (StringUtils.isBlank(country)) {
-            return "";
-        }
-
-        switch (country.trim()) {
-        case "US":
-            return "United States";
-        case "USA":
-            return "United States";
-        case "UK":
-            return "United Kingdom";
-        }
-
-        return country;
-    }
-
-    private boolean isCountryUSA(String country) {
-        if (country != null && (country.equals("USA") || country.equals("United States") || country.equals("US")
-                || country.equals("United States of America"))) {
-            return true;
-        }
-        return false;
-    }
-
+    
     @Override
     @Async
     public void extractYears(String taskId) {
@@ -559,7 +352,7 @@ public class DocImporterImpl implements DocImporter {
         try (CloseableIterator<PublicationImpl> docs = mongoTemplate.stream(new Query(), PublicationImpl.class)) {
             while (docs.hasNext()) {
                 PublicationImpl pub = docs.next();
-                findLocations(pub);
+                locMatcher.findLocations(pub);
                 pubRepo.save(pub);
             }
         }
@@ -568,229 +361,7 @@ public class DocImporterImpl implements DocImporter {
         task.setDateEnded(OffsetDateTime.now());
         taskRepo.save((ImportTaskImpl) task);
     }
-
-    private List<LocationMatch> findLocations(Publication pub)
-            throws ClassCastException, ClassNotFoundException, IOException {
-        List<LocationMatch> inValidMatches = new ArrayList<>();
-        for (ParagraphImpl para : pub.getBodyText()) {
-            if (para.getLocationMatches() == null) {
-                para.setLocationMatches(new ArrayList<>());
-            }
-            String[] tokens = tokenize(para.getText());
-            Span nameSpans[] = nameFinder.find(tokens);
-
-            for (Span span : nameSpans) {
-                LocationMatch match = createMatch(span, para, tokens);
-                if (match != null) {
-                    if (isValid(match)) {
-                        para.getLocationMatches().add(match);
-                    } else {
-                        inValidMatches.add(match);
-                    }
-                }
-            }
-            nameFinder.clearAdaptiveData();
-        }
-        return inValidMatches;
-    }
-
-    private boolean isValid(LocationMatch match) {
-        if (match.getLocationName().isEmpty()) {
-            return false;
-        }
-
-        // we do want only numbers
-        Pattern pattern = Pattern.compile("[0-9,\\.\\-\\:&\\W]+");
-        Matcher m = pattern.matcher(match.getLocationName());
-        if (m.matches()) {
-            return false;
-        }
-
-        // let's exclude 2 letter words
-        if (match.getLocationName().length() <= 2) {
-            return false;
-        }
-
-        if (m.find()) {
-            // length of match
-            int matchLength = m.group().length();
-            // if the match is as long as rest of string, we assume it's not a location
-            if (matchLength >= match.getLocationName().length() - matchLength) {
-                return false;
-            }
-        }
-
-        Pattern pattern2 = Pattern.compile("[A-Z]*[0-9,\\.\\-\\(\\)/]+[A-Z]*");
-        Matcher m2 = pattern2.matcher(match.getLocationName());
-        if (m2.matches()) {
-            return false;
-        }
-
-        // exclude things like "A,T,M", "A/Anhui/1/2005"
-        Pattern p3 = Pattern.compile("[\\S]*[0-9/\\+,]+[\\S]*");
-        Matcher m3 = p3.matcher(match.getLocationName());
-        if (m3.matches()) {
-            return false;
-        }
-
-        // exclude things like ADP-ribose or ADPrs
-        Pattern p4 = Pattern.compile("[A-Z0-9\\+\\?]{2,}\\-+[a-z]{2,}");
-        Matcher m4 = p4.matcher(match.getLocationName());
-        if (m4.matches()) {
-            return false;
-        }
-
-        if (match.getLocationName().startsWith("Appendix") || match.getLocationName().startsWith("A-")) {
-            return false;
-        }
-
-        // exclude names with multiple /
-        Pattern p5 = Pattern.compile("\\/");
-        Matcher m5 = p5.matcher(match.getLocationName());
-        int count = 0;
-        while (m5.find()) {
-            count++;
-        }
-        if (count > 1) {
-            return false;
-        }
-
-        List<Wikientry> entries = searchElasticInTitle(match.getLocationName());
-
-        if (entries.size() == 0) {
-            return false;
-        }
-
-        if (entries.size() > 0) {
-            boolean isPlace = findWikiarticles(match, entries, LocationType.OTHER, this::addArticleToMatch);
-
-            if (!isPlace) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private boolean findWikiarticles(Object match, List<Wikientry> entries, LocationType type,
-            TriConsumer<Object, Wikientry, LocationType> attachMethod) {
-        List<String> placeIndicators = Arrays.asList("republic", "land", "state", "countr", "place", "cit", "park",
-                "region", "continent", "district", "metro", "town", "captial", "village", "settlement", "university");
-
-        boolean isPlace = false;
-        // if one of the first x results seems to be a place, we assume it's one
-        for (Wikientry entry : entries) {
-            if (entry.getComplete_text().trim().toLowerCase().startsWith("#redirect")) {
-                Wikientry redirectEntry = followRedirect(entry);
-                if (redirectEntry != null) {
-                    entry = redirectEntry;
-                }
-            }
-
-            isPlace = isPlace || entry.getCategories().stream()
-                    .anyMatch(c -> placeIndicators.stream().anyMatch(p -> c.toLowerCase().contains(p)));
-
-            if (entry.getCoordinates() != null && !entry.getCoordinates().trim().isEmpty()) {
-                isPlace = true;
-                attachMethod.accept(match, entry, type);
-            }
-        }
-        return isPlace;
-    }
-
-    private void addArticleToMatch(Object matchObject, Wikientry entry, LocationType type) {
-        LocationMatch match = (LocationMatch) matchObject;
-        if (match.getWikipediaArticles() == null) {
-            match.setWikipediaArticles(new ArrayList<>());
-        }
-        boolean exists = match.getWikipediaArticles().stream().anyMatch(a -> a.getTitle().equals(entry.getTitle()));
-
-        if (!exists) {
-            WikipediaArticleImpl article = new WikipediaArticleImpl();
-            // article.setCompleteText(entry.getComplete_text());
-            article.setTitle(entry.getTitle());
-            article.setCoordinates(entry.getCoordinates());
-            article.setLocationType(type);
-            match.getWikipediaArticles().add(article);
-        }
-    }
-
-    private void addArticleToAffiliation(Object affiliationObject, Wikientry entry, LocationType type) {
-        Affiliation affiliation = (Affiliation) affiliationObject;
-        boolean exists = affiliation.getWikiarticles().stream().anyMatch(a -> a.getTitle().equals(entry.getTitle()));
-
-        if (!exists) {
-            WikipediaArticleImpl article = new WikipediaArticleImpl();
-            // article.setCompleteText(entry.getComplete_text());
-            article.setTitle(entry.getTitle());
-            article.setCoordinates(entry.getCoordinates());
-            article.setLocationType(type);
-            affiliation.getWikiarticles().add(article);
-        }
-    }
-
-    private List<Wikientry> searchElasticInTitle(String location) {
-        PageRequest page = PageRequest.of(0, 10);
-
-        BoolQueryBuilder builder = QueryBuilders.boolQuery();
-        String searchTerm = prepareSearchTerm(location);
-        if (searchTerm.trim().isEmpty()) {
-            return new ArrayList<>();
-        }
-        builder.must(QueryBuilders.queryStringQuery("title:" + searchTerm));
-        NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
-        nativeSearchQueryBuilder.withQuery(builder);
-        nativeSearchQueryBuilder.withPageable(page);
-        NativeSearchQuery query = nativeSearchQueryBuilder.build();
-        List<Wikientry> entries = searchTemplate.queryForList(query, Wikientry.class);
-        return entries;
-    }
-
-    private Wikientry followRedirect(Wikientry entry) {
-        Pattern redirectPattern = Pattern.compile("#([rR][eE][Dd][Ii][Rr][Ee][Cc][Tt]) \\[\\[(.+?)\\]\\]");
-        Matcher redirectMatcher = redirectPattern.matcher(entry.getComplete_text());
-
-        if (redirectMatcher.find()) {
-            PageRequest redirectPage = PageRequest.of(0, 1);
-            String searchTerm = prepareSearchTerm(redirectMatcher.group(2));
-
-            if (searchTerm.trim().isEmpty()) {
-                return null;
-            }
-
-            BoolQueryBuilder redirectBuilder = QueryBuilders.boolQuery();
-            redirectBuilder.must(QueryBuilders.termQuery("title_keyword", searchTerm));
-
-            NativeSearchQueryBuilder redirectQueryBuilder = new NativeSearchQueryBuilder();
-            redirectQueryBuilder.withQuery(redirectBuilder);
-            redirectQueryBuilder.withPageable(redirectPage);
-            NativeSearchQuery redirectQuery = redirectQueryBuilder.build();
-            List<Wikientry> redirectEntry = searchTemplate.queryForList(redirectQuery, Wikientry.class);
-
-            if (redirectEntry.size() > 0) {
-                return redirectEntry.get(0);
-            }
-        }
-
-        return null;
-    }
-
-    private String prepareSearchTerm(String term) {
-        term = term.replaceAll("/", " ").replaceAll("\\(", " ").replaceAll("\\)", " ");
-        term = term.replaceAll("\\[", " ").replaceAll("\\]", " ").replaceAll(":", " ");
-        term = term.replaceAll("\\{", " ").replaceAll("\\}", " ").replaceAll("~", " ").replaceAll("\\*",  " ");
-        term = term.replaceAll("\"", "").replaceAll("'", "").replaceAll("\\^", "");
-        term = term.replaceAll("!", "").replaceAll("\\-", " ").replaceAll("\\.", " ");
-        term = term.replaceAll("_", " ").replaceAll("\\\\", " ").replaceAll("\\+", " ");
-        term = term.replaceAll("\\|",  " ").replaceAll(" OR", " ").replaceAll(" OR ", " ");
-        term = term.replaceAll(" AND$", " ").replaceAll("^AND ", " ").replaceAll(" AND ", " ");
-
-        // FIXME: check against US states
-        if (term.trim().equals("OR") || term.trim().equals("AND")) {
-            return "";
-        }
-        return term;
-    }
+    
 
     @Override
     @Async
@@ -828,7 +399,7 @@ public class DocImporterImpl implements DocImporter {
                     Iterator<LocationMatch> it = para.getLocationMatches().iterator();
                     while (it.hasNext()) {
                         LocationMatch match = it.next();
-                        if (nonValidMatches.contains(match.getLocationName()) || !isValid(match)) {
+                        if (nonValidMatches.contains(match.getLocationName()) || !locMatcher.isValid(match)) {
                             try {
                                 nonValidMatches.add(match.getLocationName());
                                 writer.newLine();
@@ -856,42 +427,7 @@ public class DocImporterImpl implements DocImporter {
         taskRepo.save((ImportTaskImpl) task);
     }
 
-    private LocationMatch createMatch(Span span, ParagraphImpl para, String[] tokens) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = span.getStart(); i <= span.getEnd(); i++) {
-            if (tokens.length > i) {
-                String location = tokens[i];
-                Pattern pattern = Pattern.compile("[0-9,\\.\\-\\:&\\W]+");
-                Matcher m = pattern.matcher(location);
+    
 
-                Pattern pattern2 = Pattern.compile("[^A-Z].*");
-                Matcher m2 = pattern2.matcher(location);
-                if (!m.matches() && !m2.matches()) {
-                    sb.append(" ");
-                    sb.append(location);
-                }
-            }
-        }
-        if (sb.toString().trim().isEmpty()) {
-            return null;
-        }
-
-        LocationMatch match = new LocationMatchImpl();
-        match.setId(new ObjectId());
-        match.setStart(span.getStart());
-        match.setType(span.getType());
-        match.setSection(para.getSection());
-        match.setLocationName(sb.toString().trim());
-        match.setEnd(match.getStart() + match.getLocationName().length());
-
-        return match;
-    }
-
-    public String[] tokenize(String sentence) throws IOException {
-        File r = new File(appdataPath + modelsFolderName + File.separator + "en-token.bin");
-        TokenizerModel tokenModel = new TokenizerModel(new FileInputStream(r));
-
-        TokenizerME tokenizer = new TokenizerME(tokenModel);
-        return tokenizer.tokenize(sentence);
-    }
+    
 }

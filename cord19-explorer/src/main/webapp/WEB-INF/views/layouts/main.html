@@ -53,6 +53,24 @@
 	          	<li sec:authorize="hasRole('ADMIN')" role="presentation">
 	          		<a th:href="@{/auth/import}" >Import</a>
 	          	</li>
+	          	<li sec:authorize="hasRole('ADMIN')" role="presentation" class="dropdown">
+	          		<a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+				      Arxiv <span class="caret"></span>
+				    </a>
+				    <ul class="dropdown-menu">
+				      <li role="presentation">
+				      	<a th:href="@{/arxiv/publications}" >Arxiv Publications</a>
+				      </li>
+				      <li role="presentation">
+				      	<a th:href="@{/auth/import/arxiv}" >Import from Arxiv</a>
+				      </li>
+				      <li role="presentation">
+				      	<a th:href="@{/auth/arxiv/delete}" >Delete Arxiv Dataset</a>
+				      </li>
+				    </ul>
+	          		
+	          	</li>
+	          	
 	          	
 	          	<li sec:authorize="isAuthenticated()" role="presentation">
 	         	 	<form th:action="@{/logout}" method="POST">

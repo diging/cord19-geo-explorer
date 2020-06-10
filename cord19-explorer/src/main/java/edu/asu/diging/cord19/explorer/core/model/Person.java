@@ -33,4 +33,12 @@ public interface Person {
 
     void setEmail(String email);
 
+    void setName(String name);
+
+    String getName();
+
+    void setUri(String uri);
+
+    String getUri();
+
 }

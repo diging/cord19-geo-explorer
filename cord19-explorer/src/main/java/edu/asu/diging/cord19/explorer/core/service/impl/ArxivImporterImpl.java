@@ -138,23 +138,69 @@ public class ArxivImporterImpl implements ArxivImporter {
     private Publication parseEntry(Entry entry) {
         Publication pub = new PublicationImpl();
         pub.setDatabase(Publication.DATABASE_ARXIV);
-        ParagraphImpl abstractText = new ParagraphImpl();
-        abstractText.setText(entry.getSummary().getValue());
-        pub.setAbstracts(new ArrayList<ParagraphImpl>());
-        pub.getAbstracts().add(abstractText);
         
-        Date published = entry.getPublished();
-        pub.setPublishTime(published.toString());
-        
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(published);
-        pub.setPublishYear(cal.get(Calendar.YEAR));
+        setAbstract(entry, pub);
+        setDate(entry, pub);
         
         pub.setMetadata(new MetadataImpl());
         pub.getMetadata().setTitle(entry.getTitle());
-        pub.setPaperId(getArxivId(entry.getId()));
-        pub.setUrl(entry.getId());
         
+        setIds(entry, pub);
+        setAuthors(entry, pub);
+        setPdfLink(entry, pub);
+        setHtmlLink(entry, pub);
+        setCategories(entry, pub);
+        setArxivData(entry, pub);
+        
+        affCleaner.processAffiliations(pub);
+        return pub;
+    }
+
+    private void setArxivData(Entry entry, Publication pub) {
+        for (Element elem : entry.getForeignMarkup()) {
+            if (elem.getName().equals(ARXIV_DOI)) {
+                pub.setDoi(elem.getValue());
+            } else if(elem.getName().equals(ARXIV_JOURNAL)) {
+                pub.setJournal(elem.getValue());
+            } else if(elem.getName().equals(ARXIV_PRIMARY_CATEGORY)) {
+                CategoryImpl cat = new CategoryImpl();
+                cat.setTerm(elem.getAttributeValue("term"));
+                pub.setPrimaryCategory(cat);
+            } else if(elem.getName().equals(ARXIV_COMMENT)) {
+                pub.setComment(elem.getValue());
+            }
+        }
+    }
+
+    private void setCategories(Entry entry, Publication pub) {
+        pub.setCategories(new ArrayList<>());
+        for (Category cat : entry.getCategories()) {
+            CategoryImpl category = new CategoryImpl();
+            category.setLabel(cat.getLabel());
+            category.setScheme(cat.getScheme());
+            category.setTerm(cat.getTerm());
+            pub.getCategories().add(category);
+        }
+    }
+
+    private void setHtmlLink(Entry entry, Publication pub) {
+        for (Link link : entry.getAlternateLinks()) {
+            if (link.getType() != null && link.getType().equals(MediaType.TEXT_HTML.toString())) {
+                pub.setUrl(link.getHref());
+            }
+        }
+    }
+
+    private void setPdfLink(Entry entry, Publication pub) {
+        for (Link link : entry.getOtherLinks()) {
+            if (link.getType() != null && link.getType().equals(MediaType.APPLICATION_PDF.toString())) {
+                pub.setDocumentUrl(link.getHref());
+                pub.setDocumentType(link.getType());
+            }
+        }
+    }
+
+    private void setAuthors(Entry entry, Publication pub) {
         pub.getMetadata().setAuthors(new ArrayList<>());
         for (SyndPerson person : entry.getAuthors()) {
             PersonImpl author = new PersonImpl();
@@ -171,45 +217,28 @@ public class ArxivImporterImpl implements ArxivImporter {
             }
             pub.getMetadata().getAuthors().add(author);
         }
+    }
+
+    private void setIds(Entry entry, Publication pub) {
+        pub.setPaperId(getArxivId(entry.getId()));
+        pub.setArxivId(pub.getPaperId());
+        pub.setUrl(entry.getId());
+    }
+
+    private void setDate(Entry entry, Publication pub) {
+        Date published = entry.getPublished();
+        pub.setPublishTime(published.toString());
         
-        for (Link link : entry.getOtherLinks()) {
-            if (link.getType() != null && link.getType().equals(MediaType.APPLICATION_PDF.toString())) {
-                pub.setDocumentUrl(link.getHref());
-                pub.setDocumentType(link.getType());
-            }
-        }
-        
-        for (Link link : entry.getAlternateLinks()) {
-            if (link.getType() != null && link.getType().equals(MediaType.TEXT_HTML.toString())) {
-                pub.setUrl(link.getHref());
-            }
-        }
-        
-        pub.setCategories(new ArrayList<>());
-        for (Category cat : entry.getCategories()) {
-            CategoryImpl category = new CategoryImpl();
-            category.setLabel(cat.getLabel());
-            category.setScheme(cat.getScheme());
-            category.setTerm(cat.getTerm());
-            pub.getCategories().add(category);
-        }
-        
-        for (Element elem : entry.getForeignMarkup()) {
-            if (elem.getName().equals(ARXIV_DOI)) {
-                pub.setDoi(elem.getValue());
-            } else if(elem.getName().equals(ARXIV_JOURNAL)) {
-                pub.setJournal(elem.getValue());
-            } else if(elem.getName().equals(ARXIV_PRIMARY_CATEGORY)) {
-                CategoryImpl cat = new CategoryImpl();
-                cat.setTerm(elem.getAttributeValue("term"));
-                pub.setPrimaryCategory(cat);
-            } else if(elem.getName().equals(ARXIV_COMMENT)) {
-                pub.setComment(elem.getValue());
-            }
-        }
-        
-        affCleaner.processAffiliations(pub);
-        return pub;
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(published);
+        pub.setPublishYear(cal.get(Calendar.YEAR));
+    }
+
+    private void setAbstract(Entry entry, Publication pub) {
+        ParagraphImpl abstractText = new ParagraphImpl();
+        abstractText.setText(entry.getSummary().getValue());
+        pub.setAbstracts(new ArrayList<ParagraphImpl>());
+        pub.getAbstracts().add(abstractText);
     }
     
     private String getArxivId(String uri) {

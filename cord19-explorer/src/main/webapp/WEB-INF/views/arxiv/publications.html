@@ -5,6 +5,9 @@
   <body>
    <div layout:fragment="content">
    	<div class="row">
+   		<div>
+   		Total: [[${pubCount}]] records
+   		</div>
 	   	<nav>
 		  <ul class="pagination">
 		  	<li th:if="${page != 0}"><a href="#" th:href="@{'/arxiv/publications?page=0'}" aria-label="First"><span aria-hidden="true">&laquo;&laquo;</span></a></li>

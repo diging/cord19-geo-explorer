@@ -25,7 +25,9 @@ public interface PublicationRepository extends MongoRepository<PublicationImpl, 
     
     List<PublicationImpl> findByDatabase(String database, Pageable pageable);
     
-    long countByDatabase(String database);
+    List<PublicationImpl> findByArxivIdIsNotNullOrDatabase(String database, Pageable pageable);
+    
+    long countByArxivIdIsNotNullOrDatabase(String database);
     
     long deleteByDatabase(String database);
 }

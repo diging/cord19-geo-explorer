@@ -17,9 +17,9 @@ public class ArxivDatasetController {
 
     @RequestMapping("/arxiv/publications")
     public String list(Model model, Pageable pageable) {
-        model.addAttribute("publications", pubRepo.findByDatabase(Publication.DATABASE_ARXIV, pageable));
+        model.addAttribute("publications", pubRepo.findByArxivIdIsNotNullOrDatabase(Publication.DATABASE_ARXIV, pageable));
         
-        long pubCount = pubRepo.countByDatabase(Publication.DATABASE_ARXIV);
+        long pubCount = pubRepo.countByArxivIdIsNotNullOrDatabase(Publication.DATABASE_ARXIV);
         model.addAttribute("pubCount", pubCount);
         
         model.addAttribute("page", pageable.getPageNumber());

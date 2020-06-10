@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.feed.AtomFeedHttpMessageConverter;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -64,7 +63,13 @@ public class ArxivImporterImpl implements ArxivImporter {
     private TaskRepository taskRepo;
     
     @Autowired
+    private PublicationRepository pubRepo;
+    
+    @Autowired
     private ArxivAtomHttpConverter converter;
+    
+    @Autowired
+    private AffiliationCleanerImpl affCleaner;
 
     /* (non-Javadoc)
      * @see edu.asu.diging.cord19.explorer.core.service.impl.ArxivImporter#importMetadata(java.lang.String)
@@ -122,8 +127,11 @@ public class ArxivImporterImpl implements ArxivImporter {
 
     private void handleEntries(Feed feed) {
         for (Entry entry : feed.getEntries()) {
-            PublicationImpl pub = (PublicationImpl)parseEntry(entry);
-            repo.save(pub);
+            String arxivId = getArxivId(entry.getId());
+            if (pubRepo.findFirstByArxivId(arxivId) == null) {
+                PublicationImpl pub = (PublicationImpl)parseEntry(entry);
+                repo.save(pub);
+            }
         }
     }
 
@@ -144,7 +152,8 @@ public class ArxivImporterImpl implements ArxivImporter {
         
         pub.setMetadata(new MetadataImpl());
         pub.getMetadata().setTitle(entry.getTitle());
-        pub.setPaperId(entry.getId());
+        pub.setPaperId(getArxivId(entry.getId()));
+        pub.setUrl(entry.getId());
         
         pub.getMetadata().setAuthors(new ArrayList<>());
         for (SyndPerson person : entry.getAuthors()) {
@@ -199,6 +208,18 @@ public class ArxivImporterImpl implements ArxivImporter {
             }
         }
         
+        affCleaner.processAffiliations(pub);
         return pub;
+    }
+    
+    private String getArxivId(String uri) {
+        if(uri != null && !uri.trim().isEmpty()) {
+            int idxSlash = uri.lastIndexOf("/");
+            if (idxSlash > -1) {
+                return uri.substring(idxSlash+1);
+            }
+            return uri;
+        }
+        return "";
     }
 }

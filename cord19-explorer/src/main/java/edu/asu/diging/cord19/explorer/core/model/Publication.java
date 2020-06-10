@@ -131,4 +131,8 @@ public interface Publication {
     void setPrimaryCategory(CategoryImpl primaryCategory);
 
     CategoryImpl getPrimaryCategory();
+
+    void setArxivId(String arxivId);
+
+    String getArxivId();
 }

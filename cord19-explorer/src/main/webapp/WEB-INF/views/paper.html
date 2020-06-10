@@ -23,7 +23,8 @@
    		<div class="col-sm-12">
    		by:
    		<div th:each="author, iterstat : ${publication.metadata.authors}" style="padding-bottom: 10px;">
-   		<b>[[${author.first}]] [[${#strings.listJoin(author.middle,',')}]] [[${author.last}]]</b>
+   		<b th:if="${author.name == null}">[[${author.first}]] [[${#strings.listJoin(author.middle,',')}]] [[${author.last}]]</b>
+   		<b th:if="${author.name != null}">[[${author.name}]]</b>
    		<span th:if="${author.affiliation != null}" th:remove="tag">
    		<span th:if="${author.affiliation.institution != null || author.affiliation.locationSettlement != null || author.affiliation.locationRegion != null || author.affiliation.locationCountry != null}" th:remove="tag"> 
    		<br>

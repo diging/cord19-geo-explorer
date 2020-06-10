@@ -268,7 +268,6 @@
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-elasticsearch</artifactId>
-			<version>3.2.6.RELEASE</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/com.rometools/rome -->

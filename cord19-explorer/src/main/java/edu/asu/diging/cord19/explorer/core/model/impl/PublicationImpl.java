@@ -25,6 +25,7 @@ public class PublicationImpl implements Publication {
     private String doi;
     private String pmcid;
     private String pubmedId;
+    private String arxivId;
     private String license;
     private String sourceX;
     private String publishTime;
@@ -216,6 +217,16 @@ public class PublicationImpl implements Publication {
     @Override
     public void setPubmedId(String pubmedId) {
         this.pubmedId = pubmedId;
+    }
+
+    @Override
+    public String getArxivId() {
+        return arxivId;
+    }
+
+    @Override
+    public void setArxivId(String arxivId) {
+        this.arxivId = arxivId;
     }
 
     /*

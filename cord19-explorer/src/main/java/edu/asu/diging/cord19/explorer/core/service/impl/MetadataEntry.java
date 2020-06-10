@@ -24,9 +24,9 @@ public class MetadataEntry {
     private String publishTime;
     @CsvBindByName(column = "journal")
     private String journal;
-    @CsvBindByName(column = "Microsoft Academic Paper ID")
+    @CsvBindByName(column = "mag_id")
     private String MsAcademicPaperId;
-    @CsvBindByName(column = "WHO #Covidence")
+    @CsvBindByName(column = "who_covidence_id")
     private String whoCov;
     @CsvBindByName(column = "has_pdf_parse")
     private String hasPdfParse;
@@ -36,6 +36,10 @@ public class MetadataEntry {
     private String fullTextFile;
     @CsvBindByName(column = "url")
     private String url;
+    @CsvBindByName(column = "arxiv_id")
+    private String arxivId;
+    @CsvBindByName(column = "s2_id")
+    private String s2Id;
 
     public MetadataEntry() {
     }
@@ -166,5 +170,21 @@ public class MetadataEntry {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getArxivId() {
+        return arxivId;
+    }
+
+    public void setArxivId(String arxivId) {
+        this.arxivId = arxivId;
+    }
+
+    public String getS2Id() {
+        return s2Id;
+    }
+
+    public void setS2Id(String s2Id) {
+        this.s2Id = s2Id;
     }
 }

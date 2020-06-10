@@ -47,11 +47,13 @@ public class MapController {
     @RequestMapping(value = "/auth/map/gather", method = RequestMethod.POST)
     public String gather() throws ClassCastException, ClassNotFoundException, IOException {
         try (CloseableIterator<CountriesImpl> docs = mongoTemplate.stream(new Query(), CountriesImpl.class)) {
-            System.out.print(docs.hasNext());
+            System.out.println("Hits");
+            System.out.println(docs.hasNext());
             while (docs.hasNext()) {
                 CountriesImpl pub = docs.next();
-                System.out.println(pub.getGeometry().toString());
+                System.out.println(pub.getGeometry().getType());
             }
+
         }
         
         

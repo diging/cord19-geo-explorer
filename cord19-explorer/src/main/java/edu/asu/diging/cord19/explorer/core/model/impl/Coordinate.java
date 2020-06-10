@@ -1,17 +1,16 @@
 package edu.asu.diging.cord19.explorer.core.model.impl;
 
-import java.util.List;
-
+import java.util.ArrayList;
 public class Coordinate {
 
     
-    private List<Double> coordinate;
+    private ArrayList<Double> coordinate;
 
-    public List<Double> getCoordinate() {
+    public ArrayList<Double> getCoordinate() {
         return coordinate;
     }
 
-    public void setCoordinate(List<Double> coordinate) {
+    public void setCoordinate(ArrayList<Double> coordinate) {
         this.coordinate = coordinate;
     }
 }

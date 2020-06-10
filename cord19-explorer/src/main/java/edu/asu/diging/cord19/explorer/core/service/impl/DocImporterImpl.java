@@ -46,7 +46,9 @@ import edu.asu.diging.cord19.explorer.core.model.task.ImportTask;
 import edu.asu.diging.cord19.explorer.core.model.task.impl.ImportTaskImpl;
 import edu.asu.diging.cord19.explorer.core.model.task.impl.TaskStatus;
 import edu.asu.diging.cord19.explorer.core.mongo.PublicationRepository;
+import edu.asu.diging.cord19.explorer.core.service.AffiliationCleaner;
 import edu.asu.diging.cord19.explorer.core.service.DocImporter;
+import edu.asu.diging.cord19.explorer.core.service.TextLocationMatcher;
 
 @Component
 @PropertySource({ "classpath:config.properties", "${appConfigFile:classpath:}/app.properties",
@@ -72,10 +74,10 @@ public class DocImporterImpl implements DocImporter {
     private PublicationRepository pubRepo;
 
     @Autowired
-    private AffiliationCleanerImpl affCleaner;
+    private AffiliationCleaner affCleaner;
     
     @Autowired
-    private TextLocationMatcherImpl locMatcher;
+    private TextLocationMatcher locMatcher;
    
     @Autowired
     private MongoTemplate mongoTemplate;

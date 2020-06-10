@@ -29,6 +29,9 @@ import edu.asu.diging.cord19.explorer.core.model.impl.LocationMatchImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.LocationType;
 import edu.asu.diging.cord19.explorer.core.model.impl.ParagraphImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.WikipediaArticleImpl;
+import edu.asu.diging.cord19.explorer.core.service.ElasticsearchConnector;
+import edu.asu.diging.cord19.explorer.core.service.TextLocationMatcher;
+import edu.asu.diging.cord19.explorer.core.service.WikipediaHelper;
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.TokenNameFinderModel;
 import opennlp.tools.tokenize.TokenizerME;
@@ -38,7 +41,7 @@ import opennlp.tools.util.Span;
 @Component
 @PropertySource({ "classpath:config.properties", "${appConfigFile:classpath:}/app.properties",
 "classpath:/states.txt" })
-public class TextLocationMatcherImpl {
+public class TextLocationMatcherImpl implements TextLocationMatcher {
     
     @Value("${models.folder.name}")
     private String modelsFolderName;
@@ -48,10 +51,10 @@ public class TextLocationMatcherImpl {
 
     
     @Autowired
-    private ElasticsearchConnectorImpl elastic;
+    private ElasticsearchConnector elastic;
 
     @Autowired
-    private WikipediaHelperImpl wikiHelper;
+    private WikipediaHelper wikiHelper;
 
     private NameFinderME nameFinder;
     private TokenNameFinderModel model;
@@ -64,6 +67,10 @@ public class TextLocationMatcherImpl {
         nameFinder = new NameFinderME(model);
     }
 
+    /* (non-Javadoc)
+     * @see edu.asu.diging.cord19.explorer.core.service.impl.TextLocationMatcher#findLocations(edu.asu.diging.cord19.explorer.core.model.Publication)
+     */
+    @Override
     public List<LocationMatch> findLocations(Publication pub)
             throws ClassCastException, ClassNotFoundException, IOException {
         List<LocationMatch> inValidMatches = new ArrayList<>();
@@ -89,6 +96,10 @@ public class TextLocationMatcherImpl {
         return inValidMatches;
     }
 
+    /* (non-Javadoc)
+     * @see edu.asu.diging.cord19.explorer.core.service.impl.TextLocationMatcher#isValid(edu.asu.diging.cord19.explorer.core.model.LocationMatch)
+     */
+    @Override
     public boolean isValid(LocationMatch match) {
         if (match.getLocationName().isEmpty()) {
             return false;
@@ -167,6 +178,10 @@ public class TextLocationMatcherImpl {
         return true;
     }
     
+    /* (non-Javadoc)
+     * @see edu.asu.diging.cord19.explorer.core.service.impl.TextLocationMatcher#selectArticle(edu.asu.diging.cord19.explorer.core.model.LocationMatch)
+     */
+    @Override
     public void selectArticle(LocationMatch match) {
         if (match.getWikipediaArticles() == null) {
             return;

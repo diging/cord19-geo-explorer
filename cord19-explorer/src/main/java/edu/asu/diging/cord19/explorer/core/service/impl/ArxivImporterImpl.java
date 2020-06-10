@@ -41,6 +41,7 @@ import edu.asu.diging.cord19.explorer.core.model.task.ImportTask;
 import edu.asu.diging.cord19.explorer.core.model.task.impl.ImportTaskImpl;
 import edu.asu.diging.cord19.explorer.core.model.task.impl.TaskStatus;
 import edu.asu.diging.cord19.explorer.core.mongo.PublicationRepository;
+import edu.asu.diging.cord19.explorer.core.service.AffiliationCleaner;
 import edu.asu.diging.cord19.explorer.core.service.ArxivImporter;
 
 @Component
@@ -69,7 +70,7 @@ public class ArxivImporterImpl implements ArxivImporter {
     private ArxivAtomHttpConverter converter;
     
     @Autowired
-    private AffiliationCleanerImpl affCleaner;
+    private AffiliationCleaner affCleaner;
 
     /* (non-Javadoc)
      * @see edu.asu.diging.cord19.explorer.core.service.impl.ArxivImporter#importMetadata(java.lang.String)

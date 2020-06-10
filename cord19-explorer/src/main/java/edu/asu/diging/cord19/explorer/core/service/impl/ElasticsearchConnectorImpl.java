@@ -16,15 +16,20 @@ import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilde
 import org.springframework.stereotype.Component;
 
 import edu.asu.diging.cord19.explorer.core.elastic.model.impl.Wikientry;
+import edu.asu.diging.cord19.explorer.core.service.ElasticsearchConnector;
 
 @Component
-public class ElasticsearchConnectorImpl {
+public class ElasticsearchConnectorImpl implements ElasticsearchConnector {
 
     @Qualifier("elasticsearchTemplate")
     @Autowired
     private ElasticsearchOperations searchTemplate;
 
     
+    /* (non-Javadoc)
+     * @see edu.asu.diging.cord19.explorer.core.service.impl.ElasticsearchConnector#followRedirect(edu.asu.diging.cord19.explorer.core.elastic.model.impl.Wikientry)
+     */
+    @Override
     public Wikientry followRedirect(Wikientry entry) {
         Pattern redirectPattern = Pattern.compile("#([rR][eE][Dd][Ii][Rr][Ee][Cc][Tt]) \\[\\[(.+?)\\]\\]");
         Matcher redirectMatcher = redirectPattern.matcher(entry.getComplete_text());
@@ -54,6 +59,10 @@ public class ElasticsearchConnectorImpl {
         return null;
     }
     
+    /* (non-Javadoc)
+     * @see edu.asu.diging.cord19.explorer.core.service.impl.ElasticsearchConnector#searchInTitle(java.lang.String)
+     */
+    @Override
     public List<Wikientry> searchInTitle(String location) {
         PageRequest page = PageRequest.of(0, 10);
 

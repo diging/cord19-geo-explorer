@@ -16,19 +16,23 @@ import edu.asu.diging.cord19.explorer.core.model.Person;
 import edu.asu.diging.cord19.explorer.core.model.Publication;
 import edu.asu.diging.cord19.explorer.core.model.impl.LocationType;
 import edu.asu.diging.cord19.explorer.core.model.impl.WikipediaArticleImpl;
+import edu.asu.diging.cord19.explorer.core.service.AffiliationCleaner;
+import edu.asu.diging.cord19.explorer.core.service.ElasticsearchConnector;
+import edu.asu.diging.cord19.explorer.core.service.WikipediaHelper;
 
 @Component
-public class AffiliationCleanerImpl {
+public class AffiliationCleanerImpl implements AffiliationCleaner {
     
     @Autowired
     private Environment env;
     
     @Autowired
-    private ElasticsearchConnectorImpl elastic;
+    private ElasticsearchConnector elastic;
     
     @Autowired
-    private WikipediaHelperImpl wikiHelper;
+    private WikipediaHelper wikiHelper;
 
+    @Override
     public void processAffiliations(Publication pub) {
         if (pub.getMetadata() == null || pub.getMetadata().getAuthors() == null) {
             return;

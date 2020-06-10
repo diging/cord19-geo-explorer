@@ -9,13 +9,19 @@ import org.springframework.stereotype.Component;
 
 import edu.asu.diging.cord19.explorer.core.elastic.model.impl.Wikientry;
 import edu.asu.diging.cord19.explorer.core.model.impl.LocationType;
+import edu.asu.diging.cord19.explorer.core.service.ElasticsearchConnector;
+import edu.asu.diging.cord19.explorer.core.service.WikipediaHelper;
 
 @Component
-public class WikipediaHelperImpl {
+public class WikipediaHelperImpl implements WikipediaHelper {
     
     @Autowired
-    private ElasticsearchConnectorImpl elastic;
+    private ElasticsearchConnector elastic;
     
+    /* (non-Javadoc)
+     * @see edu.asu.diging.cord19.explorer.core.service.impl.WikipediaHelper#findWikiarticles(java.lang.Object, java.util.List, edu.asu.diging.cord19.explorer.core.model.impl.LocationType, org.apache.logging.log4j.util.TriConsumer)
+     */
+    @Override
     public boolean findWikiarticles(Object match, List<Wikientry> entries, LocationType type,
             TriConsumer<Object, Wikientry, LocationType> attachMethod) {
         List<String> placeIndicators = Arrays.asList("republic", "land", "state", "countr", "place", "cit", "park",

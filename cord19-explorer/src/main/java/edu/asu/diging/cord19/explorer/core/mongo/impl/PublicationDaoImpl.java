@@ -41,6 +41,21 @@ public class PublicationDaoImpl implements PublicationDao {
     }
     
     @Override
+    public List<String> getCountriesTop() {
+        String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
+        DistinctIterable<String> output = mongoTemplate.getCollection(collection)
+                .distinct("metadata.authors.affiliation.institution", String.class);
+        List<String> results = new ArrayList<>();
+        MongoCursor<String> it = output.iterator();
+        int i = 0;
+        while (it.hasNext() && i < 50) {
+            results.add(it.next());
+            i++;
+        }
+        return results;
+    }
+    
+    @Override
     public List<String> getDistinctAffiliations() {
         String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
         DistinctIterable<String> output = mongoTemplate.getCollection(collection)
@@ -49,6 +64,21 @@ public class PublicationDaoImpl implements PublicationDao {
         MongoCursor<String> it = output.iterator();
         while (it.hasNext()) {
             results.add(it.next());
+        }
+        return results;
+    }
+    
+    @Override
+    public List<String> getDistinctAffiliationsTop() {
+        String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
+        DistinctIterable<String> output = mongoTemplate.getCollection(collection)
+                .distinct("metadata.authors.affiliation.selectedWikiarticle.title", String.class);
+        List<String> results = new ArrayList<>();
+        MongoCursor<String> it = output.iterator();
+        int i = 0;
+        while (it.hasNext() && i < 50) {
+            results.add(it.next());
+            i++;
         }
         return results;
     }
@@ -127,6 +157,25 @@ public class PublicationDaoImpl implements PublicationDao {
         MongoCursor<String> it = output.iterator();
         while (it.hasNext()) {
             results.add(it.next());
+        }
+        return results;
+    }
+    
+    @Override
+    public List<String> getCountriesInTextTop() {
+        String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
+        Criteria criteria = Criteria.where("bodyText.locationMatches.selectedArticle").ne(null);
+        Query query = new Query();
+        query.addCriteria(criteria);
+        
+        DistinctIterable<String> output = mongoTemplate.getCollection(collection)
+                .distinct("bodyText.locationMatches.locationName", query.getQueryObject(), String.class);
+        List<String> results = new ArrayList<>();
+        MongoCursor<String> it = output.iterator();
+        int i = 0;
+        while (it.hasNext() && i < 50) {
+            results.add(it.next());
+            i++;
         }
         return results;
     }

@@ -15,10 +15,10 @@ public class HomeController {
 
     @RequestMapping(value = "/")
     public String home(Model model) {
-        model.addAttribute("countries", pubDao.getCountries());
-        model.addAttribute("cleanedAffiliations", pubDao.getDistinctAffiliations());
+        model.addAttribute("countries", pubDao.getCountriesTop());
+        model.addAttribute("cleanedAffiliations", pubDao.getDistinctAffiliationsTop());
         model.addAttribute("years", pubDao.getYears());
-        model.addAttribute("textCountries", pubDao.getCountriesInText());
+        model.addAttribute("textCountries", pubDao.getCountriesInTextTop());
         model.addAttribute("publicationCount", pubDao.getPublicationCount());
         model.addAttribute("affiliationCount", pubDao.getAffiliationCount());
         model.addAttribute("cleanedAffiliationCount", pubDao.getDistinctAffiliationCount());

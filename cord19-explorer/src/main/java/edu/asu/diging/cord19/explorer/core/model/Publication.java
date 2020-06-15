@@ -135,4 +135,12 @@ public interface Publication {
     void setArxivId(String arxivId);
 
     String getArxivId();
+
+    void setPdfJsonFiles(String pdfJsonFiles);
+
+    String getPdfJsonFiles();
+
+    void setPmcJsonFiles(String pmcJsonFiles);
+
+    String getPmcJsonFiles();
 }

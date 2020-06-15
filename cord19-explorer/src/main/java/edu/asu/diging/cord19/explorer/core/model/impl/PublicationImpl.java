@@ -34,6 +34,8 @@ public class PublicationImpl implements Publication {
     private String msAcademicPaperId;
     private boolean hasPdfParse;
     private boolean hasPmcXmlParse;
+    private String pdfJsonFiles;
+    private String pmcJsonFiles;
     private String fulltextFile;
     private String url;
     private String documentUrl;
@@ -407,6 +409,26 @@ public class PublicationImpl implements Publication {
     @Override
     public void setHasPmcXmlParse(boolean hasPmcXmlParse) {
         this.hasPmcXmlParse = hasPmcXmlParse;
+    }
+
+    @Override
+    public String getPdfJsonFiles() {
+        return pdfJsonFiles;
+    }
+
+    @Override
+    public void setPdfJsonFiles(String pdfJsonFiles) {
+        this.pdfJsonFiles = pdfJsonFiles;
+    }
+
+    @Override
+    public String getPmcJsonFiles() {
+        return pmcJsonFiles;
+    }
+
+    @Override
+    public void setPmcJsonFiles(String pmcJsonFiles) {
+        this.pmcJsonFiles = pmcJsonFiles;
     }
 
     /*

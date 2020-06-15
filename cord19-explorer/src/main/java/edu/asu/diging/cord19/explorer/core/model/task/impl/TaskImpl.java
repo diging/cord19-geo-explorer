@@ -11,10 +11,12 @@ import javax.persistence.Id;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 
-import edu.asu.diging.cord19.explorer.core.model.task.ImportTask;
+import edu.asu.diging.cord19.explorer.core.model.task.Task;
+import edu.asu.diging.cord19.explorer.core.model.task.TaskStatus;
+import edu.asu.diging.cord19.explorer.core.model.task.TaskType;
 
-@Entity
-public class ImportTaskImpl implements ImportTask {
+@Entity(name="ImportTaskImpl")
+public class TaskImpl implements Task {
 
     @Id
     @GeneratedValue(generator = "task_id_generator")
@@ -26,6 +28,9 @@ public class ImportTaskImpl implements ImportTask {
     private OffsetDateTime dateEnded;
     @Enumerated(EnumType.STRING)
     private TaskStatus status;
+    @Enumerated(EnumType.STRING)
+    private TaskType type;
+     
 
     /*
      * (non-Javadoc)
@@ -127,6 +132,16 @@ public class ImportTaskImpl implements ImportTask {
     @Override
     public void setStatus(TaskStatus status) {
         this.status = status;
+    }
+
+    @Override
+    public TaskType getType() {
+        return type;
+    }
+
+    @Override
+    public void setType(TaskType type) {
+        this.type = type;
     }
 
 }

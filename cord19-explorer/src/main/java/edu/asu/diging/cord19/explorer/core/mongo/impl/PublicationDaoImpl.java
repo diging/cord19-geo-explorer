@@ -39,7 +39,7 @@ public class PublicationDaoImpl implements PublicationDao {
         }
         return results;
     }
-    
+
     @Override
     public List<String> getDistinctAffiliations() {
         String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
@@ -52,7 +52,7 @@ public class PublicationDaoImpl implements PublicationDao {
         }
         return results;
     }
-    
+
     @Override
     public long getDistinctAffiliationCount() {
         Query query = new Query(Criteria.where("metadata.authors.affiliation.selectedWikiarticle.title").ne(null));
@@ -113,14 +113,14 @@ public class PublicationDaoImpl implements PublicationDao {
         Query query = new Query(Criteria.where("bodyText.locationMatches.selectedArticle").ne(null));
         return mongoTemplate.count(query, PublicationImpl.class);
     }
-    
+
     @Override
     public List<String> getCountriesInText() {
         String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
         Criteria criteria = Criteria.where("bodyText.locationMatches.selectedArticle").ne(null);
         Query query = new Query();
         query.addCriteria(criteria);
-        
+
         DistinctIterable<String> output = mongoTemplate.getCollection(collection)
                 .distinct("bodyText.locationMatches.locationName", query.getQueryObject(), String.class);
         List<String> results = new ArrayList<>();
@@ -129,6 +129,12 @@ public class PublicationDaoImpl implements PublicationDao {
             results.add(it.next());
         }
         return results;
+    }
+
+    @Override
+    public long getCountOfPublicationsWithLocation() {
+        Query query = new Query(Criteria.where("metadata.authors.affiliation.selectedWikiarticle").ne(null));
+        return mongoTemplate.count(query, PublicationImpl.class);
     }
 
 }

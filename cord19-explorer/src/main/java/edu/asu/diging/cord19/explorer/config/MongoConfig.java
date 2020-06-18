@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.core.SimpleMongoClientDbFactory;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 import com.mongodb.MongoClientSettings;
+import com.mongodb.MongoClientSettings.Builder;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoClient;
@@ -43,11 +44,15 @@ public class MongoConfig {
 
     @Bean
     public MongoClient mongo() throws UnknownHostException {
+    	
+    	Builder builder = MongoClientSettings.builder();
+    	if (mongoDbUser != null && !mongoDbUser.trim().isEmpty()) {
+    		builder = builder.credential(MongoCredential.createCredential(mongoDbUser, mongoDbAuthdb, mongoDbPassword.toCharArray()));
+    	}
+    	
         MongoClient mongoClient = MongoClients
-                .create(MongoClientSettings.builder()
-                        .credential(MongoCredential.createCredential(mongoDbUser, mongoDbAuthdb, mongoDbPassword.toCharArray()))
-                        .applyToClusterSettings(
-                                builder -> builder.hosts(Arrays.asList(new ServerAddress(mongoDbHost, mongoDbPort))))
+                .create(builder.applyToClusterSettings(
+                                b -> b.hosts(Arrays.asList(new ServerAddress(mongoDbHost, mongoDbPort))))
                         .build());
         return mongoClient;
     }

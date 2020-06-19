@@ -28,6 +28,8 @@ public class ExportImpl implements Export {
     
     @OneToOne(targetEntity=TaskImpl.class)
     private Task task;
+    
+    private String filename;
 
     @Override
     public String getId() {
@@ -57,6 +59,16 @@ public class ExportImpl implements Export {
     @Override
     public void setTask(Task task) {
         this.task = task;
+    }
+
+    @Override
+    public String getFilename() {
+        return filename;
+    }
+
+    @Override
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
 
 }

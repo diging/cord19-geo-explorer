@@ -1,5 +1,6 @@
 package edu.asu.diging.cord19.explorer.core.service.impl;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,21 +8,27 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import edu.asu.diging.cord19.explorer.core.data.ExportRepository;
-import edu.asu.diging.cord19.explorer.core.model.export.Export;
+import edu.asu.diging.cord19.explorer.core.data.TaskRepository;
 import edu.asu.diging.cord19.explorer.core.model.export.ExportType;
 import edu.asu.diging.cord19.explorer.core.model.export.impl.ExportImpl;
 import edu.asu.diging.cord19.explorer.core.model.task.Task;
+import edu.asu.diging.cord19.explorer.core.model.task.TaskStatus;
+import edu.asu.diging.cord19.explorer.core.model.task.impl.TaskImpl;
 import edu.asu.diging.cord19.explorer.core.service.Exporter;
 
 @Service
-public class ExportHandlerImpl {
+public class ExportHandlerImpl implements ExportHandler {
 
     @Autowired
     private ExportRepository exportRepo;
     
     @Autowired
+    private TaskRepository taskRepo;
+    
+    @Autowired
     private List<Exporter> exporters;
 
+    @Override
     @Async
     public void startExport(Task task, ExportType type) {
         ExportImpl export = new ExportImpl();
@@ -36,6 +43,9 @@ public class ExportHandlerImpl {
             }
         }
         
+        task.setDateEnded(OffsetDateTime.now());
+        task.setStatus(TaskStatus.DONE);
+        taskRepo.save((TaskImpl)task);
         exportRepo.save(export);
     }
 }

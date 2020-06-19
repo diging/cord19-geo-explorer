@@ -16,4 +16,8 @@ public interface Export {
 
     String getId();
 
+    void setFilename(String filename);
+
+    String getFilename();
+
 }

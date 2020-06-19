@@ -53,6 +53,9 @@
 	          	<li sec:authorize="hasRole('ADMIN')" role="presentation">
 	          		<a th:href="@{/auth/import}" >Import</a>
 	          	</li>
+	          	<li sec:authorize="hasRole('ADMIN')" role="presentation">
+	          		<a th:href="@{/auth/export}" >Export</a>
+	          	</li>
 	          	<li sec:authorize="hasRole('ADMIN')" role="presentation" class="dropdown">
 	          		<a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
 				      Arxiv <span class="caret"></span>

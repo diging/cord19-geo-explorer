@@ -1,27 +1,53 @@
 package edu.asu.diging.cord19.explorer.core.service.impl;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.util.CloseableIterator;
 import org.springframework.stereotype.Component;
+
+import com.opencsv.bean.StatefulBeanToCsv;
+import com.opencsv.bean.StatefulBeanToCsvBuilder;
+import com.opencsv.exceptions.CsvDataTypeMismatchException;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 
 import edu.asu.diging.cord19.explorer.core.model.export.Export;
 import edu.asu.diging.cord19.explorer.core.model.export.ExportType;
-import edu.asu.diging.cord19.explorer.core.mongo.PublicationRepository;
+import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
+import edu.asu.diging.cord19.explorer.core.service.ExportedMetadataFactory;
 import edu.asu.diging.cord19.explorer.core.service.Exporter;
 
 @Component
 @PropertySource({ "classpath:config.properties", "${appConfigFile:classpath:}/app.properties"})
 public class CsvExporter implements Exporter {
     
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+    
     @Autowired
-    private PublicationRepository pubRepo;
+    private MongoTemplate mongoTemplate;
+    
+    @Autowired
+    private ExportedMetadataFactory factory;
     
     @Value("${app.data.path}")
     private String exportPath;
     
     @Value("${export.folder.name}")
     private String exportFolder;
+    
+    @Value("${export.file.name.prefix}")
+    private String exportFilenamePrefix;
     
     /* (non-Javadoc)
      * @see edu.asu.diging.cord19.explorer.core.service.impl.Exporter#supports(edu.asu.diging.cord19.explorer.core.model.export.ExportType)
@@ -35,7 +61,33 @@ public class CsvExporter implements Exporter {
      * @see edu.asu.diging.cord19.explorer.core.service.impl.Exporter#export(edu.asu.diging.cord19.explorer.core.model.task.Task)
      */
     @Override
-    public Export export(Export export) {
+    public void export(Export export) {
         
+        File file = new File(exportPath + File.separator + exportFolder);
+        if (!file.exists()) {
+            file.mkdir();
+        }
+        
+        String filename = exportFilenamePrefix + export.getId() + ".csv";
+        
+        Writer writer = null;
+        try {
+            writer = new FileWriter(file.getAbsolutePath() + File.separator + filename);
+        } catch (IOException e) {
+            logger.error("Could not write csv file.", e);
+            return;
+        }
+        StatefulBeanToCsv<ExportedMetadataEntry> beanToCsv = new StatefulBeanToCsvBuilder<ExportedMetadataEntry>(writer).build();
+        try (CloseableIterator<PublicationImpl> docs = mongoTemplate.stream(new Query().noCursorTimeout(),
+                PublicationImpl.class)) {
+            while (docs.hasNext()) {
+                PublicationImpl pub = docs.next();
+                try {
+                    beanToCsv.write(factory.createEntry(pub));
+                } catch (CsvDataTypeMismatchException | CsvRequiredFieldEmptyException e) {
+                    logger.error("Can't write csv.", e);
+                }
+            }
+        }
     }
 }

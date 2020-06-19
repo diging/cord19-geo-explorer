@@ -9,4 +9,6 @@ public interface ExportHandler {
 
     void startExport(Task task, ExportType type);
 
+    String getExportFolderPath();
+
 }

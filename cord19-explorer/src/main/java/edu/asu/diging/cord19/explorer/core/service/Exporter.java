@@ -7,6 +7,6 @@ public interface Exporter {
 
     boolean supports(ExportType type);
 
-    void export(Export export);
+    void export(Export export, String exportFolder);
 
 }

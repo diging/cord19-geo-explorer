@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +20,10 @@ import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 
+import edu.asu.diging.cord19.explorer.core.data.ExportRepository;
 import edu.asu.diging.cord19.explorer.core.model.export.Export;
 import edu.asu.diging.cord19.explorer.core.model.export.ExportType;
+import edu.asu.diging.cord19.explorer.core.model.export.impl.ExportImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
 import edu.asu.diging.cord19.explorer.core.service.ExportedMetadataFactory;
 import edu.asu.diging.cord19.explorer.core.service.Exporter;
@@ -40,11 +40,8 @@ public class CsvExporter implements Exporter {
     @Autowired
     private ExportedMetadataFactory factory;
     
-    @Value("${app.data.path}")
-    private String exportPath;
-    
-    @Value("${export.folder.name}")
-    private String exportFolder;
+    @Autowired
+    private ExportRepository repo;
     
     @Value("${export.file.name.prefix}")
     private String exportFilenamePrefix;
@@ -61,14 +58,16 @@ public class CsvExporter implements Exporter {
      * @see edu.asu.diging.cord19.explorer.core.service.impl.Exporter#export(edu.asu.diging.cord19.explorer.core.model.task.Task)
      */
     @Override
-    public void export(Export export) {
+    public void export(Export export, String exportFolder) {
         
-        File file = new File(exportPath + File.separator + exportFolder);
+        File file = new File(exportFolder);
         if (!file.exists()) {
             file.mkdir();
         }
         
         String filename = exportFilenamePrefix + export.getId() + ".csv";
+        export.setFilename(filename);
+        repo.save((ExportImpl)export);
         
         Writer writer = null;
         try {

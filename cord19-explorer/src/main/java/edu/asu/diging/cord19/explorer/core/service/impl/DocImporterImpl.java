@@ -44,9 +44,9 @@ import edu.asu.diging.cord19.explorer.core.model.LocationMatch;
 import edu.asu.diging.cord19.explorer.core.model.Publication;
 import edu.asu.diging.cord19.explorer.core.model.impl.ParagraphImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
-import edu.asu.diging.cord19.explorer.core.model.task.ImportTask;
-import edu.asu.diging.cord19.explorer.core.model.task.impl.ImportTaskImpl;
-import edu.asu.diging.cord19.explorer.core.model.task.impl.TaskStatus;
+import edu.asu.diging.cord19.explorer.core.model.task.Task;
+import edu.asu.diging.cord19.explorer.core.model.task.TaskStatus;
+import edu.asu.diging.cord19.explorer.core.model.task.impl.TaskImpl;
 import edu.asu.diging.cord19.explorer.core.mongo.PublicationRepository;
 import edu.asu.diging.cord19.explorer.core.service.AffiliationCleaner;
 import edu.asu.diging.cord19.explorer.core.service.DocImporter;
@@ -94,13 +94,13 @@ public class DocImporterImpl implements DocImporter {
     @Override
     @Async
     public void run(String rootFolder, String taskId) throws IOException {
-        Optional<ImportTaskImpl> optional = taskRepo.findById(taskId);
+        Optional<TaskImpl> optional = taskRepo.findById(taskId);
         if (!optional.isPresent()) {
             return;
             // FIXME: mark as failure
         }
 
-        ImportTask task = optional.get();
+        Task task = optional.get();
         task.setStatus(TaskStatus.PROCESSING);
 
         File file = new File(appdataPath + File.separator + "logs" + File.separator + task.getId() + ".txt");
@@ -192,10 +192,10 @@ public class DocImporterImpl implements DocImporter {
 
         task.setStatus(TaskStatus.DONE);
         task.setDateEnded(OffsetDateTime.now());
-        taskRepo.save((ImportTaskImpl) task);
+        taskRepo.save((TaskImpl) task);
     }
 
-    private void storeFile(File f, ImportTask task, BufferedWriter writer)
+    private void storeFile(File f, Task task, BufferedWriter writer)
             throws JsonParseException, JsonMappingException, IOException, ClassCastException, ClassNotFoundException {
         if (!f.getName().endsWith(".json")) {
             return;
@@ -224,13 +224,13 @@ public class DocImporterImpl implements DocImporter {
     @Override
     @Async
     public void cleanAffiliations(String taskId, boolean reprocess) {
-        Optional<ImportTaskImpl> optional = taskRepo.findById(taskId);
+        Optional<TaskImpl> optional = taskRepo.findById(taskId);
         if (!optional.isPresent()) {
             return;
             // FIXME: mark as failure
         }
 
-        ImportTask task = optional.get();
+        Task task = optional.get();
         task.setStatus(TaskStatus.PROCESSING);
 
         Query query;
@@ -255,19 +255,19 @@ public class DocImporterImpl implements DocImporter {
 
         task.setStatus(TaskStatus.DONE);
         task.setDateEnded(OffsetDateTime.now());
-        taskRepo.save((ImportTaskImpl) task);
+        taskRepo.save((TaskImpl) task);
     }
 
     @Override
     @Async
     public void selectLocationMatches(String taskId) {
-        Optional<ImportTaskImpl> optional = taskRepo.findById(taskId);
+        Optional<TaskImpl> optional = taskRepo.findById(taskId);
         if (!optional.isPresent()) {
             return;
             // FIXME: mark as failure
         }
 
-        ImportTask task = optional.get();
+        Task task = optional.get();
         task.setStatus(TaskStatus.PROCESSING);
 
         Query query = new Query();
@@ -286,7 +286,7 @@ public class DocImporterImpl implements DocImporter {
 
         task.setStatus(TaskStatus.DONE);
         task.setDateEnded(OffsetDateTime.now());
-        taskRepo.save((ImportTaskImpl) task);
+        taskRepo.save((TaskImpl) task);
     }
 
     private void processLocationMatches(Publication pub) {
@@ -309,13 +309,13 @@ public class DocImporterImpl implements DocImporter {
     @Override
     @Async
     public void extractYears(String taskId) {
-        Optional<ImportTaskImpl> optional = taskRepo.findById(taskId);
+        Optional<TaskImpl> optional = taskRepo.findById(taskId);
         if (!optional.isPresent()) {
             return;
             // FIXME: mark as failure
         }
 
-        ImportTask task = optional.get();
+        Task task = optional.get();
         task.setStatus(TaskStatus.PROCESSING);
 
         try (CloseableIterator<PublicationImpl> docs = mongoTemplate.stream(new Query(), PublicationImpl.class)) {
@@ -328,7 +328,7 @@ public class DocImporterImpl implements DocImporter {
 
         task.setStatus(TaskStatus.DONE);
         task.setDateEnded(OffsetDateTime.now());
-        taskRepo.save((ImportTaskImpl) task);
+        taskRepo.save((TaskImpl) task);
     }
 
     private void extractYear(Publication pub) {
@@ -350,13 +350,13 @@ public class DocImporterImpl implements DocImporter {
     @Override
     @Async
     public void extractLocations(String taskId) throws ClassCastException, ClassNotFoundException, IOException {
-        Optional<ImportTaskImpl> optional = taskRepo.findById(taskId);
+        Optional<TaskImpl> optional = taskRepo.findById(taskId);
         if (!optional.isPresent()) {
             return;
             // FIXME: mark as failure
         }
 
-        ImportTask task = optional.get();
+        Task task = optional.get();
         task.setStatus(TaskStatus.PROCESSING);
 
         try (CloseableIterator<PublicationImpl> docs = mongoTemplate.stream(new Query(), PublicationImpl.class)) {
@@ -369,20 +369,20 @@ public class DocImporterImpl implements DocImporter {
 
         task.setStatus(TaskStatus.DONE);
         task.setDateEnded(OffsetDateTime.now());
-        taskRepo.save((ImportTaskImpl) task);
+        taskRepo.save((TaskImpl) task);
     }
     
 
     @Override
     @Async
     public void removeUnvalid(String taskId) {
-        Optional<ImportTaskImpl> optional = taskRepo.findById(taskId);
+        Optional<TaskImpl> optional = taskRepo.findById(taskId);
         if (!optional.isPresent()) {
             return;
             // FIXME: mark as failure
         }
 
-        ImportTask task = optional.get();
+        Task task = optional.get();
         task.setStatus(TaskStatus.PROCESSING);
 
         File file = new File(appdataPath + File.separator + "logs" + File.separator + task.getId() + ".txt");
@@ -434,7 +434,7 @@ public class DocImporterImpl implements DocImporter {
 
         task.setStatus(TaskStatus.DONE);
         task.setDateEnded(OffsetDateTime.now());
-        taskRepo.save((ImportTaskImpl) task);
+        taskRepo.save((TaskImpl) task);
     }
 
     

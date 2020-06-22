@@ -2,9 +2,7 @@ package edu.asu.diging.cord19.explorer.core.model.task;
 
 import java.time.OffsetDateTime;
 
-import edu.asu.diging.cord19.explorer.core.model.task.impl.TaskStatus;
-
-public interface ImportTask {
+public interface Task {
 
     String getId();
 
@@ -25,5 +23,9 @@ public interface ImportTask {
     void setStatus(TaskStatus status);
 
     TaskStatus getStatus();
+
+    void setType(TaskType type);
+
+    TaskType getType();
 
 }

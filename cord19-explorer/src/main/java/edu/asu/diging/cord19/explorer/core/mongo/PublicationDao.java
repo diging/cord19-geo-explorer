@@ -26,6 +26,8 @@ public interface PublicationDao {
 
     long getCountriesInTextCount();
 
+    long getCountOfPublicationsWithLocation();
+    
     List<String> getDistinctAffiliationsTop();
 
     List<String> getCountriesTop();

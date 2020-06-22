@@ -84,7 +84,7 @@ public class ElasticsearchConnectorImpl implements ElasticsearchConnector {
         term = term.replaceAll("/", " ").replaceAll("\\(", " ").replaceAll("\\)", " ");
         term = term.replaceAll("\\[", " ").replaceAll("\\]", " ").replaceAll(":", " ");
         term = term.replaceAll("\\{", " ").replaceAll("\\}", " ").replaceAll("~", " ").replaceAll("\\*",  " ");
-        term = term.replaceAll("\"", "").replaceAll("'", "").replaceAll("\\^", "");
+        term = term.replaceAll("\"", "").replaceAll("'", "").replaceAll("\\^", "").replaceAll("\\#", " ");
         term = term.replaceAll("!", "").replaceAll("\\-", " ").replaceAll("\\.", " ");
         term = term.replaceAll("_", " ").replaceAll("\\\\", " ").replaceAll("\\+", " ");
         term = term.replaceAll("\\|",  " ").replaceAll(" OR", " ").replaceAll(" OR ", " ");

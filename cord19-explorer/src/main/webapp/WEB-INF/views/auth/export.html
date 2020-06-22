@@ -1,0 +1,16 @@
+<html layout:decorate="~{layouts/main}">
+  <head>
+    <title>CORD-19 Geo Explorer</title>
+  </head>
+  <body>
+   <div layout:fragment="content">
+      <h2>Export Dataset</h2>
+      
+      <form action="#" th:action="@{/auth/export/start}" method="POST">
+      	<p>
+      	<button class="btn btn-primary" type="submit">Start Export</button>
+      	</p>
+      </form>
+   </div>
+  </body>
+</html>

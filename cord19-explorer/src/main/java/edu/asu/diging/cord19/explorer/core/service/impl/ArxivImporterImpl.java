@@ -37,9 +37,9 @@ import edu.asu.diging.cord19.explorer.core.model.impl.MetadataImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.ParagraphImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.PersonImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
-import edu.asu.diging.cord19.explorer.core.model.task.ImportTask;
-import edu.asu.diging.cord19.explorer.core.model.task.impl.ImportTaskImpl;
-import edu.asu.diging.cord19.explorer.core.model.task.impl.TaskStatus;
+import edu.asu.diging.cord19.explorer.core.model.task.Task;
+import edu.asu.diging.cord19.explorer.core.model.task.TaskStatus;
+import edu.asu.diging.cord19.explorer.core.model.task.impl.TaskImpl;
 import edu.asu.diging.cord19.explorer.core.mongo.PublicationRepository;
 import edu.asu.diging.cord19.explorer.core.service.AffiliationCleaner;
 import edu.asu.diging.cord19.explorer.core.service.ArxivImporter;
@@ -79,13 +79,13 @@ public class ArxivImporterImpl implements ArxivImporter {
     @Async
     public void importMetadata(String taskId, String searchTerm) {
         
-        Optional<ImportTaskImpl> optional = taskRepo.findById(taskId);
+        Optional<TaskImpl> optional = taskRepo.findById(taskId);
         if (!optional.isPresent()) {
             return;
             // FIXME: mark as failure
         }
 
-        ImportTask task = optional.get();
+        Task task = optional.get();
         task.setStatus(TaskStatus.PROCESSING);
         
         List<HttpMessageConverter<?>> converters = new ArrayList<>();
@@ -123,7 +123,7 @@ public class ArxivImporterImpl implements ArxivImporter {
         
         task.setStatus(TaskStatus.DONE);
         task.setDateEnded(OffsetDateTime.now());
-        taskRepo.save((ImportTaskImpl) task);
+        taskRepo.save((TaskImpl) task);
     }
 
     private void handleEntries(Feed feed) {

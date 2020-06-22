@@ -4,7 +4,7 @@ import java.util.List;
 
 public class CleanedCoordinatesImpl {
     private String type;
-    private List<Double> coordinates;
+    private List<Double> coordinates; 
     
     
     public String getType() {

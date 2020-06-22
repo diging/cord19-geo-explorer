@@ -1,10 +1,13 @@
 package edu.asu.diging.cord19.explorer.core.model.impl;
 
 import java.util.ArrayList;
-import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class GeometryImpl {
-    private String type;    
+    private String type;
+    
+    private ArrayList<ArrayList<ArrayList<?>>> coordinates; 
     
     public String getType() {
         return type;
@@ -12,6 +15,14 @@ public class GeometryImpl {
     
     public void setType(String type) {
         this.type = type;
+    }
+
+    public ArrayList<ArrayList<ArrayList<?>>> getCoordinatesList() {
+        return coordinates;
+    }
+
+    public void setCoordinates(ArrayList<ArrayList<ArrayList<?>>> coordinates) {
+        this.coordinates = coordinates;
     }
 
 

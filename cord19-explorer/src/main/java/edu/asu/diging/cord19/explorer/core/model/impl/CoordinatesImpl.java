@@ -4,13 +4,13 @@ import java.util.ArrayList;
 
 public class CoordinatesImpl {
     
-    private ArrayList<Coordinate> coordinates;
+    private ArrayList<Double> coordinates;
 
-    public ArrayList<Coordinate> getCoordinates() {
+    public ArrayList<Double> getCoordinatePair() {
         return coordinates;
     }
 
-    public void setCoordinates(ArrayList<Coordinate> coordinates) {
+    public void setCoordinates(ArrayList<Double> coordinates) {
         this.coordinates = coordinates;
     }
     

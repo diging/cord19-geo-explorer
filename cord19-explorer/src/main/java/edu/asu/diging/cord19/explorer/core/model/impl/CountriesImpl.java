@@ -15,8 +15,40 @@ public class CountriesImpl implements Country {
     private ObjectId id;
     
     private String countryCode;
-    private String name;
+    @JsonProperty("properties")
+    private PropertiesImpl properties;
+    @JsonProperty("geometry")
     private GeometryImpl geometry;
+    private int selectedWikipediaCount;
+    private String type;
+    
+    
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public PropertiesImpl getProperties() {
+        return properties;
+    }
+
+    public void setProperties(PropertiesImpl properties) {
+        this.properties = properties;
+    }
+    public int getSelectedWikipediaCount() {
+        return selectedWikipediaCount;
+    }
+
+    public void setSelectedWikipediaCount(int selectedWikipediaCount) {
+        this.selectedWikipediaCount = selectedWikipediaCount;
+    }
+    
+    public void incrementSelectedWikipediaCount() {
+        this.selectedWikipediaCount++;
+    }
 
     public ObjectId getId() {
         return id;
@@ -32,14 +64,6 @@ public class CountriesImpl implements Country {
 
     public void setCountryCode(String countryCode) {
         this.countryCode = countryCode;
-    }
-    
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public GeometryImpl getGeometry() {

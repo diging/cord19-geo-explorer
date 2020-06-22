@@ -120,6 +120,7 @@ public class CoordinateCleaningController {
                        cleanedCoords.setCoordinates(formattedCoords);
                        article.setCleanedCoords(cleanedCoords);
                        System.out.println(pub.getPaperId());
+                       
                     }
                 }
                 pubRepo.save(pub);   

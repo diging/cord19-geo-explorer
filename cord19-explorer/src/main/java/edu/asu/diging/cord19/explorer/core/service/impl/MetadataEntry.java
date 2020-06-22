@@ -28,10 +28,10 @@ public class MetadataEntry {
     private String MsAcademicPaperId;
     @CsvBindByName(column = "who_covidence_id")
     private String whoCov;
-    @CsvBindByName(column = "has_pdf_parse")
-    private String hasPdfParse;
-    @CsvBindByName(column = "has_pmc_xml_parse")
-    private String hasPmcXmlParse;
+    @CsvBindByName(column = "pdf_json_files")
+    private String pdfJsonFiles;
+    @CsvBindByName(column = "pmc_json_files")
+    private String pmcJsonFiles;
     @CsvBindByName(column = "full_text_file")
     private String fullTextFile;
     @CsvBindByName(column = "url")
@@ -140,20 +140,20 @@ public class MetadataEntry {
         this.whoCov = whoCov;
     }
 
-    public String getHasPdfParse() {
-        return hasPdfParse;
+    public String getPdfJsonFiles() {
+        return pdfJsonFiles;
     }
 
-    public void setHasPdfParse(String hasPdfParse) {
-        this.hasPdfParse = hasPdfParse;
+    public void setPdfJsonFiles(String pdfJsonFiles) {
+        this.pdfJsonFiles = pdfJsonFiles;
     }
 
-    public String getHasPmcXmlParse() {
-        return hasPmcXmlParse;
+    public String getPmcJsonFiles() {
+        return pmcJsonFiles;
     }
 
-    public void setHasPmcXmlParse(String hasPmcXmlParse) {
-        this.hasPmcXmlParse = hasPmcXmlParse;
+    public void setPmcJsonFiles(String pmcJsonFiles) {
+        this.pmcJsonFiles = pmcJsonFiles;
     }
 
     public String getFullTextFile() {

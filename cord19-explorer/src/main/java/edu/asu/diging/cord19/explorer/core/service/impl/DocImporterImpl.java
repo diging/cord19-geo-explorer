@@ -19,6 +19,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,6 +83,13 @@ public class DocImporterImpl implements DocImporter {
    
     @Autowired
     private MongoTemplate mongoTemplate;
+    
+    private ObjectMapper mapper;
+    
+    @PostConstruct
+    public void init() {
+        mapper = new ObjectMapper();
+    }
 
     @Override
     @Async
@@ -158,10 +167,12 @@ public class DocImporterImpl implements DocImporter {
                 }
 
                 if (pub != null) {
-                    pub.setHasPdfParse(entry.getHasPdfParse().equals("TRUE"));
+                    pub.setHasPdfParse(entry.getPdfJsonFiles() != null && !entry.getPdfJsonFiles().trim().isEmpty());
+                    pub.setPdfJsonFiles(entry.getPdfJsonFiles());
                     pub.setCordId(entry.getCord_uid());
                     pub.setDoi(entry.getDoi());
-                    pub.setHasPmcXmlParse(entry.getHasPmcXmlParse().equals("TRUE"));
+                    pub.setHasPmcXmlParse(entry.getPmcJsonFiles() != null && entry.getPmcJsonFiles().trim().isEmpty());
+                    pub.setPmcJsonFiles(entry.getPmcJsonFiles());
                     pub.setJournal(entry.getJournal());
                     pub.setLicense(entry.getLicense());
                     pub.setMsAcademicPaperId(entry.getMsAcademicPaperId());
@@ -189,7 +200,6 @@ public class DocImporterImpl implements DocImporter {
         if (!f.getName().endsWith(".json")) {
             return;
         }
-        ObjectMapper mapper = new ObjectMapper();
         PublicationImpl publication = mapper.readValue(f, PublicationImpl.class);
 
         // do not reimport existing publications

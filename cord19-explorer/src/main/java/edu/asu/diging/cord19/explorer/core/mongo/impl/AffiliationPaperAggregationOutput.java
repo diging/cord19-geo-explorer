@@ -6,6 +6,8 @@ public class AffiliationPaperAggregationOutput {
 
     private String id;
     private List<String> paperId;
+    private String settlement;
+    private String country;
     private String wiki;
     private String coord;
     private String status;
@@ -21,6 +23,18 @@ public class AffiliationPaperAggregationOutput {
     }
     public void setPaperId(List<String> paperId) {
         this.paperId = paperId;
+    }
+    public String getSettlement() {
+        return settlement;
+    }
+    public void setSettlement(String settlement) {
+        this.settlement = settlement;
+    }
+    public String getCountry() {
+        return country;
+    }
+    public void setCountry(String country) {
+        this.country = country;
     }
     public String getWiki() {
         return wiki;

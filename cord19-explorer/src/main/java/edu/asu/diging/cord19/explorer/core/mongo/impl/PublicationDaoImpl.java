@@ -75,6 +75,8 @@ public class PublicationDaoImpl implements PublicationDao {
 
         GroupOperation group = Aggregation.group("metadata.authors.affiliation.institution").first("metadata.authors.affiliation.selectedWikiarticle.title").as("wiki")
                 .first("metadata.authors.affiliation.selectionStatus").as("status")
+                .first("metadata.authors.affiliation.locationSettlement").as("settlement")
+                .first("metadata.authors.affiliation.locationCountry").as("country")
                 .first("metadata.authors.affiliation.selectedWikiarticle.coordinates").as("coord");
 
         SortOperation sort = Aggregation.sort(Sort.by(Order.asc("_id")));

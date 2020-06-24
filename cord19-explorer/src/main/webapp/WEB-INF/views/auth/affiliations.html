@@ -48,9 +48,12 @@
       <tr th:each="aff : ${affs}" th:classappend="(${aff.status} == 'INCORRECT' ? 'danger' : '') + (${aff.status} == 'CORRECT_REGION' ? 'warning' : '') + (${aff.status} == 'CORRECT' ? 'success' : '')" >
       	<td>
       		 <a th:href="@{'/affiliation?name=' + ${#uris.escapeQueryParam(aff.id)}}"><span th:text="${aff.id}"></span></a>
+      		 <br>[[${aff.settlement}]], [[${aff.country}]]
       	</td>
       	<td>
-      		<span th:text="${aff.wiki}"></span>
+      		<a th:if="${aff.wiki}" target="_blank" th:href="'https://en.wikipedia.org/wiki/' + ${aff.wiki}">
+      		[[${aff.wiki}]]
+      		</a>
       	</td>
       	<td>
       		<span th:text="${aff.coord}"></span>

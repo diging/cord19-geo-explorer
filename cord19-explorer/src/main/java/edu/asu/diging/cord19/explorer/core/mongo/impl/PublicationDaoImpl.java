@@ -73,8 +73,7 @@ public class PublicationDaoImpl implements PublicationDao {
     public List<AffiliationPaperAggregationOutput> getAffiliationsAndArticles(long start, long pageSize) {
         UnwindOperation unwind = Aggregation.unwind("metadata.authors");
 
-        GroupOperation group = Aggregation.group("metadata.authors.affiliation.institution").push("$paperId")
-                .as("paperId").first("metadata.authors.affiliation.selectedWikiarticle.title").as("wiki")
+        GroupOperation group = Aggregation.group("metadata.authors.affiliation.institution").first("metadata.authors.affiliation.selectedWikiarticle.title").as("wiki")
                 .first("metadata.authors.affiliation.selectionStatus").as("status")
                 .first("metadata.authors.affiliation.selectedWikiarticle.coordinates").as("coord");
 

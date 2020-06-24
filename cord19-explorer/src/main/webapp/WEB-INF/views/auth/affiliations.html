@@ -41,7 +41,6 @@
       <table class="table table-striped">
       <tr>
       	<th>Institution</th>
-      	<th>Number of appearances</th>
       	<th>Selected Wiki article</th>
       	<th>Coordinates</th>
       	<th>Status</th>
@@ -49,9 +48,6 @@
       <tr th:each="aff : ${affs}" th:classappend="(${aff.status} == 'INCORRECT' ? 'danger' : '') + (${aff.status} == 'CORRECT_REGION' ? 'warning' : '') + (${aff.status} == 'CORRECT' ? 'success' : '')" >
       	<td>
       		 <a th:href="@{'/affiliation?name=' + ${#uris.escapeQueryParam(aff.id)}}"><span th:text="${aff.id}"></span></a>
-      	</td>
-      	<td>
-      	[[${#arrays.length(aff.paperId)}]] </span>
       	</td>
       	<td>
       		<span th:text="${aff.wiki}"></span>

@@ -2,6 +2,8 @@ package edu.asu.diging.cord19.explorer.core.mongo;
 
 import java.util.List;
 
+import edu.asu.diging.cord19.explorer.core.mongo.impl.AffiliationPaperAggregationOutput;
+
 public interface PublicationDao {
 
     List<String> getCountries();
@@ -33,5 +35,9 @@ public interface PublicationDao {
     List<String> getCountriesTop();
 
     List<String> getCountriesInTextTop();
+
+    List<AffiliationPaperAggregationOutput> getAffiliationsAndArticles(long start, long pageSize);
+
+    long getTotalAffiliation();
 
 }

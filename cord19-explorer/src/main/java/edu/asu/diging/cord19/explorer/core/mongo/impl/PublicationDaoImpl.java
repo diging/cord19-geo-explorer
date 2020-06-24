@@ -4,16 +4,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationExpression;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.CountOperation;
 import org.springframework.data.mongodb.core.aggregation.GroupOperation;
+import org.springframework.data.mongodb.core.aggregation.LimitOperation;
+import org.springframework.data.mongodb.core.aggregation.SkipOperation;
+import org.springframework.data.mongodb.core.aggregation.SortOperation;
 import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
 import org.springframework.data.mongodb.core.aggregation.UnwindOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.client.DistinctIterable;
 import com.mongodb.client.MongoCursor;
 
@@ -59,21 +68,42 @@ public class PublicationDaoImpl implements PublicationDao {
         }
         return results;
     }
-    
-    public void getAffiliationsAndArticles() {
-        String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
+
+    @Override
+    public List<AffiliationPaperAggregationOutput> getAffiliationsAndArticles(long start, long pageSize) {
         UnwindOperation unwind = Aggregation.unwind("metadata.authors");
-        
-        GroupOperation group = Aggregation.group("metadata.authors.affiliation.institution");
-        group.push("paperId");
-        group.first("metadata.authors.affiliation.selectedWikiarticle.title");
-        group.first("metadata.authors.affiliation.selectedWikiarticle.coordinate");
-        
-        TypedAggregation<AffiliationPaperAggregationOutput> aggregation = Aggregation.newAggregation(AffiliationPaperAggregationOutput.class, unwind, group);
-        
-        AggregationResults<AffiliationPaperAggregationOutput> results = mongoTemplate.aggregate(aggregation, AffiliationPaperAggregationOutput.class);
+
+        GroupOperation group = Aggregation.group("metadata.authors.affiliation.institution").push("$paperId")
+                .as("paperId").first("metadata.authors.affiliation.selectedWikiarticle.title").as("wiki")
+                .first("metadata.authors.affiliation.selectionStatus").as("status")
+                .first("metadata.authors.affiliation.selectedWikiarticle.coordinates").as("coord");
+
+        SortOperation sort = Aggregation.sort(Sort.by(Order.asc("_id")));
+
+        SkipOperation skip = Aggregation.skip(start);
+        LimitOperation limit = Aggregation.limit(pageSize);
+
+        Aggregation aggregation = Aggregation.newAggregation(unwind, group, sort, skip, limit);
+
+        AggregationResults<AffiliationPaperAggregationOutput> results = mongoTemplate.aggregate(aggregation,
+                PublicationImpl.class, AffiliationPaperAggregationOutput.class);
+        return results.getMappedResults();
     }
     
+    @Override
+    public long getTotalAffiliation() {
+        UnwindOperation unwind = Aggregation.unwind("metadata.authors");
+
+        GroupOperation group = Aggregation.group("metadata.authors.affiliation.institution");
+
+        CountOperation count = Aggregation.count().as("total");
+        Aggregation aggregation = Aggregation.newAggregation(unwind, group, count);
+        
+        AggregationResults<AffiliationCount> results = mongoTemplate.aggregate(aggregation,
+                PublicationImpl.class, AffiliationCount.class);
+        return results.getRawResults().getLong("count");
+    }
+
     @Override
     public List<String> getDistinctAffiliations() {
         String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
@@ -101,7 +131,7 @@ public class PublicationDaoImpl implements PublicationDao {
         }
         return results;
     }
-    
+
     @Override
     public long getDistinctAffiliationCount() {
         Query query = new Query(Criteria.where("metadata.authors.affiliation.selectedWikiarticle.title").ne(null));
@@ -179,14 +209,14 @@ public class PublicationDaoImpl implements PublicationDao {
         }
         return results;
     }
-    
+
     @Override
     public List<String> getCountriesInTextTop() {
         String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
         Criteria criteria = Criteria.where("bodyText.locationMatches.selectedArticle").ne(null);
         Query query = new Query();
         query.addCriteria(criteria);
-        
+
         DistinctIterable<String> output = mongoTemplate.getCollection(collection)
                 .distinct("bodyText.locationMatches.locationName", query.getQueryObject(), String.class);
         List<String> results = new ArrayList<>();

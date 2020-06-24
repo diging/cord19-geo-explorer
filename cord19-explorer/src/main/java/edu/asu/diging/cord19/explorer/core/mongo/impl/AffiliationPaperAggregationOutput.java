@@ -8,6 +8,7 @@ public class AffiliationPaperAggregationOutput {
     private List<String> paperId;
     private String wiki;
     private String coord;
+    private String status;
     
     public String getId() {
         return id;
@@ -32,6 +33,12 @@ public class AffiliationPaperAggregationOutput {
     }
     public void setCoord(String coord) {
         this.coord = coord;
+    }
+    public String getStatus() {
+        return status;
+    }
+    public void setStatus(String status) {
+        this.status = status;
     }
     
 }

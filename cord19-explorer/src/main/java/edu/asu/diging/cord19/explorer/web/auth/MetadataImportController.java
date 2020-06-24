@@ -11,23 +11,22 @@ import org.springframework.web.bind.annotation.RequestParam;
 import edu.asu.diging.cord19.explorer.core.service.DocumentImportManager;
 
 @Controller
-public class ImportController {
+public class MetadataImportController {
 
     @Autowired
     private DocumentImportManager importManager;
-
-    @RequestMapping(value = "/auth/import", method = RequestMethod.GET)
+    
+    @RequestMapping(value = "/auth/metadata/import", method = RequestMethod.GET)
     public String show() {
 
-        return "auth/import";
+        return "auth/metadataImport";
     }
 
-    @RequestMapping(value = "/auth/import", method = RequestMethod.POST)
-    public String startImport(@RequestParam("rootFolder") String rootFolder) throws IOException {
-        importManager.startImport(rootFolder);
+    @RequestMapping(value = "/auth/metadata/import", method = RequestMethod.POST)
+    public String startImport(@RequestParam("filepath") String filepath) throws IOException {
+        importManager.startMetadataImport(filepath);
 
-        return "auth/importStarted";
+        return "auth/metadataImportStarted";
     }
-    
 
 }

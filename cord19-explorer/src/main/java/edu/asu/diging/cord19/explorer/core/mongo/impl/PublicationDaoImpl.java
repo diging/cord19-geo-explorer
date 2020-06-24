@@ -5,6 +5,11 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.GroupOperation;
+import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
+import org.springframework.data.mongodb.core.aggregation.UnwindOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -53,6 +58,20 @@ public class PublicationDaoImpl implements PublicationDao {
             i++;
         }
         return results;
+    }
+    
+    public void getAffiliationsAndArticles() {
+        String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
+        UnwindOperation unwind = Aggregation.unwind("metadata.authors");
+        
+        GroupOperation group = Aggregation.group("metadata.authors.affiliation.institution");
+        group.push("paperId");
+        group.first("metadata.authors.affiliation.selectedWikiarticle.title");
+        group.first("metadata.authors.affiliation.selectedWikiarticle.coordinate");
+        
+        TypedAggregation<AffiliationPaperAggregationOutput> aggregation = Aggregation.newAggregation(AffiliationPaperAggregationOutput.class, unwind, group);
+        
+        AggregationResults<AffiliationPaperAggregationOutput> results = mongoTemplate.aggregate(aggregation, AffiliationPaperAggregationOutput.class);
     }
     
     @Override

@@ -2,6 +2,7 @@ package edu.asu.diging.cord19.explorer.core.service.impl;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -21,6 +22,7 @@ import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.lucene.util.packed.DirectMonotonicReader.Meta;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,10 +66,9 @@ public class DocImporterImpl implements DocImporter {
 
     @Value("${metadata.filename.msid}")
     private String metadataFilenameMsId;
-    
+
     @Value("${app.data.path}")
     private String appdataPath;
-
 
     @Autowired
     private TaskRepository taskRepo;
@@ -77,15 +78,15 @@ public class DocImporterImpl implements DocImporter {
 
     @Autowired
     private AffiliationCleaner affCleaner;
-    
+
     @Autowired
     private TextLocationMatcher locMatcher;
-   
+
     @Autowired
     private MongoTemplate mongoTemplate;
-    
+
     private ObjectMapper mapper;
-    
+
     @PostConstruct
     public void init() {
         mapper = new ObjectMapper();
@@ -147,52 +148,53 @@ public class DocImporterImpl implements DocImporter {
 
         writer.close();
 
-        File metadataFileBase = new File(rootFolder + File.separator + metadataFilename);
-        // File metadataFileMsId = new File(rootFolder + File.separator +
-        // metadataFilenameMsId);
-
-        for (File metadataFile : Arrays.asList(metadataFileBase)) {
-            CsvToBean<MetadataEntry> bean = new CsvToBeanBuilder(new FileReader(metadataFile))
-                    .withType(MetadataEntry.class).withIgnoreLeadingWhiteSpace(true).build();
-
-            Iterator<MetadataEntry> it = bean.iterator();
-            while (it.hasNext()) {
-                MetadataEntry entry = it.next();
-                PublicationImpl pub = null;
-                if (entry.getSha() != null && !entry.getSha().isEmpty()) {
-                    pub = pubRepo.findFirstByPaperId(entry.getSha());
-                }
-                if (pub == null && entry.getPmcid() != null && !entry.getPmcid().isEmpty()) {
-                    pub = pubRepo.findFirstByPaperId(entry.getPmcid());
-                }
-
-                if (pub != null) {
-                    pub.setHasPdfParse(entry.getPdfJsonFiles() != null && !entry.getPdfJsonFiles().trim().isEmpty());
-                    pub.setPdfJsonFiles(entry.getPdfJsonFiles());
-                    pub.setCordId(entry.getCord_uid());
-                    pub.setDoi(entry.getDoi());
-                    pub.setHasPmcXmlParse(entry.getPmcJsonFiles() != null && entry.getPmcJsonFiles().trim().isEmpty());
-                    pub.setPmcJsonFiles(entry.getPmcJsonFiles());
-                    pub.setJournal(entry.getJournal());
-                    pub.setLicense(entry.getLicense());
-                    pub.setMsAcademicPaperId(entry.getMsAcademicPaperId());
-                    pub.setPmcid(entry.getPmcid());
-                    pub.setPublishTime(entry.getPublishTime());
-                    pub.setPubmedId(entry.getPubmed_id());
-                    pub.setSha(entry.getSha());
-                    pub.setSourceX(entry.getSourceX());
-                    pub.setUrl(entry.getUrl());
-                    pub.setWhoCovidence(entry.getWhoCov());
-                    pub.setArxivId(entry.getArxivId());
-                    extractYear(pub);
-                    pubRepo.save(pub);
-                }
-            }
-        }
+        parseMetadataCsv(rootFolder + File.separator + metadataFilename);
 
         task.setStatus(TaskStatus.DONE);
         task.setDateEnded(OffsetDateTime.now());
         taskRepo.save((TaskImpl) task);
+    }
+
+    private void parseMetadataCsv(String metadataFilename) throws FileNotFoundException {
+        File metadataFile = new File(metadataFilename);
+
+        CsvToBean<MetadataEntry> bean = new CsvToBeanBuilder<MetadataEntry>(new FileReader(metadataFile)).withType(MetadataEntry.class)
+                .withIgnoreLeadingWhiteSpace(true).withSeparator(',').build();
+
+        Iterator<MetadataEntry> it = bean.iterator();
+        while (it.hasNext()) {
+            MetadataEntry entry = it.next();
+            PublicationImpl pub = null;
+            if (entry.getSha() != null && !entry.getSha().isEmpty()) {
+                pub = pubRepo.findFirstByPaperId(entry.getSha());
+            }
+            if (pub == null && entry.getPmcid() != null && !entry.getPmcid().isEmpty()) {
+                pub = pubRepo.findFirstByPaperId(entry.getPmcid());
+            }
+
+            if (pub != null) {
+                pub.setHasPdfParse(entry.getPdfJsonFiles() != null && !entry.getPdfJsonFiles().trim().isEmpty());
+                pub.setPdfJsonFiles(entry.getPdfJsonFiles());
+                pub.setCordId(entry.getCord_uid());
+                pub.setDoi(entry.getDoi());
+                pub.setHasPmcXmlParse(entry.getPmcJsonFiles() != null && entry.getPmcJsonFiles().trim().isEmpty());
+                pub.setPmcJsonFiles(entry.getPmcJsonFiles());
+                pub.setJournal(entry.getJournal());
+                pub.setLicense(entry.getLicense());
+                pub.setMsAcademicPaperId(entry.getMsAcademicPaperId());
+                pub.setPmcid(entry.getPmcid());
+                pub.setPublishTime(entry.getPublishTime());
+                pub.setPubmedId(entry.getPubmed_id());
+                pub.setSha(entry.getSha());
+                pub.setSourceX(entry.getSourceX());
+                pub.setUrl(entry.getUrl());
+                pub.setWhoCovidence(entry.getWhoCov());
+                pub.setArxivId(entry.getArxivId());
+                extractYear(pub);
+                pubRepo.save(pub);
+            }
+        }
+        
     }
 
     private void storeFile(File f, Task task, BufferedWriter writer)
@@ -219,6 +221,30 @@ public class DocImporterImpl implements DocImporter {
         pubRepo.save(publication);
         task.setProcessed(task.getProcessed() + 1);
         logger.debug("Stored: " + publication.getPaperId());
+    }
+
+    @Override
+    @Async
+    public void importMetadata(String taskId, String metadataFile) {
+        Optional<TaskImpl> optional = taskRepo.findById(taskId);
+        if (!optional.isPresent()) {
+            return;
+            // FIXME: mark as failure
+        }
+
+        Task task = optional.get();
+        task.setStatus(TaskStatus.PROCESSING);
+        
+        try {
+            parseMetadataCsv(metadataFile);
+            task.setStatus(TaskStatus.DONE);
+        } catch (FileNotFoundException e) {
+            logger.error("Could not parse metadata file.", e);
+            task.setStatus(TaskStatus.FAILURE);
+        }
+        
+        task.setDateEnded(OffsetDateTime.now());
+        taskRepo.save((TaskImpl) task);
     }
 
     @Override
@@ -305,7 +331,6 @@ public class DocImporterImpl implements DocImporter {
         }
     }
 
-    
     @Override
     @Async
     public void extractYears(String taskId) {
@@ -371,7 +396,6 @@ public class DocImporterImpl implements DocImporter {
         task.setDateEnded(OffsetDateTime.now());
         taskRepo.save((TaskImpl) task);
     }
-    
 
     @Override
     @Async
@@ -437,7 +461,4 @@ public class DocImporterImpl implements DocImporter {
         taskRepo.save((TaskImpl) task);
     }
 
-    
-
-    
 }

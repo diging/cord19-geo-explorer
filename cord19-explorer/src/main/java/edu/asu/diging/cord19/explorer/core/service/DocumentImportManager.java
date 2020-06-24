@@ -16,4 +16,6 @@ public interface DocumentImportManager {
 
     String startLocationMatchSelection();
 
+    String startMetadataImport(String pathToFile) throws IOException;
+
 }

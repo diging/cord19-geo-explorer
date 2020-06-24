@@ -43,7 +43,9 @@
 	      	<nav>
 	          <ul class="nav nav-pills pull-right">
 	          	
-	          	
+	          	<li role="presentation">
+	          		<a th:href="@{/stats}" >Basic Stats</a>
+	          	</li>
 	          	<li sec:authorize="hasRole('ADMIN')" role="presentation">
 	          		<a th:href="@{/admin/user/list}" >Users</a>
 	          	</li>

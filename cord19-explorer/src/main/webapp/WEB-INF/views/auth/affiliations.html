@@ -39,12 +39,14 @@
 		</nav>
       
       <table class="table table-striped">
+      <thead>
       <tr>
       	<th>Institution</th>
       	<th>Selected Wiki article</th>
       	<th>Coordinates</th>
       	<th>Status</th>
       </tr>
+      </thead>
       <tr th:each="aff : ${affs}" th:classappend="(${aff.status} == 'INCORRECT' ? 'danger' : '') + (${aff.status} == 'CORRECT_REGION' ? 'warning' : '') + (${aff.status} == 'CORRECT' ? 'success' : '')" >
       	<td>
       		 <a th:href="@{'/affiliation?name=' + ${#uris.escapeQueryParam(aff.id)}}"><span th:text="${aff.id}"></span></a>

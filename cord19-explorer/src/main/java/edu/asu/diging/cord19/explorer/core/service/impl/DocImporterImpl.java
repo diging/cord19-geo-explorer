@@ -12,7 +12,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -22,7 +21,6 @@ import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 
-import org.apache.lucene.util.packed.DirectMonotonicReader.Meta;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -164,6 +162,7 @@ public class DocImporterImpl implements DocImporter {
         Iterator<MetadataEntry> it = bean.iterator();
         while (it.hasNext()) {
             MetadataEntry entry = it.next();
+            logger.debug("Parsing metadata entry: "  + entry.getCord_uid());
             PublicationImpl pub = null;
             if (entry.getSha() != null && !entry.getSha().isEmpty()) {
                 pub = pubRepo.findFirstByPaperId(entry.getSha());

@@ -41,6 +41,7 @@
 		<app.data.path></app.data.path>
 
 		<log.level>info</log.level>
+		<log.level.diging>debug</log.level.diging>
 
 		<tomcat.deploy.path></tomcat.deploy.path>
 		<tomcat.app.name>cord19-geo-explorer</tomcat.app.name>

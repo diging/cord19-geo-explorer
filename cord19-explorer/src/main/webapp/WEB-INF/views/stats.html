@@ -1,0 +1,27 @@
+<html layout:decorate="~{layouts/main}">
+  <head>
+    <title>Authority Matcher</title>
+  </head>
+  <body>
+   <div layout:fragment="content">
+   	<div class="row">
+   	<ul class="list-group">
+   		<li class="list-group-item">
+   		Total number of publications: <span class="label label-primary">[[${totalPublications}]]</span>
+   		</li>
+   		<li class="list-group-item">
+   		Number of total authors: <span class="label label-primary">[[${authorCount}]]</span>
+   		</li>
+  		<li class="list-group-item">
+   		Number of papers with at least one author affiliation: <span class="label label-success">[[${paperWithAffCount}]]</span>
+   		</li>
+   		<li class="list-group-item">
+   		Number of papers with no affiliations: <span class="label label-warning">[[${paperWithoutAffCount}]]</span>
+   		</li>
+   		
+   	</ul>
+   	</div>
+     
+   </div>
+  </body>
+</html>

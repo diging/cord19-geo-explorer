@@ -3,26 +3,23 @@ package edu.asu.diging.cord19.explorer.core.mongo.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationExpression;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.CountOperation;
 import org.springframework.data.mongodb.core.aggregation.GroupOperation;
 import org.springframework.data.mongodb.core.aggregation.LimitOperation;
 import org.springframework.data.mongodb.core.aggregation.SkipOperation;
 import org.springframework.data.mongodb.core.aggregation.SortOperation;
-import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
 import org.springframework.data.mongodb.core.aggregation.UnwindOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
-import com.mongodb.BasicDBObject;
 import com.mongodb.client.DistinctIterable;
 import com.mongodb.client.MongoCursor;
 
@@ -100,8 +97,8 @@ public class PublicationDaoImpl implements PublicationDao {
         CountOperation count = Aggregation.count().as("total");
         Aggregation aggregation = Aggregation.newAggregation(unwind, group, count);
         
-        AggregationResults<AffiliationCount> results = mongoTemplate.aggregate(aggregation,
-                PublicationImpl.class, AffiliationCount.class);
+        AggregationResults<Document> results = mongoTemplate.aggregate(aggregation,
+                PublicationImpl.class, Document.class);
         return results.getRawResults().getLong("count");
     }
 

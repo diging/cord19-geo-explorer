@@ -1,4 +1,4 @@
-package edu.asu.diging.cord19.explorer.core.service.impl;
+package edu.asu.diging.cord19.explorer.core.service.arxiv.impl;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -41,8 +41,8 @@ import edu.asu.diging.cord19.explorer.core.model.task.Task;
 import edu.asu.diging.cord19.explorer.core.model.task.TaskStatus;
 import edu.asu.diging.cord19.explorer.core.model.task.impl.TaskImpl;
 import edu.asu.diging.cord19.explorer.core.mongo.PublicationRepository;
-import edu.asu.diging.cord19.explorer.core.service.AffiliationCleaner;
-import edu.asu.diging.cord19.explorer.core.service.ArxivImporter;
+import edu.asu.diging.cord19.explorer.core.service.arxiv.ArxivImporter;
+import edu.asu.diging.cord19.explorer.core.service.worker.AffiliationCleaner;
 
 @Component
 @PropertySource({ "classpath:config.properties", "${appConfigFile:classpath:}/app.properties",

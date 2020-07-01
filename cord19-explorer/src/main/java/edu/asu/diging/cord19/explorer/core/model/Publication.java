@@ -143,4 +143,8 @@ public interface Publication {
     void setPmcJsonFiles(String pmcJsonFiles);
 
     String getPmcJsonFiles();
+
+    void setDuplicate(boolean duplicate);
+
+    boolean isDuplicate();
 }

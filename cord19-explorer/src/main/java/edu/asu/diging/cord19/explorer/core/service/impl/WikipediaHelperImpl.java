@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 
 import edu.asu.diging.cord19.explorer.core.elastic.model.impl.Wikientry;
 import edu.asu.diging.cord19.explorer.core.model.impl.LocationType;
-import edu.asu.diging.cord19.explorer.core.service.ElasticsearchConnector;
 import edu.asu.diging.cord19.explorer.core.service.WikipediaHelper;
+import edu.asu.diging.cord19.explorer.core.service.worker.ElasticsearchConnector;
 
 @Component
 public class WikipediaHelperImpl implements WikipediaHelper {

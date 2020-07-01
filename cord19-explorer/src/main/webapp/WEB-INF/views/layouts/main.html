@@ -52,8 +52,19 @@
 	          	<li sec:authorize="hasRole('ADMIN')" role="presentation">
 	          		<a th:href="@{/auth/task}" >Tasks</a>
 	          	</li>
-	          	<li sec:authorize="hasRole('ADMIN')" role="presentation">
-	          		<a th:href="@{/auth/affiliations}" >Clean Affiliations</a>
+	          	<li sec:authorize="hasRole('ADMIN')" role="presentation" class="dropdown">
+	          		<a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+				      Cleaning <span class="caret"></span>
+				    </a>
+				    <ul class="dropdown-menu">
+				      <li sec:authorize="hasRole('ADMIN')" role="presentation">
+			          	<a th:href="@{/auth/affiliations}" >Clean Affiliations</a>
+			          </li>
+			          <li sec:authorize="hasRole('ADMIN')" role="presentation">
+		          		<a th:href="@{/auth/publications/clean}" >Remove Duplicates</a>
+		          	  </li>
+				    </ul>
+	          		
 	          	</li>
 	          	
 	          	<li sec:authorize="hasRole('ADMIN')" role="presentation" class="dropdown">

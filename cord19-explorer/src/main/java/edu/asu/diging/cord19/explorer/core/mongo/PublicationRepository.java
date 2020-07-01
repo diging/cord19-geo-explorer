@@ -5,13 +5,14 @@ import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+import edu.asu.diging.cord19.explorer.core.model.Publication;
 import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
 
 public interface PublicationRepository extends MongoRepository<PublicationImpl, String> {
 
     PublicationImpl findFirstByPaperId(String paperId);
     
-    PublicationImpl findFirstByArxivId(String arxivId);
+    Publication findFirstByArxivId(String arxivId);
 
     List<PublicationImpl> findByBodyTextLocationMatchesLocationName(String location);
     

@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 import edu.asu.diging.cord19.explorer.core.data.TaskRepository;
 import edu.asu.diging.cord19.explorer.core.model.task.TaskType;
 import edu.asu.diging.cord19.explorer.core.model.task.impl.TaskImpl;
-import edu.asu.diging.cord19.explorer.core.service.DocImporter;
 import edu.asu.diging.cord19.explorer.core.service.DocumentImportManager;
+import edu.asu.diging.cord19.explorer.core.service.worker.DocImporter;
 
 @Service
 public class DocumentImportManagerImpl implements DocumentImportManager {

@@ -1,4 +1,4 @@
-package edu.asu.diging.cord19.explorer.core.service.impl;
+package edu.asu.diging.cord19.explorer.core.service.arxiv.impl;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 import edu.asu.diging.cord19.explorer.core.data.TaskRepository;
 import edu.asu.diging.cord19.explorer.core.model.task.TaskType;
 import edu.asu.diging.cord19.explorer.core.model.task.impl.TaskImpl;
-import edu.asu.diging.cord19.explorer.core.service.ArxivImportManager;
-import edu.asu.diging.cord19.explorer.core.service.ArxivImporter;
+import edu.asu.diging.cord19.explorer.core.service.arxiv.ArxivImportManager;
+import edu.asu.diging.cord19.explorer.core.service.arxiv.ArxivImporter;
 
 @Service
 public class ArxivImportManagerImpl implements ArxivImportManager {

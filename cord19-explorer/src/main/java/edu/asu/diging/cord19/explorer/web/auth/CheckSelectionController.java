@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import edu.asu.diging.cord19.explorer.core.model.Publication;
 import edu.asu.diging.cord19.explorer.core.model.impl.PersonImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.WikipediaSelectionStatus;
@@ -25,7 +26,7 @@ public class CheckSelectionController {
     public String post(String affiliation, String status, String page) {
         // FIXME: needs to go into manager class
         List<PublicationImpl> pubs = repo.findByMetadataAuthorsAffiliationInstitution(affiliation);
-        for (PublicationImpl pub : pubs) {
+        for (Publication pub : pubs) {
             for (PersonImpl person : pub.getMetadata().getAuthors()) {
                 if (person.getAffiliation().getInstitution() != null
                         && person.getAffiliation().getInstitution().equals(affiliation)) {

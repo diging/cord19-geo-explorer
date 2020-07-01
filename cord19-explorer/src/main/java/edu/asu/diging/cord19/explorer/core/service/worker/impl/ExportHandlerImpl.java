@@ -1,4 +1,4 @@
-package edu.asu.diging.cord19.explorer.core.service.impl;
+package edu.asu.diging.cord19.explorer.core.service.worker.impl;
 
 import java.io.File;
 import java.time.OffsetDateTime;
@@ -16,7 +16,8 @@ import edu.asu.diging.cord19.explorer.core.model.export.impl.ExportImpl;
 import edu.asu.diging.cord19.explorer.core.model.task.Task;
 import edu.asu.diging.cord19.explorer.core.model.task.TaskStatus;
 import edu.asu.diging.cord19.explorer.core.model.task.impl.TaskImpl;
-import edu.asu.diging.cord19.explorer.core.service.Exporter;
+import edu.asu.diging.cord19.explorer.core.service.worker.ExportHandler;
+import edu.asu.diging.cord19.explorer.core.service.worker.Exporter;
 
 @Service
 public class ExportHandlerImpl implements ExportHandler {

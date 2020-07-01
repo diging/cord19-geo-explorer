@@ -1,4 +1,4 @@
-package edu.asu.diging.cord19.explorer.core.service.impl;
+package edu.asu.diging.cord19.explorer.core.service.worker.impl;
 
 public class ExportedMetadataEntry {
 

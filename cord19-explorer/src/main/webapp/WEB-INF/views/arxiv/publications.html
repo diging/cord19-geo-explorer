@@ -41,7 +41,7 @@
    		  <tr th:each="pub : ${publications}">
 		    <td>
 		    <b><a th:href="@{'/paper/' + ${pub.paperId}}">[[${pub.metadata.title}]]</a></b><br>
-		    [[${pub.abstracts[0].text}]]
+		    <span th:if="${not #lists.isEmpty(pub.abstracts)}">[[${pub.abstracts[0]?.text}]]</span>
 		    </td>
 		    
 	      </tr>

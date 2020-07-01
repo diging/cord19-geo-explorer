@@ -10,7 +10,7 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.feed.AtomFeedHttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import edu.asu.diging.cord19.explorer.core.service.impl.ArxivAtomHttpConverter;
+import edu.asu.diging.cord19.explorer.core.service.arxiv.impl.ArxivAtomHttpConverter;
 
 @Configuration
 @ComponentScan("edu.asu.diging.simpleusers.web")

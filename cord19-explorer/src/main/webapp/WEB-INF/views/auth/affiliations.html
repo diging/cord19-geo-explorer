@@ -56,7 +56,10 @@
       	<td>
       		<a th:if="${aff.wiki}" target="_blank" th:href="'https://en.wikipedia.org/wiki/' + ${aff.wiki}">
       		[[${aff.wiki}]]
-      		</a>
+      		</a><br>
+      		<i th:if="${aff.locType == 'CURATED'}" class="fas fa-user-check"></i>
+      		<i th:if="${aff.locType == 'CITY'}" class="fas fa-city"></i>
+      		<i th:if="${aff.locType == 'COUNTRY'}" class="far fa-flag"></i>
       	</td>
       	<td>
       		<span th:text="${aff.coord}"></span>
@@ -101,6 +104,7 @@
     		  } else {
     			  $("#searchTerm").val(country);
     		  }
+    		  $("#affiliationName").val(title);
     		  $("#searchModal").modal('show');
     	  });
     	  
@@ -111,6 +115,7 @@
     	  $("#searchBtn").click(function() {
     		  $("#searchResults").empty();
     		  var searchTerm = $("#searchTerm").val();
+    		  var affiliation = $("#affiliationName").val();
     		  if (searchTerm != undefined) {
     			  $.get("[(@{/auth/affiliation/wiki/find})]?title=" + searchTerm, function( data ) {
     				var ul = $('<div class="list-group">');
@@ -119,6 +124,22 @@
     					li.append("<b>" + elem.title + "</b>");
     					li.append("<br>");
     					li.append(elem.shortDescription);
+    					if (elem.redirectsTo != undefined) {
+    						li.append("Redirects to: <i>" + elem.redirectsTo + "</i>");
+    					}
+    					if (elem.coordinates != undefined) {
+    						var span = $('<span class="pull-right"></span>');
+    						span.append('<i class="fas fa-map-marked-alt"></i>');
+    						span.click(function(e) {
+								selectLocation(elem.id, affiliation);
+								e.preventDefault();
+								$("#searchModal").modal('hide');
+							});		
+    						li.append(span);
+    						li.append('<span class="clearfix"></span>');
+    					} else {
+    						li.addClass("disabled");
+    					}
     					ul.append(li);
     				});
     				$("#searchResults").append(ul);
@@ -126,6 +147,16 @@
     		  }
     	  });
       })
+      
+      function selectLocation(id, affiliation) {
+    	  $.ajax({
+    		  type: "POST",
+    		  url: "[[(@{/auth/affiliation/wiki/select})]]?id=" + id + "&affiliation=" + affiliation + "&[[${_csrf.parameterName}]]=[[${_csrf.token}]]",
+    		  success: function() {
+    			  console.log("success")
+    		  },
+    		});
+      }
       
       </script>
       
@@ -139,6 +170,7 @@
 	      <div class="modal-body">
 	     	<p>
 	        <input class="form-control" type="text" id="searchTerm">
+	        <input type="hidden" id="affiliationName">
 	        </p>
 	        <p id="searchResults">
 	        </p>

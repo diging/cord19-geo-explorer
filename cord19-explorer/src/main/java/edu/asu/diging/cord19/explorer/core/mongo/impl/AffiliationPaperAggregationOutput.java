@@ -11,6 +11,7 @@ public class AffiliationPaperAggregationOutput {
     private String wiki;
     private String coord;
     private String status;
+    private String locType;
     
     public String getId() {
         return id;
@@ -53,6 +54,12 @@ public class AffiliationPaperAggregationOutput {
     }
     public void setStatus(String status) {
         this.status = status;
+    }
+    public String getLocType() {
+        return locType;
+    }
+    public void setLocType(String locType) {
+        this.locType = locType;
     }
     
 }

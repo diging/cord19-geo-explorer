@@ -79,13 +79,34 @@ public class ElasticsearchConnectorImpl implements ElasticsearchConnector {
         List<Wikientry> entries = searchTemplate.queryForList(query, Wikientry.class);
         for (Wikientry entry : entries) {
             String text = entry.getComplete_text();
-            Pattern p = Pattern.compile("\\{\\{ *?short description *?\\|(.+?)\\}\\}");
-            Matcher m = p.matcher(text);
-            if (m.find()) {
-                entry.setShortDescription(m.group(1));
+            Pattern pDesc = Pattern.compile("\\{\\{ *?short description *?\\|(.+?)\\}\\}");
+            Matcher mDesc = pDesc.matcher(text);
+            if (mDesc.find()) {
+                entry.setShortDescription(mDesc.group(1));
+                continue;
+            }
+            
+            Pattern pRedir = Pattern.compile("#[Rr][Ee][Dd][Ii][Rr][Ee][Cc][Tt] +?\\[\\[(.+?)\\]\\]");
+            Matcher mRedir = pRedir.matcher(text);
+            if (mRedir.find()) {
+                entry.setRedirectsTo(mRedir.group(1));
             }
         }
         return entries;
+    }
+    
+    @Override
+    public Wikientry findById(String id) {
+        BoolQueryBuilder builder = QueryBuilders.boolQuery();
+        builder.must(QueryBuilders.queryStringQuery("_id:" + id));
+        NativeSearchQueryBuilder nativeSearchQueryBuilder = new NativeSearchQueryBuilder();
+        nativeSearchQueryBuilder.withQuery(builder);
+        NativeSearchQuery query = nativeSearchQueryBuilder.build();
+        List<Wikientry> entries = searchTemplate.queryForList(query, Wikientry.class);
+        if (entries != null && entries.size() > 0) {
+            return entries.get(0);
+        }
+        return null;
     }
     
     private String prepareSearchTerm(String term) {

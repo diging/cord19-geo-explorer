@@ -1,4 +1,4 @@
-package edu.asu.diging.cord19.explorer.core.service.impl;
+package edu.asu.diging.cord19.explorer.core.service.worker.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -29,9 +29,9 @@ import edu.asu.diging.cord19.explorer.core.model.impl.LocationMatchImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.LocationType;
 import edu.asu.diging.cord19.explorer.core.model.impl.ParagraphImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.WikipediaArticleImpl;
-import edu.asu.diging.cord19.explorer.core.service.ElasticsearchConnector;
-import edu.asu.diging.cord19.explorer.core.service.TextLocationMatcher;
 import edu.asu.diging.cord19.explorer.core.service.WikipediaHelper;
+import edu.asu.diging.cord19.explorer.core.service.worker.ElasticsearchConnector;
+import edu.asu.diging.cord19.explorer.core.service.worker.TextLocationMatcher;
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.TokenNameFinderModel;
 import opennlp.tools.tokenize.TokenizerME;

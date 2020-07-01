@@ -1,4 +1,4 @@
-package edu.asu.diging.cord19.explorer.core.service.impl;
+package edu.asu.diging.cord19.explorer.core.service.worker.impl;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -21,12 +21,13 @@ import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 
 import edu.asu.diging.cord19.explorer.core.data.ExportRepository;
+import edu.asu.diging.cord19.explorer.core.model.Publication;
 import edu.asu.diging.cord19.explorer.core.model.export.Export;
 import edu.asu.diging.cord19.explorer.core.model.export.ExportType;
 import edu.asu.diging.cord19.explorer.core.model.export.impl.ExportImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
-import edu.asu.diging.cord19.explorer.core.service.ExportedMetadataFactory;
-import edu.asu.diging.cord19.explorer.core.service.Exporter;
+import edu.asu.diging.cord19.explorer.core.service.worker.ExportedMetadataFactory;
+import edu.asu.diging.cord19.explorer.core.service.worker.Exporter;
 
 @Component
 @PropertySource({ "classpath:config.properties", "${appConfigFile:classpath:}/app.properties"})
@@ -80,7 +81,7 @@ public class CsvExporter implements Exporter {
         try (CloseableIterator<PublicationImpl> docs = mongoTemplate.stream(new Query().noCursorTimeout(),
                 PublicationImpl.class)) {
             while (docs.hasNext()) {
-                PublicationImpl pub = docs.next();
+                Publication pub = docs.next();
                 try {
                     beanToCsv.write(factory.createEntry(pub));
                 } catch (CsvDataTypeMismatchException | CsvRequiredFieldEmptyException e) {

@@ -1,4 +1,4 @@
-package edu.asu.diging.cord19.explorer.core.service.impl;
+package edu.asu.diging.cord19.explorer.core.service.worker.impl;
 
 import java.util.Arrays;
 
@@ -9,7 +9,7 @@ import edu.asu.diging.cord19.explorer.core.model.Publication;
 import edu.asu.diging.cord19.explorer.core.model.impl.CategoryImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.ParagraphImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.PersonImpl;
-import edu.asu.diging.cord19.explorer.core.service.ExportedMetadataFactory;
+import edu.asu.diging.cord19.explorer.core.service.worker.ExportedMetadataFactory;
 
 @Component
 public class ExportedMetadataFactoryImpl implements ExportedMetadataFactory {

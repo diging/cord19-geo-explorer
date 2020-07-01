@@ -1,4 +1,4 @@
-package edu.asu.diging.cord19.explorer.core.service.impl;
+package edu.asu.diging.cord19.explorer.core.service.worker.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +16,7 @@ import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilde
 import org.springframework.stereotype.Component;
 
 import edu.asu.diging.cord19.explorer.core.elastic.model.impl.Wikientry;
-import edu.asu.diging.cord19.explorer.core.service.ElasticsearchConnector;
+import edu.asu.diging.cord19.explorer.core.service.worker.ElasticsearchConnector;
 
 @Component
 public class ElasticsearchConnectorImpl implements ElasticsearchConnector {

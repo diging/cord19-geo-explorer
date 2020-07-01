@@ -1,4 +1,4 @@
-package edu.asu.diging.cord19.explorer.core.service.impl;
+package edu.asu.diging.cord19.explorer.core.service.worker.impl;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -16,9 +16,9 @@ import edu.asu.diging.cord19.explorer.core.model.Person;
 import edu.asu.diging.cord19.explorer.core.model.Publication;
 import edu.asu.diging.cord19.explorer.core.model.impl.LocationType;
 import edu.asu.diging.cord19.explorer.core.model.impl.WikipediaArticleImpl;
-import edu.asu.diging.cord19.explorer.core.service.AffiliationCleaner;
-import edu.asu.diging.cord19.explorer.core.service.ElasticsearchConnector;
 import edu.asu.diging.cord19.explorer.core.service.WikipediaHelper;
+import edu.asu.diging.cord19.explorer.core.service.worker.AffiliationCleaner;
+import edu.asu.diging.cord19.explorer.core.service.worker.ElasticsearchConnector;
 
 @Component
 public class AffiliationCleanerImpl implements AffiliationCleaner {

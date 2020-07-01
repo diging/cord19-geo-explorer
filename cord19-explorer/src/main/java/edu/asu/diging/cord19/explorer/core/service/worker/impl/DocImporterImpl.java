@@ -1,4 +1,4 @@
-package edu.asu.diging.cord19.explorer.core.service.impl;
+package edu.asu.diging.cord19.explorer.core.service.worker.impl;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -48,9 +48,9 @@ import edu.asu.diging.cord19.explorer.core.model.task.Task;
 import edu.asu.diging.cord19.explorer.core.model.task.TaskStatus;
 import edu.asu.diging.cord19.explorer.core.model.task.impl.TaskImpl;
 import edu.asu.diging.cord19.explorer.core.mongo.PublicationRepository;
-import edu.asu.diging.cord19.explorer.core.service.AffiliationCleaner;
-import edu.asu.diging.cord19.explorer.core.service.DocImporter;
-import edu.asu.diging.cord19.explorer.core.service.TextLocationMatcher;
+import edu.asu.diging.cord19.explorer.core.service.worker.AffiliationCleaner;
+import edu.asu.diging.cord19.explorer.core.service.worker.DocImporter;
+import edu.asu.diging.cord19.explorer.core.service.worker.TextLocationMatcher;
 
 @Component
 @PropertySource({ "classpath:config.properties", "${appConfigFile:classpath:}/app.properties",
@@ -157,7 +157,7 @@ public class DocImporterImpl implements DocImporter {
         File metadataFile = new File(metadataFilename);
 
         CsvToBean<MetadataEntry> bean = new CsvToBeanBuilder<MetadataEntry>(new FileReader(metadataFile)).withType(MetadataEntry.class)
-                .withIgnoreLeadingWhiteSpace(true).withSeparator(',').build();
+                .withIgnoreLeadingWhiteSpace(true).withSeparator(',').withQuoteChar('\"').build();
 
         Iterator<MetadataEntry> it = bean.iterator();
         while (it.hasNext()) {

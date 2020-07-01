@@ -22,6 +22,7 @@ import edu.asu.diging.cord19.explorer.core.model.export.impl.ExportImpl;
 import edu.asu.diging.cord19.explorer.core.model.task.TaskType;
 import edu.asu.diging.cord19.explorer.core.model.task.impl.TaskImpl;
 import edu.asu.diging.cord19.explorer.core.service.ExportManager;
+import edu.asu.diging.cord19.explorer.core.service.worker.ExportHandler;
 
 @Service
 public class ExportManagerImpl implements ExportManager {

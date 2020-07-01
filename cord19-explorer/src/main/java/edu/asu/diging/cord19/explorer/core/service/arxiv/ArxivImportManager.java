@@ -1,4 +1,4 @@
-package edu.asu.diging.cord19.explorer.core.service;
+package edu.asu.diging.cord19.explorer.core.service.arxiv;
 
 import java.io.IOException;
 

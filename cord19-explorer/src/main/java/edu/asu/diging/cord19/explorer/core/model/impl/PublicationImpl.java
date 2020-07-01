@@ -43,6 +43,7 @@ public class PublicationImpl implements Publication {
     private String whoCovidence;
     
     private String database;
+    private boolean duplicate;
 
     @JsonProperty("abstract")
     private List<ParagraphImpl> abstracts;
@@ -527,6 +528,16 @@ public class PublicationImpl implements Publication {
     @Override
     public void setDatabase(String database) {
         this.database = database;
+    }
+
+    @Override
+    public boolean isDuplicate() {
+        return duplicate;
+    }
+
+    @Override
+    public void setDuplicate(boolean duplicate) {
+        this.duplicate = duplicate;
     }
 
     /*

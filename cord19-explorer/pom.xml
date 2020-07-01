@@ -28,6 +28,7 @@
 		<mongo.database.user></mongo.database.user>
 		<mongo.database.password></mongo.database.password>
 		<mongo.database.authdb>admin</mongo.database.authdb>
+		<mongo.duplicate.database.name>cord19ds-duplicates</mongo.duplicate.database.name>
 
 		<elasticsearch.index>wikipedia_complete</elasticsearch.index>
 		<elasticsearch.host>localhost:9200</elasticsearch.host>

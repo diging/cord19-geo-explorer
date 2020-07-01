@@ -77,6 +77,14 @@ public class ElasticsearchConnectorImpl implements ElasticsearchConnector {
         nativeSearchQueryBuilder.withPageable(page);
         NativeSearchQuery query = nativeSearchQueryBuilder.build();
         List<Wikientry> entries = searchTemplate.queryForList(query, Wikientry.class);
+        for (Wikientry entry : entries) {
+            String text = entry.getComplete_text();
+            Pattern p = Pattern.compile("\\{\\{ *?short description *?\\|(.+?)\\}\\}");
+            Matcher m = p.matcher(text);
+            if (m.find()) {
+                entry.setShortDescription(m.group(1));
+            }
+        }
         return entries;
     }
     

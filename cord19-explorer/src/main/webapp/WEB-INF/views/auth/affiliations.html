@@ -44,6 +44,7 @@
       	<th>Institution</th>
       	<th>Selected Wiki article</th>
       	<th>Coordinates</th>
+      	<th></th>
       	<th>Status</th>
       </tr>
       </thead>
@@ -59,6 +60,9 @@
       	</td>
       	<td>
       		<span th:text="${aff.coord}"></span>
+      	</td>
+      	<td>
+      		<a href="#"><i class="fas fa-tools aff-fix" th:attr="data-title=${aff.id}, data-city=${aff.settlement}, data-country=${aff.country}"></i></a>
       	</td>
       	<td>
       		<form th:action="@{'/auth/affiliation/status'}" method="POST">
@@ -83,6 +87,70 @@
       </tr>
       </table>
       
+      <script>
+      $(function() {
+    	  $(".aff-fix").click(function(e) {
+    		  e.preventDefault();
+    		  var title = $(e.target).attr("data-title");
+    		  var city = $(e.target).attr("data-city");
+    		  var country = $(e.target).attr("data-country");
+    		  if (title != undefined) {
+    			  $("#searchTerm").val(title);
+    		  } else if (city != undefined) {
+    			  $("#searchTerm").val(city);
+    		  } else {
+    			  $("#searchTerm").val(country);
+    		  }
+    		  $("#searchModal").modal('show');
+    	  });
+    	  
+    	  $("#closeBtn").click(function() {
+    		  $("#searchResults").empty();
+    	  })
+    	  
+    	  $("#searchBtn").click(function() {
+    		  $("#searchResults").empty();
+    		  var searchTerm = $("#searchTerm").val();
+    		  if (searchTerm != undefined) {
+    			  $.get("[(@{/auth/affiliation/wiki/find})]?title=" + searchTerm, function( data ) {
+    				var ul = $('<div class="list-group">');
+    				data.forEach(function(elem, idx) {
+    					var li = $('<a href="https://en.wikipedia.org/wiki/' + elem.title + '" target="_blank" class="list-group-item">');
+    					li.append("<b>" + elem.title + "</b>");
+    					li.append("<br>");
+    					li.append(elem.shortDescription);
+    					ul.append(li);
+    				});
+    				$("#searchResults").append(ul);
+    			  })
+    		  }
+    	  });
+      })
+      
+      </script>
+      
+      <div id="searchModal" class="modal fade" tabindex="-1" role="dialog">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title">Search</h4>
+	      </div>
+	      <div class="modal-body">
+	     	<p>
+	        <input class="form-control" type="text" id="searchTerm">
+	        </p>
+	        <p id="searchResults">
+	        </p>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" id="closeBtn" data-dismiss="modal">Close</button>
+	        <button id="searchBtn" type="button" class="btn btn-primary">Search</button>
+	      </div>
+	    </div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+	
    </div>
   </body>
 </html>

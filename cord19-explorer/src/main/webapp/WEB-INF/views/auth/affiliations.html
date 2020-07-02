@@ -48,12 +48,12 @@
       	<th>Status</th>
       </tr>
       </thead>
-      <tr th:each="aff : ${affs}" th:classappend="(${aff.status} == 'INCORRECT' ? 'danger' : '') + (${aff.status} == 'CORRECT_REGION' ? 'warning' : '') + (${aff.status} == 'CORRECT' ? 'success' : '')" >
+      <tr th:each="aff, iter : ${affs}" th:classappend="(${aff.status} == 'INCORRECT' ? 'danger' : '') + (${aff.status} == 'CORRECT_REGION' ? 'warning' : '') + (${aff.status} == 'CORRECT' ? 'success' : '')" >
       	<td>
       		 <a th:href="@{'/affiliation?name=' + ${#uris.escapeQueryParam(aff.id)}}"><span th:text="${aff.id}"></span></a>
       		 <br>[[${aff.settlement}]], [[${aff.country}]]
       	</td>
-      	<td>
+      	<td th:attr="id=${'name-' + iter.index}">
       		<a th:if="${aff.wiki}" target="_blank" th:href="'https://en.wikipedia.org/wiki/' + ${aff.wiki}">
       		[[${aff.wiki}]]
       		</a><br>
@@ -65,7 +65,7 @@
       		<span th:text="${aff.coord}"></span>
       	</td>
       	<td>
-      		<a href="#"><i class="fas fa-tools aff-fix" th:attr="data-title=${aff.id}, data-city=${aff.settlement}, data-country=${aff.country}"></i></a>
+      		<a href="#"><i class="fas fa-tools aff-fix" th:attr="data-index=${iter.index}, data-title=${aff.id}, data-city=${aff.settlement}, data-country=${aff.country}"></i></a>
       	</td>
       	<td>
       		<form th:action="@{'/auth/affiliation/status'}" method="POST">
@@ -91,6 +91,7 @@
       </table>
       
       <script>
+      //# sourceURL=correct.js
       $(function() {
     	  $(".aff-fix").click(function(e) {
     		  e.preventDefault();
@@ -105,6 +106,7 @@
     			  $("#searchTerm").val(country);
     		  }
     		  $("#affiliationName").val(title);
+    		  $("#rowIdx").val($(e.target).attr("data-index"));
     		  $("#searchModal").modal('show');
     	  });
     	  
@@ -116,6 +118,7 @@
     		  $("#searchResults").empty();
     		  var searchTerm = $("#searchTerm").val();
     		  var affiliation = $("#affiliationName").val();
+    		  var rowIdx = $("#rowIdx").val();
     		  if (searchTerm != undefined) {
     			  $.get("[(@{/auth/affiliation/wiki/find})]?title=" + searchTerm, function( data ) {
     				var ul = $('<div class="list-group">');
@@ -131,7 +134,7 @@
     						var span = $('<span class="pull-right"></span>');
     						span.append('<i class="fas fa-map-marked-alt"></i>');
     						span.click(function(e) {
-								selectLocation(elem.id, affiliation);
+								selectLocation(elem.id, affiliation, rowIdx);
 								e.preventDefault();
 								$("#searchModal").modal('hide');
 							});		
@@ -148,12 +151,19 @@
     	  });
       })
       
-      function selectLocation(id, affiliation) {
+      function selectLocation(id, affiliation, idx) {
     	  $.ajax({
     		  type: "POST",
     		  url: "[[(@{/auth/affiliation/wiki/select})]]?id=" + id + "&affiliation=" + affiliation + "&[[${_csrf.parameterName}]]=[[${_csrf.token}]]",
-    		  success: function() {
-    			  console.log("success")
+    		  success: function(data) {
+    			  data = JSON.parse(data);
+    			  var td = $("#name-" + idx);
+    			  td.empty();
+    			  var a = $('<a href="https://en.wikipedia.org/wiki/' + data.title + '" targe="_blank">' + data.title + "</a>");
+    			  td.append(a);
+    			  td.append("<br>");
+    			  td.append("(" + data.count + ") ")
+    			  td.append('<i class="fas fa-user-check"></i>');
     		  },
     		});
       }
@@ -171,6 +181,7 @@
 	     	<p>
 	        <input class="form-control" type="text" id="searchTerm">
 	        <input type="hidden" id="affiliationName">
+	        <input type="hidden" id="rowIdx">
 	        </p>
 	        <p id="searchResults">
 	        </p>

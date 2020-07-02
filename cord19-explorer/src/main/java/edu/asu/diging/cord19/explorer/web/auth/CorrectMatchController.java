@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.sun.mail.iap.Response;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.asu.diging.cord19.explorer.core.elastic.model.impl.Wikientry;
 import edu.asu.diging.cord19.explorer.core.model.Publication;
@@ -19,7 +20,6 @@ import edu.asu.diging.cord19.explorer.core.model.impl.LocationType;
 import edu.asu.diging.cord19.explorer.core.model.impl.PersonImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.WikipediaArticleImpl;
-import edu.asu.diging.cord19.explorer.core.model.impl.WikipediaSelectionStatus;
 import edu.asu.diging.cord19.explorer.core.mongo.PublicationRepository;
 import edu.asu.diging.cord19.explorer.core.service.worker.ElasticsearchConnector;
 
@@ -47,25 +47,32 @@ public class CorrectMatchController {
             return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
         }
         
+        WikipediaArticleImpl article = new WikipediaArticleImpl();
+        article.setTitle(selected.getTitle());
+        article.setCoordinates(selected.getCoordinates());
+        article.setLocationType(LocationType.CURATED);
+        article.setSelectedOn(OffsetDateTime.now().toString());
+        
         List<PublicationImpl> pubs = repo.findByMetadataAuthorsAffiliationInstitution(affiliation);
+        int count = 0;
         for (Publication pub : pubs) {
             for (PersonImpl person : pub.getMetadata().getAuthors()) {
                 if (person.getAffiliation().getInstitution() != null
                         && person.getAffiliation().getInstitution().equals(affiliation)) {
-                    WikipediaArticleImpl article = new WikipediaArticleImpl();
-                    // article.setCompleteText(entry.getComplete_text());
-                    article.setTitle(selected.getTitle());
-                    article.setCoordinates(selected.getCoordinates());
-                    article.setLocationType(LocationType.CURATED);
-                    article.setSelectedOn(OffsetDateTime.now().toString());
-                    
                     person.getAffiliation().setSelectedWikiarticle(article);
                     person.getAffiliation().setSelectionCheckedOn(OffsetDateTime.now().toString());
                     repo.save((PublicationImpl) pub);
+                    count++;
                 }
             }
         }
         
-        return new ResponseEntity<>(HttpStatus.OK);
+        ObjectMapper mapper = new ObjectMapper();
+        ObjectNode root = mapper.createObjectNode();
+        root.put("count", count);
+        root.put("title", article.getTitle());
+        root.put("type", article.getLocationType().toString());
+        
+        return new ResponseEntity<>(root.toString(), HttpStatus.OK);
     }
  }

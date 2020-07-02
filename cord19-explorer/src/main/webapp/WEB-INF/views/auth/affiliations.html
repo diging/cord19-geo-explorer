@@ -44,21 +44,28 @@
       	<th>Institution</th>
       	<th>Selected Wiki article</th>
       	<th>Coordinates</th>
+      	<th></th>
       	<th>Status</th>
       </tr>
       </thead>
-      <tr th:each="aff : ${affs}" th:classappend="(${aff.status} == 'INCORRECT' ? 'danger' : '') + (${aff.status} == 'CORRECT_REGION' ? 'warning' : '') + (${aff.status} == 'CORRECT' ? 'success' : '')" >
+      <tr th:each="aff, iter : ${affs}" th:classappend="(${aff.status} == 'INCORRECT' ? 'danger' : '') + (${aff.status} == 'CORRECT_REGION' ? 'warning' : '') + (${aff.status} == 'CORRECT' ? 'success' : '')" >
       	<td>
       		 <a th:href="@{'/affiliation?name=' + ${#uris.escapeQueryParam(aff.id)}}"><span th:text="${aff.id}"></span></a>
       		 <br>[[${aff.settlement}]], [[${aff.country}]]
       	</td>
-      	<td>
+      	<td th:attr="id=${'name-' + iter.index}">
       		<a th:if="${aff.wiki}" target="_blank" th:href="'https://en.wikipedia.org/wiki/' + ${aff.wiki}">
       		[[${aff.wiki}]]
-      		</a>
+      		</a><br>
+      		<i th:if="${aff.locType == 'CURATED'}" class="fas fa-user-check"></i>
+      		<i th:if="${aff.locType == 'CITY'}" class="fas fa-city"></i>
+      		<i th:if="${aff.locType == 'COUNTRY'}" class="far fa-flag"></i>
       	</td>
       	<td>
       		<span th:text="${aff.coord}"></span>
+      	</td>
+      	<td>
+      		<a href="#"><i class="fas fa-tools aff-fix" th:attr="data-index=${iter.index}, data-title=${aff.id}, data-city=${aff.settlement}, data-country=${aff.country}"></i></a>
       	</td>
       	<td>
       		<form th:action="@{'/auth/affiliation/status'}" method="POST">
@@ -83,6 +90,110 @@
       </tr>
       </table>
       
+      <script>
+      //# sourceURL=correct.js
+      $(function() {
+    	  $(".aff-fix").click(function(e) {
+    		  e.preventDefault();
+    		  var title = $(e.target).attr("data-title");
+    		  var city = $(e.target).attr("data-city");
+    		  var country = $(e.target).attr("data-country");
+    		  if (title != undefined) {
+    			  $("#searchTerm").val(title);
+    		  } else if (city != undefined) {
+    			  $("#searchTerm").val(city);
+    		  } else {
+    			  $("#searchTerm").val(country);
+    		  }
+    		  $("#affiliationName").val(title);
+    		  $("#rowIdx").val($(e.target).attr("data-index"));
+    		  $("#searchModal").modal('show');
+    	  });
+    	  
+    	  $("#closeBtn").click(function() {
+    		  $("#searchResults").empty();
+    	  })
+    	  
+    	  $("#searchBtn").click(function() {
+    		  $("#searchResults").empty();
+    		  var searchTerm = $("#searchTerm").val();
+    		  var affiliation = $("#affiliationName").val();
+    		  var rowIdx = $("#rowIdx").val();
+    		  if (searchTerm != undefined) {
+    			  $.get("[(@{/auth/affiliation/wiki/find})]?title=" + searchTerm, function( data ) {
+    				var ul = $('<div class="list-group">');
+    				data.forEach(function(elem, idx) {
+    					var li = $('<a href="https://en.wikipedia.org/wiki/' + elem.title + '" target="_blank" class="list-group-item">');
+    					li.append("<b>" + elem.title + "</b>");
+    					li.append("<br>");
+    					li.append(elem.shortDescription);
+    					if (elem.redirectsTo != undefined) {
+    						li.append("Redirects to: <i>" + elem.redirectsTo + "</i>");
+    					}
+    					if (elem.coordinates != undefined) {
+    						var span = $('<span class="pull-right"></span>');
+    						span.append('<i class="fas fa-map-marked-alt"></i>');
+    						span.click(function(e) {
+								selectLocation(elem.id, affiliation, rowIdx);
+								e.preventDefault();
+								$("#searchModal").modal('hide');
+							});		
+    						li.append(span);
+    						li.append('<span class="clearfix"></span>');
+    					} else {
+    						li.addClass("disabled");
+    					}
+    					ul.append(li);
+    				});
+    				$("#searchResults").append(ul);
+    			  })
+    		  }
+    	  });
+      })
+      
+      function selectLocation(id, affiliation, idx) {
+    	  $.ajax({
+    		  type: "POST",
+    		  url: "[[(@{/auth/affiliation/wiki/select})]]?id=" + id + "&affiliation=" + affiliation + "&[[${_csrf.parameterName}]]=[[${_csrf.token}]]",
+    		  success: function(data) {
+    			  data = JSON.parse(data);
+    			  var td = $("#name-" + idx);
+    			  td.empty();
+    			  var a = $('<a href="https://en.wikipedia.org/wiki/' + data.title + '" targe="_blank">' + data.title + "</a>");
+    			  td.append(a);
+    			  td.append("<br>");
+    			  td.append("(" + data.count + ") ")
+    			  td.append('<i class="fas fa-user-check"></i>');
+    		  },
+    		});
+      }
+      
+      </script>
+      
+      <div id="searchModal" class="modal fade" tabindex="-1" role="dialog">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+	        <h4 class="modal-title">Search</h4>
+	      </div>
+	      <div class="modal-body">
+	     	<p>
+	        <input class="form-control" type="text" id="searchTerm">
+	        <input type="hidden" id="affiliationName">
+	        <input type="hidden" id="rowIdx">
+	        </p>
+	        <p id="searchResults">
+	        </p>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" id="closeBtn" data-dismiss="modal">Close</button>
+	        <button id="searchBtn" type="button" class="btn btn-primary">Search</button>
+	      </div>
+	    </div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+	
    </div>
   </body>
 </html>

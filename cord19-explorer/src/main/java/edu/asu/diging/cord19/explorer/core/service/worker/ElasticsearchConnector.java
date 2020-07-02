@@ -10,4 +10,6 @@ public interface ElasticsearchConnector {
 
     List<Wikientry> searchInTitle(String location);
 
+    Wikientry findById(String id);
+
 }

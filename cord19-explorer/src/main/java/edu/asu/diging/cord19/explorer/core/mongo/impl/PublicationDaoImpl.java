@@ -74,7 +74,8 @@ public class PublicationDaoImpl implements PublicationDao {
                 .first("metadata.authors.affiliation.selectionStatus").as("status")
                 .first("metadata.authors.affiliation.locationSettlement").as("settlement")
                 .first("metadata.authors.affiliation.locationCountry").as("country")
-                .first("metadata.authors.affiliation.selectedWikiarticle.coordinates").as("coord");
+                .first("metadata.authors.affiliation.selectedWikiarticle.coordinates").as("coord")
+                .first("metadata.authors.affiliation.selectedWikiarticle.locationType").as("locType");
 
         SortOperation sort = Aggregation.sort(Sort.by(Order.asc("_id")));
 

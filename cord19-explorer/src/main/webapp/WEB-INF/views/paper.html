@@ -67,7 +67,7 @@
 	      	[# th:each="match : ${para.locationMatches}" ]
 	      	[# th:if="${match != null && match.selectedArticle != null}" ]
 	      	$("#[(${#ids.next('para')})]").mark("[(${match.locationName})]", { "separateWordSearch": false})	
-	     	var title = [[${#strings.defaultString(publication.metadata.title, 'No title available')}]];
+	     	var title = [[${match.selectedArticle.title}]]
 	      	$("#[(${#ids.next('para')})]").mark("[(${match.locationName})]", { "separateWordSearch": false}).attr('title', title);
 	      	[/]
 	      	[# th:if="${match != null && match.selectedArticle == null}" ]

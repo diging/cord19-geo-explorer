@@ -40,6 +40,8 @@ public class MetadataEntry {
     private String arxivId;
     @CsvBindByName(column = "s2_id")
     private String s2Id;
+    @CsvBindByName(column = "authors")
+    private String authors;
 
     public MetadataEntry() {
     }
@@ -186,5 +188,12 @@ public class MetadataEntry {
 
     public void setS2Id(String s2Id) {
         this.s2Id = s2Id;
+    }
+    public String getAuthors() {
+        return authors;
+    }
+
+    public void setAuthors(String authors) {
+        this.authors = authors;
     }
 }

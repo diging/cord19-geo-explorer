@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -41,8 +42,11 @@ import com.opencsv.bean.CsvToBeanBuilder;
 
 import edu.asu.diging.cord19.explorer.core.data.TaskRepository;
 import edu.asu.diging.cord19.explorer.core.model.LocationMatch;
+import edu.asu.diging.cord19.explorer.core.model.Person;
 import edu.asu.diging.cord19.explorer.core.model.Publication;
+import edu.asu.diging.cord19.explorer.core.model.impl.MetadataImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.ParagraphImpl;
+import edu.asu.diging.cord19.explorer.core.model.impl.PersonImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
 import edu.asu.diging.cord19.explorer.core.model.task.Task;
 import edu.asu.diging.cord19.explorer.core.model.task.TaskStatus;
@@ -169,29 +173,73 @@ public class DocImporterImpl implements DocImporter {
             }
             if (pub == null && entry.getPmcid() != null && !entry.getPmcid().isEmpty()) {
                 pub = pubRepo.findFirstByPaperId(entry.getPmcid());
+            } 
+            
+            if (pub == null) {
+                pub = new PublicationImpl();
             }
 
-            if (pub != null) {
-                pub.setHasPdfParse(entry.getPdfJsonFiles() != null && !entry.getPdfJsonFiles().trim().isEmpty());
-                pub.setPdfJsonFiles(entry.getPdfJsonFiles());
-                pub.setCordId(entry.getCord_uid());
-                pub.setDoi(entry.getDoi());
-                pub.setHasPmcXmlParse(entry.getPmcJsonFiles() != null && entry.getPmcJsonFiles().trim().isEmpty());
-                pub.setPmcJsonFiles(entry.getPmcJsonFiles());
-                pub.setJournal(entry.getJournal());
-                pub.setLicense(entry.getLicense());
-                pub.setMsAcademicPaperId(entry.getMsAcademicPaperId());
-                pub.setPmcid(entry.getPmcid());
-                pub.setPublishTime(entry.getPublishTime());
-                pub.setPubmedId(entry.getPubmed_id());
-                pub.setSha(entry.getSha());
-                pub.setSourceX(entry.getSourceX());
-                pub.setUrl(entry.getUrl());
-                pub.setWhoCovidence(entry.getWhoCov());
-                pub.setArxivId(entry.getArxivId());
-                extractYear(pub);
-                pubRepo.save(pub);
+            
+            pub.setHasPdfParse(entry.getPdfJsonFiles() != null && !entry.getPdfJsonFiles().trim().isEmpty());
+            pub.setPdfJsonFiles(entry.getPdfJsonFiles());
+            pub.setCordId(entry.getCord_uid());
+            pub.setDoi(entry.getDoi());
+            pub.setHasPmcXmlParse(entry.getPmcJsonFiles() != null && entry.getPmcJsonFiles().trim().isEmpty());
+            pub.setPmcJsonFiles(entry.getPmcJsonFiles());
+            pub.setJournal(entry.getJournal());
+            pub.setLicense(entry.getLicense());
+            pub.setMsAcademicPaperId(entry.getMsAcademicPaperId());
+            pub.setPmcid(entry.getPmcid());
+            pub.setPublishTime(entry.getPublishTime());
+            pub.setPubmedId(entry.getPubmed_id());
+            pub.setSha(entry.getSha());
+            pub.setSourceX(entry.getSourceX());
+            pub.setUrl(entry.getUrl());
+            pub.setWhoCovidence(entry.getWhoCov());
+            pub.setArxivId(entry.getArxivId());
+            if (pub.getMetadata() == null) {
+                if (pub.getMetadata() == null) {
+                    pub.setMetadata(new MetadataImpl());
+                }
             }
+            
+            if (pub.getMetadata().getTitle() == null || pub.getMetadata().getTitle().isEmpty()) {
+                pub.getMetadata().setTitle(entry.getTitle());
+            }
+            
+            if (pub.getMetadata().getAuthors() == null) {
+                pub.getMetadata().setAuthors(new ArrayList<>());
+            }
+            
+            if (pub.getMetadata().getAuthors().isEmpty()) {
+                String authorStr = entry.getAuthors();
+                if (authorStr.contains(";")) {
+                    String[] authors = authorStr.split(";");
+                    for (String author : authors) {
+                        Person person = new PersonImpl();
+                        String[] nameParts = author.split(", ");
+                        if (nameParts.length > 1) {
+                            person.setLast(nameParts[0]);
+                            person.setFirst(nameParts[1]);
+                            /*
+                             * The following really doesn't seem to make sense as it would
+                             * mean the name would be something like Bauer, Peter, Franz but
+                             * who knows. Let's make those middle names for now.
+                             */
+                            if (nameParts.length > 2) {
+                                List<String> middleParts = new ArrayList<>();
+                                for (int i = 2; i<nameParts.length; i++) {
+                                    middleParts.add(nameParts[i]);
+                                }
+                                person.setMiddle(middleParts);
+                            }
+                        }
+                    }
+                }
+            }
+            extractYear(pub);
+            pubRepo.save(pub);
+            
         }
         
     }

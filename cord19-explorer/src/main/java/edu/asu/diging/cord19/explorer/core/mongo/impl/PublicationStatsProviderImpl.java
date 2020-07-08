@@ -6,12 +6,12 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.CountOperation;
+import org.springframework.data.mongodb.core.aggregation.GroupOperation;
 import org.springframework.data.mongodb.core.aggregation.MatchOperation;
 import org.springframework.data.mongodb.core.aggregation.UnwindOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Controller;
-
 
 
 import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
@@ -44,8 +44,17 @@ public class PublicationStatsProviderImpl implements PublicationStatsProvider {
      */
     @Override
     public long getPaperWithAuthorAffiliationCount() {
-        Query query = new Query(Criteria.where("metadata.authors.affiliation.locationCountry").ne(null));
-        return mongoTemplate.count(query, PublicationImpl.class);
+        String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
+        
+        UnwindOperation unwind = Aggregation.unwind("metadata.authors");
+        MatchOperation match = Aggregation.match(Criteria.where("metadata.authors.affiliation.locationCountry").exists(true));
+        GroupOperation group = Aggregation.group("paperId");
+        CountOperation count  = Aggregation.count().as("total");
+        
+        Aggregation aggregation = Aggregation.newAggregation(unwind, match, group, count);
+        AggregationResults<Document> doc = mongoTemplate.aggregate(aggregation, collection, Document.class); 
+        
+        return doc.getMappedResults().get(0).getInteger("total");
     }
      
     /* (non-Javadoc)
@@ -55,11 +64,13 @@ public class PublicationStatsProviderImpl implements PublicationStatsProvider {
     public long getPaperWithoutAuthorAffiliationCount() {
         String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
         
-        MatchOperation match = Aggregation.match(Criteria.where("metadata.authors").elemMatch(Criteria.where("affiliation.locationCountry").exists(false)));
+        MatchOperation match = Aggregation.match(Criteria.where("metadata.authors").not().elemMatch(Criteria.where("affiliation.locationCountry").exists(true)));
         CountOperation count  = Aggregation.count().as("total");
         
         Aggregation aggregation = Aggregation.newAggregation(match, count);
         AggregationResults<Document> doc = mongoTemplate.aggregate(aggregation, collection, Document.class); 
         return doc.getMappedResults().get(0).getInteger("total");
     }
+    
+    
 }

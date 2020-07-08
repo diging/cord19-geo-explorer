@@ -8,4 +8,16 @@ public interface PublicationStatsProvider {
 
     long getPaperWithoutAuthorAffiliationCount();
 
+    long getAuthorWithAffiliationAndWikiarticleCount();
+
+    long getAuthorWithAffiliationCount();
+
+    long getPaperWithAtLeastOneAffiliationAndWikiarticleCount();
+
+    long getAuthorsWithAffiliationAndIncorrectWikiarticleCount();
+
+    long getAuthorsWithAffiliationAndCorrectRegionWikiarticleCount();
+
+    long getPapersWithAffiliationAndIncorrectWikiarticleCount();
+
 }

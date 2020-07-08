@@ -24,6 +24,12 @@ public class StatsController {
         model.addAttribute("authorCount", provider.getAuthorCount());
         model.addAttribute("totalPublications", repo.count());
         
+        model.addAttribute("authorWithAffCount", provider.getAuthorWithAffiliationCount());
+        model.addAttribute("authorWithAffAndArticleCount", provider.getAuthorWithAffiliationAndWikiarticleCount());
+        model.addAttribute("paperWithAffAndArticleCount", provider.getPaperWithAtLeastOneAffiliationAndWikiarticleCount());
+        model.addAttribute("authorWithIncorrectAffArticleMatch", provider.getAuthorsWithAffiliationAndIncorrectWikiarticleCount());
+        model.addAttribute("authorsWithCorrectRegionAffCount", provider.getAuthorsWithAffiliationAndCorrectRegionWikiarticleCount());
+        model.addAttribute("papersWithIncorrectAffArticleMatch", provider.getPapersWithAffiliationAndIncorrectWikiarticleCount());
         return "stats";
     }
 }

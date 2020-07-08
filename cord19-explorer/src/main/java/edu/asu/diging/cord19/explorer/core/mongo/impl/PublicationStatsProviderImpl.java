@@ -37,6 +37,10 @@ public class PublicationStatsProviderImpl implements PublicationStatsProvider {
         
         Aggregation aggregation = Aggregation.newAggregation(unwind, count);
         AggregationResults<Document> doc = mongoTemplate.aggregate(aggregation, collection, Document.class); 
+        
+        if (doc.getMappedResults().isEmpty()) {
+            return 0;
+        }
         return doc.getMappedResults().get(0).getInteger("total");
     }
     
@@ -55,6 +59,9 @@ public class PublicationStatsProviderImpl implements PublicationStatsProvider {
         Aggregation aggregation = Aggregation.newAggregation(unwind, match, group, count);
         AggregationResults<Document> doc = mongoTemplate.aggregate(aggregation, collection, Document.class); 
         
+        if (doc.getMappedResults().isEmpty()) {
+            return 0;
+        }
         return doc.getMappedResults().get(0).getInteger("total");
     }
      
@@ -70,6 +77,10 @@ public class PublicationStatsProviderImpl implements PublicationStatsProvider {
         
         Aggregation aggregation = Aggregation.newAggregation(match, count);
         AggregationResults<Document> doc = mongoTemplate.aggregate(aggregation, collection, Document.class); 
+        
+        if (doc.getMappedResults().isEmpty()) {
+            return 0;
+        }
         return doc.getMappedResults().get(0).getInteger("total");
     }
     
@@ -84,6 +95,9 @@ public class PublicationStatsProviderImpl implements PublicationStatsProvider {
         Aggregation aggregation = Aggregation.newAggregation(unwind, match, count);
         AggregationResults<Document> doc = mongoTemplate.aggregate(aggregation, collection, Document.class); 
         
+        if (doc.getMappedResults().isEmpty()) {
+            return 0;
+        }
         return doc.getMappedResults().get(0).getInteger("total");
     }
     
@@ -99,6 +113,9 @@ public class PublicationStatsProviderImpl implements PublicationStatsProvider {
         Aggregation aggregation = Aggregation.newAggregation(unwind, match1, match2, count);
         AggregationResults<Document> doc = mongoTemplate.aggregate(aggregation, collection, Document.class); 
         
+        if (doc.getMappedResults().isEmpty()) {
+            return 0;
+        }
         return doc.getMappedResults().get(0).getInteger("total");
     }
     
@@ -115,6 +132,9 @@ public class PublicationStatsProviderImpl implements PublicationStatsProvider {
         Aggregation aggregation = Aggregation.newAggregation(unwind, match1, match2, group, count);
         AggregationResults<Document> doc = mongoTemplate.aggregate(aggregation, collection, Document.class); 
         
+        if (doc.getMappedResults().isEmpty()) {
+            return 0;
+        }
         return doc.getMappedResults().get(0).getInteger("total");
     }
     
@@ -131,6 +151,9 @@ public class PublicationStatsProviderImpl implements PublicationStatsProvider {
         Aggregation aggregation = Aggregation.newAggregation(unwind, match1, match2, match3, count);
         AggregationResults<Document> doc = mongoTemplate.aggregate(aggregation, collection, Document.class); 
         
+        if (doc.getMappedResults().isEmpty()) {
+            return 0;
+        }
         return doc.getMappedResults().get(0).getInteger("total");
     }
     
@@ -148,6 +171,9 @@ public class PublicationStatsProviderImpl implements PublicationStatsProvider {
         Aggregation aggregation = Aggregation.newAggregation(unwind, match1, match2, match3, group, count);
         AggregationResults<Document> doc = mongoTemplate.aggregate(aggregation, collection, Document.class); 
         
+        if (doc.getMappedResults().isEmpty()) {
+            return 0;
+        }
         return doc.getMappedResults().get(0).getInteger("total");
     }
     
@@ -164,6 +190,9 @@ public class PublicationStatsProviderImpl implements PublicationStatsProvider {
         Aggregation aggregation = Aggregation.newAggregation(unwind, match1, match2, match3, count);
         AggregationResults<Document> doc = mongoTemplate.aggregate(aggregation, collection, Document.class); 
         
+        if (doc.getMappedResults().isEmpty()) {
+            return 0;
+        }
         return doc.getMappedResults().get(0).getInteger("total");
     }
 }

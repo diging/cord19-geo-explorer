@@ -76,6 +76,11 @@
 			<artifactId>simple-users</artifactId>
 			<version>1.0</version>
 		</dependency>
+		<dependency>
+			<groupId>edu.asu.diging</groupId>
+			<artifactId>publication-metadata-util</artifactId>
+			<version>0.1</version>
+		</dependency>
 
 		<!-- Spring -->
 		<dependency>

@@ -55,6 +55,8 @@ import edu.asu.diging.cord19.explorer.core.mongo.PublicationRepository;
 import edu.asu.diging.cord19.explorer.core.service.worker.AffiliationCleaner;
 import edu.asu.diging.cord19.explorer.core.service.worker.DocImporter;
 import edu.asu.diging.cord19.explorer.core.service.worker.TextLocationMatcher;
+import edu.asu.diging.pubmeta.util.service.AuthorsParser;
+import edu.asu.diging.pubmeta.util.service.impl.AuthorsParserImpl;
 
 @Component
 @PropertySource({ "classpath:config.properties", "${appConfigFile:classpath:}/app.properties",
@@ -88,10 +90,12 @@ public class DocImporterImpl implements DocImporter {
     private MongoTemplate mongoTemplate;
 
     private ObjectMapper mapper;
+    private AuthorsParser authorParser;
 
     @PostConstruct
     public void init() {
         mapper = new ObjectMapper();
+        authorParser = new AuthorsParserImpl();
     }
 
     @Override
@@ -174,9 +178,17 @@ public class DocImporterImpl implements DocImporter {
             if (pub == null && entry.getPmcid() != null && !entry.getPmcid().isEmpty()) {
                 pub = pubRepo.findFirstByPaperId(entry.getPmcid());
             } 
+            if (pub == null) {
+                pub = pubRepo.findFirstByPaperId(entry.getCord_uid());
+            }
             
             if (pub == null) {
                 pub = new PublicationImpl();
+                String paperId = entry.getSha() != null ? entry.getSha() : entry.getPmcid();
+                if (paperId == null || paperId.isEmpty()) {
+                    paperId = entry.getCord_uid();
+                }
+                pub.setPaperId(paperId);
             }
 
             
@@ -186,17 +198,17 @@ public class DocImporterImpl implements DocImporter {
             pub.setDoi(entry.getDoi());
             pub.setHasPmcXmlParse(entry.getPmcJsonFiles() != null && entry.getPmcJsonFiles().trim().isEmpty());
             pub.setPmcJsonFiles(entry.getPmcJsonFiles());
-            pub.setJournal(entry.getJournal());
-            pub.setLicense(entry.getLicense());
-            pub.setMsAcademicPaperId(entry.getMsAcademicPaperId());
-            pub.setPmcid(entry.getPmcid());
-            pub.setPublishTime(entry.getPublishTime());
+            pub.setJournal(entry.getJournal() != null ? entry.getJournal().trim() : null);
+            pub.setLicense(entry.getLicense() != null ? entry.getLicense().trim() : null);
+            pub.setMsAcademicPaperId(entry.getMsAcademicPaperId() != null ? entry.getMsAcademicPaperId().trim() : null);
+            pub.setPmcid(entry.getPmcid() != null ? entry.getPmcid().trim() : null);
+            pub.setPublishTime(entry.getPublishTime() != null ? entry.getPublishTime().trim() : "");
             pub.setPubmedId(entry.getPubmed_id());
             pub.setSha(entry.getSha());
             pub.setSourceX(entry.getSourceX());
             pub.setUrl(entry.getUrl());
-            pub.setWhoCovidence(entry.getWhoCov());
-            pub.setArxivId(entry.getArxivId());
+            pub.setWhoCovidence(entry.getWhoCov() != null ? entry.getWhoCov().trim() : entry.getWhoCov());
+            pub.setArxivId(entry.getArxivId() != null ? entry.getArxivId().trim() : null);
             if (pub.getMetadata() == null) {
                 if (pub.getMetadata() == null) {
                     pub.setMetadata(new MetadataImpl());
@@ -212,29 +224,13 @@ public class DocImporterImpl implements DocImporter {
             }
             
             if (pub.getMetadata().getAuthors().isEmpty()) {
-                String authorStr = entry.getAuthors();
-                if (authorStr.contains(";")) {
-                    String[] authors = authorStr.split(";");
-                    for (String author : authors) {
-                        Person person = new PersonImpl();
-                        String[] nameParts = author.split(", ");
-                        if (nameParts.length > 1) {
-                            person.setLast(nameParts[0]);
-                            person.setFirst(nameParts[1]);
-                            /*
-                             * The following really doesn't seem to make sense as it would
-                             * mean the name would be something like Bauer, Peter, Franz but
-                             * who knows. Let's make those middle names for now.
-                             */
-                            if (nameParts.length > 2) {
-                                List<String> middleParts = new ArrayList<>();
-                                for (int i = 2; i<nameParts.length; i++) {
-                                    middleParts.add(nameParts[i]);
-                                }
-                                person.setMiddle(middleParts);
-                            }
-                        }
-                    }
+                List<edu.asu.diging.pubmeta.util.model.Person> authors = authorParser.parseAuthorString(entry.getAuthors());
+                for (edu.asu.diging.pubmeta.util.model.Person author : authors) {
+                    PersonImpl person = new PersonImpl();
+                    person.setLast(author.getLastName());
+                    person.setFirst(author.getFirstName());
+                    person.setMiddle(author.getMiddleNames());
+                    pub.getMetadata().getAuthors().add(person);
                 }
             }
             extractYear(pub);

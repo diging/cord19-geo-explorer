@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -41,8 +42,11 @@ import com.opencsv.bean.CsvToBeanBuilder;
 
 import edu.asu.diging.cord19.explorer.core.data.TaskRepository;
 import edu.asu.diging.cord19.explorer.core.model.LocationMatch;
+import edu.asu.diging.cord19.explorer.core.model.Person;
 import edu.asu.diging.cord19.explorer.core.model.Publication;
+import edu.asu.diging.cord19.explorer.core.model.impl.MetadataImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.ParagraphImpl;
+import edu.asu.diging.cord19.explorer.core.model.impl.PersonImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
 import edu.asu.diging.cord19.explorer.core.model.task.Task;
 import edu.asu.diging.cord19.explorer.core.model.task.TaskStatus;
@@ -51,6 +55,8 @@ import edu.asu.diging.cord19.explorer.core.mongo.PublicationRepository;
 import edu.asu.diging.cord19.explorer.core.service.worker.AffiliationCleaner;
 import edu.asu.diging.cord19.explorer.core.service.worker.DocImporter;
 import edu.asu.diging.cord19.explorer.core.service.worker.TextLocationMatcher;
+import edu.asu.diging.pubmeta.util.service.AuthorsParser;
+import edu.asu.diging.pubmeta.util.service.impl.AuthorsParserImpl;
 
 @Component
 @PropertySource({ "classpath:config.properties", "${appConfigFile:classpath:}/app.properties",
@@ -84,10 +90,12 @@ public class DocImporterImpl implements DocImporter {
     private MongoTemplate mongoTemplate;
 
     private ObjectMapper mapper;
+    private AuthorsParser authorParser;
 
     @PostConstruct
     public void init() {
         mapper = new ObjectMapper();
+        authorParser = new AuthorsParserImpl();
     }
 
     @Override
@@ -169,29 +177,65 @@ public class DocImporterImpl implements DocImporter {
             }
             if (pub == null && entry.getPmcid() != null && !entry.getPmcid().isEmpty()) {
                 pub = pubRepo.findFirstByPaperId(entry.getPmcid());
+            } 
+            if (pub == null) {
+                pub = pubRepo.findFirstByPaperId(entry.getCord_uid());
+            }
+            
+            if (pub == null) {
+                pub = new PublicationImpl();
+                String paperId = entry.getSha() != null ? entry.getSha() : entry.getPmcid();
+                if (paperId == null || paperId.isEmpty()) {
+                    paperId = entry.getCord_uid();
+                }
+                pub.setPaperId(paperId);
             }
 
-            if (pub != null) {
-                pub.setHasPdfParse(entry.getPdfJsonFiles() != null && !entry.getPdfJsonFiles().trim().isEmpty());
-                pub.setPdfJsonFiles(entry.getPdfJsonFiles());
-                pub.setCordId(entry.getCord_uid());
-                pub.setDoi(entry.getDoi());
-                pub.setHasPmcXmlParse(entry.getPmcJsonFiles() != null && entry.getPmcJsonFiles().trim().isEmpty());
-                pub.setPmcJsonFiles(entry.getPmcJsonFiles());
-                pub.setJournal(entry.getJournal());
-                pub.setLicense(entry.getLicense());
-                pub.setMsAcademicPaperId(entry.getMsAcademicPaperId());
-                pub.setPmcid(entry.getPmcid());
-                pub.setPublishTime(entry.getPublishTime());
-                pub.setPubmedId(entry.getPubmed_id());
-                pub.setSha(entry.getSha());
-                pub.setSourceX(entry.getSourceX());
-                pub.setUrl(entry.getUrl());
-                pub.setWhoCovidence(entry.getWhoCov());
-                pub.setArxivId(entry.getArxivId());
-                extractYear(pub);
-                pubRepo.save(pub);
+            
+            pub.setHasPdfParse(entry.getPdfJsonFiles() != null && !entry.getPdfJsonFiles().trim().isEmpty());
+            pub.setPdfJsonFiles(entry.getPdfJsonFiles());
+            pub.setCordId(entry.getCord_uid());
+            pub.setDoi(entry.getDoi());
+            pub.setHasPmcXmlParse(entry.getPmcJsonFiles() != null && entry.getPmcJsonFiles().trim().isEmpty());
+            pub.setPmcJsonFiles(entry.getPmcJsonFiles());
+            pub.setJournal(entry.getJournal() != null ? entry.getJournal().trim() : null);
+            pub.setLicense(entry.getLicense() != null ? entry.getLicense().trim() : null);
+            pub.setMsAcademicPaperId(entry.getMsAcademicPaperId() != null ? entry.getMsAcademicPaperId().trim() : null);
+            pub.setPmcid(entry.getPmcid() != null ? entry.getPmcid().trim() : null);
+            pub.setPublishTime(entry.getPublishTime() != null ? entry.getPublishTime().trim() : "");
+            pub.setPubmedId(entry.getPubmed_id());
+            pub.setSha(entry.getSha());
+            pub.setSourceX(entry.getSourceX());
+            pub.setUrl(entry.getUrl());
+            pub.setWhoCovidence(entry.getWhoCov() != null ? entry.getWhoCov().trim() : entry.getWhoCov());
+            pub.setArxivId(entry.getArxivId() != null ? entry.getArxivId().trim() : null);
+            if (pub.getMetadata() == null) {
+                if (pub.getMetadata() == null) {
+                    pub.setMetadata(new MetadataImpl());
+                }
             }
+            
+            if (pub.getMetadata().getTitle() == null || pub.getMetadata().getTitle().isEmpty()) {
+                pub.getMetadata().setTitle(entry.getTitle());
+            }
+            
+            if (pub.getMetadata().getAuthors() == null) {
+                pub.getMetadata().setAuthors(new ArrayList<>());
+            }
+            
+            if (pub.getMetadata().getAuthors().isEmpty()) {
+                List<edu.asu.diging.pubmeta.util.model.Person> authors = authorParser.parseAuthorString(entry.getAuthors());
+                for (edu.asu.diging.pubmeta.util.model.Person author : authors) {
+                    PersonImpl person = new PersonImpl();
+                    person.setLast(author.getLastName());
+                    person.setFirst(author.getFirstName());
+                    person.setMiddle(author.getMiddleNames());
+                    pub.getMetadata().getAuthors().add(person);
+                }
+            }
+            extractYear(pub);
+            pubRepo.save(pub);
+            
         }
         
     }

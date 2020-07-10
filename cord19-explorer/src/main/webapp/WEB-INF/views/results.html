@@ -1,0 +1,11 @@
+<html layout:decorate="~{layouts/main}">
+  <head>
+    <title>Authority Matcher</title>
+  </head>
+  <body>
+   <div layout:fragment="content">
+   <input type="text" id="search" name="search">
+   <a th:href="@{'/result}"><input type="button" value="Search Publications"></a>
+   </div>
+  </body>
+</html>

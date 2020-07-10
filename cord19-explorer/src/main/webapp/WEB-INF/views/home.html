@@ -4,6 +4,8 @@
   </head>
   <body>
    <div layout:fragment="content">
+   <input type="text" id="search" name="search">
+   <a th:href="@{'/result'}"><input type="button" value="Search Publications"></a>
    	<div class="row">
    		<div class="col-md-12">[[${publicationCount}]] publications</div>
    		<div class="col-md-3">

@@ -8,7 +8,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan
+@ComponentScan({"edu.asu.diging.simpleusers"})
 public class SpringWebConfig implements WebMvcConfigurer {
 
     @Override

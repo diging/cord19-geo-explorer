@@ -22,15 +22,15 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.formLogin().loginPage("/")
-        .loginProcessingUrl("/login/authenticate")
-        .failureUrl("/?error=bad_credentials")
-        .and().logout().deleteCookies("JSESSIONID").logoutUrl("/logout").logoutSuccessUrl("/").and().exceptionHandling()
-                .accessDeniedPage("/403")
+        http.formLogin().loginPage("/").loginProcessingUrl("/login/authenticate").failureUrl("/?error=bad_credentials")
+                .and().logout().deleteCookies("JSESSIONID").logoutUrl("/logout").logoutSuccessUrl("/").and()
+                .exceptionHandling().accessDeniedPage("/403")
                 // Configures url based authorization
                 .and().authorizeRequests()
                 // Anyone can access the urls
-                .antMatchers("/", "/resources/**", "/login/authenticate", "/register", "/location/**", "/paper/**", "/affiliation/**", "/arxiv/**", "/stats", "/logout").permitAll()
+                .antMatchers("/", "/resources/**", "/login/authenticate", "/register", "/location/**", "/paper/**",
+                        "/affiliation/**", "/arxiv/**", "/stats", "/logout")
+                .permitAll()
                 // The rest of the our application is protected.
                 .antMatchers("/users/**", "/admin/**", "/auth/**").hasRole("ADMIN").anyRequest().hasRole("USER");
     }

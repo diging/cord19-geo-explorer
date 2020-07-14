@@ -14,13 +14,19 @@
 		<spring-security-version>5.3.1.RELEASE</spring-security-version>
 		<spring-data.version>Moore-SR6</spring-data.version>
 		<thymeleaf.version>3.0.11.RELEASE</thymeleaf.version>
-		<encoding.type>{bcrypt}</encoding.type>
 		<admin.password>$2a$04$oQo44vqcDIFRoYKiAXoNheurzkwX9dcNmowvTX/hsWuBMwijqn44i</admin.password>
 
 		<db.driver>com.mysql.jdbc.Driver</db.driver>
 		<db.database.url>jdbc-url-to-db</db.database.url>
 		<db.user>db-user</db.user>
 		<db.password>db-password</db.password>
+		
+		<email.user></email.user>
+        <email.password></email.password>
+        <email.host></email.host>
+        <email.port></email.port>
+        <email.from></email.from>
+        <app.url></app.url>
 
 		<mongo.database.name>cord19ds</mongo.database.name>
 		<mongo.database.host>localhost</mongo.database.host>

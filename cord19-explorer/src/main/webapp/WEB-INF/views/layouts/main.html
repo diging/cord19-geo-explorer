@@ -148,25 +148,30 @@
 	    
    </div>
   </body>
-  <footer class="footer">
-      <div class="container">
-        <div class="row">
-        <div class="col-md-12">
-		<hr style="margin-bottom: 25px;">
-		<p class="text-muted pull-left">
-	    <p class="text-muted">
-	   	<div sec:authorize="isAnonymous()">
-		<form name='f' class="form-inline pull-right" th:action="@{/login/authenticate}" method="POST">
-			Login:
-			<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-  			<input placeholder="Username" class="form-control input-sm" type="text" id="username" name="username"/>        
-		    <input placeholder="Password" class="form-control input-sm" type="password" id="password" name="password"/>    
-		    <button type="submit" class="btn btn-default btn-sm">Log in</button>
-		</form>
+<footer class="footer">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<hr style="margin-bottom: 25px;">
+				<p class="text-muted pull-left">
+				<p class="text-muted">
+				<div sec:authorize="isAnonymous()">
+					<form name='loginForm' class="form-inline pull-right"
+						th:action="@{/login/authenticate}" method="POST">
+						Login: <input type="hidden" name="${_csrf.parameterName}"
+							value="${_csrf.token}" /> <input placeholder="Username"
+							class="form-control input-sm" type="text" id="username"
+							name="username" /> <input placeholder="Password"
+							class="form-control input-sm" type="password" id="password"
+							name="password" />
+						<button type="submit" class="btn btn-default btn-sm">Log
+							in</button>
+					</form>
+				</div>
+				</p>
+				</p>
+			</div>
 		</div>
-        </p>
-        </div>
-        </div>
-      </div>
-    </footer>
+	</div>
+</footer>
 </html>

@@ -4,9 +4,11 @@
 </head>
 <body>
 	<div layout:fragment="content">
-		<input type="text" id="search" name="search"> <a
-			th:href="@{'/result'}"><input type="butt"
-			value="Search Publications"></a>
+		<form th:action="@{'/result'}" method="GET">
+		<input type="text" id="search" th:name="search"> 
+		<!-- <a th:href="@{'/result'}"><input type="button" value="Search Publications"></a> -->
+		<button type="submit" id="submit">Search Publications</button>
+		</form>
 		<div class="row">
 			<div class="col-md-12">[[${publicationCount}]] publications</div>
 			<div class="col-md-3">

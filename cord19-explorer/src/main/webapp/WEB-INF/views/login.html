@@ -1,0 +1,44 @@
+<html layout:decorate="~{layouts/main}">
+  <head>
+    <title>CORD19 Geo Explorer</title>
+  </head>
+  <body>
+   <div layout:fragment="content">
+   		<div th:if="${loginError}" class="alert alert-danger">Invalid username or password</div>
+		<div class="container">
+			<div sec:authorize="isAnonymous()">
+				<form name='f' class="form-horizontal" th:action="@{/login/authenticate}" method="POST">
+					<h2>Login</h2>
+					<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+					<div class="form-group">
+						<label class="col-sm-12" for="username">Username:</label>
+						<div class="col-sm-12">
+							<input placeholder="Username" class="form-control input-sm"
+								type="text" id="username" name="username" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-12" for="password">Password:</label>
+						<div class="col-sm-12">
+							<input placeholder="Password" class="form-control input-sm"
+								type="password" id="password" name="password" />
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-sm-12">
+							<button type="submit" class="btn btn-primary bg-dark-blue">Login</button>
+						</div>
+					</div>
+				</form>
+				<div class="float-left">
+					<small> Don't have an account yet? <a th:href="@{/register}">Sign up!</a>
+					<br> 
+					Forgot your password? <a th:href="@{/reset/password/request}">Reset
+							it!</a>
+					</small>
+				</div>
+		</div>
+	</div>
+	</div>
+  </body>
+</html>

@@ -28,4 +28,16 @@ public class HomeController {
         model.addAttribute("textCountriesCount", pubDao.getCountriesInTextCount());
         return "home";
     }
+    
+    @RequestMapping(value ="/login")
+    public String login() {
+        return "login";
+    }
+    
+    @RequestMapping(value ="/loginFailed")
+    public String loginFailed(Model model) {
+        model.addAttribute("loginError", true);
+        return "login";
+    }
+    
 }

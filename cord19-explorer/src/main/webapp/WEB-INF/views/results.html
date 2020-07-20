@@ -4,9 +4,14 @@
   </head>
   <body>
    <div layout:fragment="content">
-   <h5>Search Page</h5>
    <input type="text" id="search" name="search">
    <a th:href="@{'/result}"><input type="button" value="Search Publications"></a>
+   <h3>Search Results</h3>
+   		<div th:each="pub : ${matchedPublications}">
+		    <b><a th:href="@{'/paper/' + ${pub.paperId}}">[[${#strings.defaultString(pub.metadata.title, 'No title available')}]]</a></b>
+		    <br>
+	     </div>
+   
    </div>
   </body>
 </html>

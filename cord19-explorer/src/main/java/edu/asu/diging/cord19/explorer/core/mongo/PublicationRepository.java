@@ -24,8 +24,6 @@ public interface PublicationRepository extends MongoRepository<PublicationImpl, 
     
     List<PublicationImpl> findByMetadataAuthorsAffiliationLocationCountry(String country);
     
-    List<PublicationImpl> findByMetadataTitle(String title);
-    
     List<PublicationImpl> findByDatabase(String database, Pageable pageable);
     
     List<PublicationImpl> findByArxivIdIsNotNullOrDatabase(String database, Pageable pageable);

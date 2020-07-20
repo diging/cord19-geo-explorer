@@ -9,18 +9,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
-import edu.asu.diging.cord19.explorer.core.mongo.PublicationRepository;
+import edu.asu.diging.cord19.explorer.core.mongo.PublicationSearchProvider;
 
 @Controller
 public class ResultsController {
     
     @Autowired
-    private PublicationRepository pubRepo;
+    private PublicationSearchProvider pubSearchProvider;
 
     @RequestMapping(value = "/result")
     public String search(@RequestParam("search") String title, Model model) {
-        List<PublicationImpl> pubs = pubRepo.findByMetadataTitle(title);
-        model.addAttribute("publications", pubs);
+        List<PublicationImpl> matched = pubSearchProvider.searchPublicationTitles(title);
+        model.addAttribute("matchedPublications", matched);
         return "results";
     }
 

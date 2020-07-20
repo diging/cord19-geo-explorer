@@ -31,12 +31,12 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
                 // Configures url based authorization
                 .and().authorizeRequests()
                 // Anyone can access the urls
-                .antMatchers("/", "/resources/**", "/login", "/loginFailed","/register", "/location/**", "/paper/**",
+                .antMatchers("/", "/resources/**", "/login", "/loginFailed","/register", "/location/**", "/paper/**", "/stats",
                         "/affiliation/**", "/arxiv/**", "/logout")
                 .permitAll()
                 // The rest of the our application is protected.
                 .antMatchers("/users/**", "/admin/**").hasRole("ADMIN")
-                .antMatchers("/auth/**", "/stats").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/auth/**").hasAnyRole("USER", "ADMIN")
                 .anyRequest().hasRole("USER");
     }
 

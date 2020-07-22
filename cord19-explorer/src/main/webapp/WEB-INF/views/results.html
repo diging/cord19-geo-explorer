@@ -1,17 +1,50 @@
 <html layout:decorate="~{layouts/main}">
-  <head>
-    <title>Authority Matcher</title>
-  </head>
-  <body>
-   <div layout:fragment="content">
-   <input type="text" id="search" name="search">
-   <a th:href="@{'/result}"><input type="button" value="Search Publications"></a>
-   <h3>Search Results</h3>
-   		<div th:each="pub : ${matchedPublications}">
-		    <b><a th:href="@{'/paper/' + ${pub.paperId}}">[[${#strings.defaultString(pub.metadata.title, 'No title available')}]]</a></b>
-		    <br>
-	     </div>
-   
-   </div>
-  </body>
+<head>
+<title>Authority Matcher</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<form th:action="@{'/result'}" method="GET">
+			<input type="text" id="search" th:name="search">
+			<button type="submit" id="submit">Search Publications</button>
+		</form>
+		<h3>Search Results</h3>
+		<div th:each="pub, iStat : ${matchedPublicationsPage}">
+			<b><a th:href="@{'/paper/' + ${pub.paperId}}">[[${#strings.defaultString(pub.metadata.title,
+					'No title available')}]]</a></b> <br>
+			<div th:each="author, iterstat : ${pub.metadata.authors}"
+				style="padding-bottom: 10px; display: inline">
+				<b th:if="${author.name == null}">[[${author.first}]]
+					[[${#strings.listJoin(author.middle,',')}]] [[${author.last}]]</b> <b
+					th:if="${author.name != null}">[[${author.name}]]</b>
+					<span th:text="!${iterstat.last} ? ',': ''"></span>
+			</div>
+			
+		</div>
+		<div th:if="${matchedPublicationsPage.totalPages > 0}"
+			class="pagination" th:each="pageNumber : ${pageNumbers}">
+			<a
+				th:href="@{/result(size=${matchedPublicationsPage.size}, page=${pageNumber}, search=${title})}"
+				th:text=${pageNumber}
+				th:class="${pageNumber==matchedPublicationsPage.number + 1} ? active"></a>
+		</div>
+</body>
+<style>
+.pagination {
+	display: inline-block;
+}
+
+.pagination a {
+	color: black;
+	float: left;
+	padding: 5px 5px;
+	text-decoration: none;
+}
+
+.pagination a.active {
+	background-color: gray;
+	color: white;
+	border-radius: 2px;
+}
+</style>
 </html>

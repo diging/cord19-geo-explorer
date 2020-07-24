@@ -66,11 +66,10 @@
 	      $(function() {
 	      	[# th:each="match, iStat : ${para.locationMatches}" ]
 	      	[# th:if="${match != null && match.selectedArticle != null}" ]
-	      	$("#[(${#ids.next('para')})]").mark("[(${match.locationName})]", { "separateWordSearch": false})
 	     	var title = [[${match.selectedArticle.title}]]
-	      	$("#[(${#ids.next('para')})]").mark("[(${match.locationName})]", { "separateWordSearch": false}).attr('title', title);
 	        $("#[(${#ids.next('para')})]").mark("[(${match.locationName})]", { "separateWordSearch": false, "className": "wiki-[(${#ids.next('para')})]-[(${iStat.index})]"})
 	        $("mark.wiki-[(${#ids.next('para')})]-[(${iStat.index})]").wrap( "<a href='https://en.wikipedia.org/wiki/"+title+"' target=_blank></a>" );
+	        $("mark.wiki-[(${#ids.next('para')})]-[(${iStat.index})]").attr('title', title);
 	      	[/]
 	      	[# th:if="${match != null && match.selectedArticle == null}" ]
 		    $("#[(${#ids.next('para')})]").mark("[(${match.locationName})]", { "separateWordSearch": false, "className": "locationNotFound"})	

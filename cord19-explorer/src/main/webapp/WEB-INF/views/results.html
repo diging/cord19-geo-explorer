@@ -21,12 +21,11 @@
 			</div>
 			
 		</div>
-		<div th:if="${matchedPublicationsPage.totalPages > 0}"
+		<div th:if="${totalPages > 0}"
 			class="pagination" th:each="pageNumber : ${pageNumbers}">
 			<a
-				th:href="@{/result(size=${matchedPublicationsPage.size}, page=${pageNumber}, search=${title})}"
-				th:text=${pageNumber}
-				th:class="${pageNumber==matchedPublicationsPage.number + 1} ? active"></a>
+				th:href="@{/page(size=${#lists.size(matchedPublicationsPage)}, page=${pageNumber}, search=${title}, totalPages=${totalPages})}"
+				th:text=${pageNumber}></a>
 		</div>
 </body>
 <style>

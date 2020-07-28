@@ -18,17 +18,22 @@ public class PublicationSeachProviderImpl implements PublicationSearchProvider {
     private MongoTemplate mongoTemplate;
 
     @Override
-    public int searchResultSize(String title) {
+    public long searchResultSize(String title) {
         Criteria regex = Criteria.where("metadata.title").regex(".*" + title + ".*", "i");
-        return mongoTemplate.find(new Query().addCriteria(regex), PublicationImpl.class).size();
+        return mongoTemplate.count(new Query().addCriteria(regex), PublicationImpl.class);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see edu.asu.diging.cord19.explorer.core.mongo.PublicationSearchProvider#
+     * getRequestedPage(String title, Inter currentPage, Integer size) 
+     * Current page index starts from 0
+     */
     @Override
     public List<PublicationImpl> getRequestedPage(String title, Integer currentPage, Integer size) {
         Criteria regex = Criteria.where("metadata.title").regex(".*" + title + ".*", "i");
         int startItem = currentPage * size;
-        List<PublicationImpl> results = mongoTemplate.find(new Query().addCriteria(regex).skip(startItem).limit(size),
-                PublicationImpl.class);
-        return results;
+        return mongoTemplate.find(new Query().addCriteria(regex).skip(startItem).limit(size), PublicationImpl.class);
     }
 }

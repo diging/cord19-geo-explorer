@@ -33,6 +33,8 @@
    		 <span th:if="${author.affiliation.locationRegion != null}" th:remove="tag">[[${author.affiliation.locationRegion}]],</span> 
    		 <span th:if="${author.affiliation.locationCountry != null}" th:remove="tag">[[${author.affiliation.locationCountry}]]</span>
    		 <span th:if="${author.affiliation.selectedWikiarticle != null}"><span class="label label-info">matched</span> <i>[[${author.affiliation.selectedWikiarticle.title}]]</i> ([[${author.affiliation.selectedWikiarticle.coordinates}]])</span>
+   		 <span th:if="${author.email != null}">[[${author.email}]] </span>
+   		 <span th:if="${author.uri != null}">[[${author.uri}]] </span>
    		 </span>
    		</span>
    		</div>

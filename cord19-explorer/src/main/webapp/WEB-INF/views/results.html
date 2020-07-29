@@ -4,7 +4,7 @@
 </head>
 <body>
 	<div layout:fragment="content">
-		<form th:action="@{'/result'}" method="GET">
+		<form th:action="@{'/search'}" method="GET">
 			<input type="text" id="search" th:name="search">
 			<button type="submit" id="submit">Search Publications</button>
 		</form>
@@ -24,7 +24,7 @@
 		<div th:if="${totalPages > 0}"
 			class="pagination" th:each="pageNumber : ${pageNumbers}">
 			<a
-				th:href="@{/page(size=${#lists.size(matchedPublicationsPage)}, page=${pageNumber}, search=${title}, totalPages=${totalPages})}"
+				th:href="@{/search(size=${#lists.size(matchedPublicationsPage)}, page=${pageNumber}, search=${query}, totalPages=${totalPages})}"
 				th:text=${pageNumber}></a>
 		</div>
 </body>

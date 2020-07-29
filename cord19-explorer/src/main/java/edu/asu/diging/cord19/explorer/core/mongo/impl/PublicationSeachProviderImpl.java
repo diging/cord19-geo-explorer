@@ -28,7 +28,12 @@ public class PublicationSeachProviderImpl implements PublicationSearchProvider {
      * 
      * @see edu.asu.diging.cord19.explorer.core.mongo.PublicationSearchProvider#
      * getRequestedPage(String title, Inter currentPage, Integer size) 
-     * Current page index starts from 0
+     * @param  title to be searched for
+     * @param  currentPage the index of page starting from 0
+     * @size length of result sublist
+     * @return List of PublicationImpl instances containing the 'title' parameter
+     * 
+     * 
      */
     @Override
     public List<PublicationImpl> getRequestedPage(String title, Integer currentPage, Integer size) {

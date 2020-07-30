@@ -36,8 +36,24 @@
    		 <span th:if="${author.email != null}">[[${author.email}]] </span>
    		 <span th:if="${author.uri != null}">[[${author.uri}]] </span>
    		 </span>
-   		</span>
+   		</span> 
    		</div>
+   		<b>cordId: </b><span th:if="${publication.cordId != null}">[[${publication.cordId}]]</span><br>
+   		<b>sha: </b><span th:if="${publication.sha != null}">[[${publication.sha}]]</span><br>
+   		<b>paperId: </b><span th:if="${publication.paperId != null}">[[${publication.paperId}]]</span><br>
+   		<b>doi: </b><span th:if="${publication.doi != null}">[[${publication.doi}]]</span><br>
+   		<b>pmcid: </b><span th:if="${publication.pmcid != null}">[[${publication.pmcid}]]</span><br>
+   		<b>pubmedId: </b><span th:if="${publication.pubmedId != null}">[[${publication.pubmedId}]]</span><br>
+   		<b>license: </b><span th:if="${publication.license != null}">[[${publication.license}]]</span><br>
+   		<b>sourceX: </b><span th:if="${publication.sourceX != null}">[[${publication.sourceX}]]</span><br>
+   		<b>publishTime: </b><span th:if="${publication.publishTime != null}">[[${publication.publishTime}]]</span><br>
+   		<b>publishYear: </b><span th:if="${publication.publishYear != null}">[[${publication.publishYear}]]</span><br>
+   		<b>journal: </b><span th:if="${publication.journal != null}">[[${publication.journal}]]</span><br>
+   		<b>msAcademicPaperId: </b><span th:if="${publication.msAcademicPaperId != null}">[[${publication.msAcademicPaperId}]]</span><br>
+   		<b>hasPdfParse: </b><span th:if="${publication.hasPdfParse != null}">[[${publication.hasPdfParse}]]</span><br>
+   		<b>url: </b><span th:if="${publication.url != null}"><a th:href ="${publication.url}" target=_blank>[[${publication.url}]]</a></span><br>
+   		<b>whoCovidence: </b><span th:if="${publication.whoCovidence != null}">[[${publication.whoCovidence}]]</span><br>
+   		
    		</div>
    		
    		  <div style="padding-top: 20px;" class="col-sm-12">

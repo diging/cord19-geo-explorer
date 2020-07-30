@@ -24,15 +24,16 @@ public class PublicationSeachProviderImpl implements PublicationSearchProvider {
     }
 
     /*
-     * (non-Javadoc)
+     * Returns a {@code List<PublicationImpl>} instance representing the
+     * publication titles matched with the input parameter 'title' . 
      * 
-     * @see edu.asu.diging.cord19.explorer.core.mongo.PublicationSearchProvider#
-     * getRequestedPage(String title, Inter currentPage, Integer size) 
-     * @param  title to be searched for
-     * @param  currentPage the index of page starting from 0
-     * @size length of result sublist
-     * @return List of PublicationImpl instances containing the 'title' parameter
+     * @param title Metadata title to be queried
      * 
+     * @param currentPage index of current page starting from 0
+     * 
+     * @param size length of result sublist
+     * 
+     * @return List of PublicationImpl instances containing the 'title' string
      * 
      */
     @Override

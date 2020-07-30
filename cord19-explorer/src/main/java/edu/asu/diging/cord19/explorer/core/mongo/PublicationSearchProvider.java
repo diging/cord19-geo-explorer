@@ -8,6 +8,6 @@ public interface PublicationSearchProvider {
 
     long searchResultSize(String title);
 
-    List<PublicationImpl> getRequestedPage(String title, Integer currentPage, Integer size);
+    List<PublicationImpl> getRequestedPage(String title, Long currentPage, Integer size);
 
 }

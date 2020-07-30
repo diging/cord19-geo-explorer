@@ -4,9 +4,9 @@
 </head>
 <body>
 	<div layout:fragment="content">
-		<form th:action="@{'/search'}" method="GET">
-		<input type="text" id="search" th:name="search"> 
-		<button type="submit" id="submit">Search Publications</button>
+		<form th:action="@{'/search'}" method="GET" class="form-inline my-2 my-lg-0" style="float:right">
+			<input class="form-control mr-sm-2" type="search" id="search" th:name="search">
+			<button type="submit" class="btn btn-outline-success my-2 my-sm-0" id="submit"><i class="fa fa-search"></i></button>
 		</form>
 		<div class="row">
 			<div class="col-md-12">[[${publicationCount}]] publications</div>

@@ -36,9 +36,9 @@ public class PublicationSeachProviderImpl implements PublicationSearchProvider {
      * 
      */
     @Override
-    public List<PublicationImpl> getRequestedPage(String title, Integer currentPage, Integer size) {
+    public List<PublicationImpl> getRequestedPage(String title, Long currentPage, Integer size) {
         Criteria regex = Criteria.where("metadata.title").regex(".*" + title + ".*", "i");
-        int startItem = currentPage * size;
+        long startItem = currentPage * size;
         return mongoTemplate.find(new Query().addCriteria(regex).skip(startItem).limit(size), PublicationImpl.class);
     }
 }

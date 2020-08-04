@@ -19,13 +19,13 @@ public class HomeController {
         //model.addAttribute("cleanedAffiliations", pubDao.getDistinctAffiliations());
         //model.addAttribute("years", pubDao.getYears());
         //model.addAttribute("textCountries", pubDao.getCountriesInText());
-        model.addAttribute("publicationCount", pubDao.getPublicationCount());
-        model.addAttribute("affiliationCount", pubDao.getAffiliationCount());
-        model.addAttribute("cleanedAffiliationCount", pubDao.getDistinctAffiliationCount());
-        model.addAttribute("yearCount", pubDao.getYearCount());
+//        model.addAttribute("publicationCount", pubDao.getPublicationCount());
+//        model.addAttribute("affiliationCount", pubDao.getAffiliationCount());
+//        model.addAttribute("cleanedAffiliationCount", pubDao.getDistinctAffiliationCount());
+//        model.addAttribute("yearCount", pubDao.getYearCount());
         //model.addAttribute("journals", pubDao.getJournals());
-        model.addAttribute("journalCount", pubDao.getJournalCount());
-        model.addAttribute("textCountriesCount", pubDao.getCountriesInTextCount());
+//        model.addAttribute("journalCount", pubDao.getJournalCount());
+//        model.addAttribute("textCountriesCount", pubDao.getCountriesInTextCount());
         return "home";
     }
 }

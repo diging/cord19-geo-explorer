@@ -1,0 +1,34 @@
+
+<script>
+	$('input').popup(); 
+	
+	
+</script>
+
+<div class="map" th:fragment="map">
+<img width="100%" style="position: absolute" alt="navigation map" th:src="@{/resources/bootstrap/images/Static-map.jpg}">
+<div class="filter">
+	<button class="btn dark-btn" id="filterBtn" type="button" data-toggle="modal" data-target="#filterModal" style="margin-bottom: 15px;"><i class="fa fa-filter"></i>&nbsp;Filters</button>
+	<div class="modal fade" id="filterModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="background: none">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	       <div class="modal-body">
+			 	<div class="modal-header">
+			        <button type="button" class="btn dark-btn" data-dismiss="modal" style="float: right"><i class="fas fa-times"></i></button>
+			      </div>
+				<label for="amount">Publication year range</label>
+				<input type="text" id="amount" readonly class="range-input">
+				<div id="slider-range"></div>
+			</div>
+	    </div>
+	  </div>
+	</div>
+</div>
+<div class="pan">
+	<button class="btn dark-btn" id="filterBtn" type="button" data-toggle="modal" data-target="#filterModal" style="margin-bottom: 20px"><i class="fa fa-location-arrow"></i></button>
+		<button class="btn dark-btn" id="filterBtn" type="button"><i class="fa fa-plus"></i></button>
+		<button class="btn dark-btn" id="filterBtn" type="button"><i class="fas fa-minus"></i></button>	
+	</div>	
+</div>
+
+

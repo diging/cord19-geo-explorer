@@ -1,0 +1,100 @@
+<html layout:decorate="~{layouts/main}">
+
+<head>
+	<script>
+		$('#filterModal').on('shown.bs.modal', function () {
+		  $('#filterBtn').trigger('focus')
+		});
+		$( function() {
+		    $( "#slider-range" ).slider({
+		      range: true,
+		      min: 2016,
+		      max: 2020,
+		      values: [2017, 2019 ],
+		      slide: function( event, ui ) {
+		        $( "#amount" ).val(ui.values[ 0 ] + " - " + ui.values[ 1 ] );
+		      }
+		    });
+		    $( "#amount" ).val($( "#slider-range" ).slider( "values", 0 ) +
+		      " - " + $( "#slider-range" ).slider( "values", 1 ) );
+		  } );
+		$('.carousel').carousel('pause');
+	</script>
+</head>
+<body>
+	<div th:replace="layouts/navbar :: navbar"></div>
+	
+	<div class="top-stats">
+		<div class="stat">
+			<h6 class="stat-header">Countries with publications</h6>
+			<h2 style="color: var(--primary)">42</h2>
+		</div>
+		<div class="divider"></div>
+		<div class="stat">
+			<h6 class="stat-header">Total Authors</h6>
+			<h2 style="color: var(--primary)">502,468</h2>
+		</div>
+		<div class="divider"></div>
+		<div class="stat">
+			<h6 class="stat-header">Total Publications</h6>
+			<h2 style="color: var(--primary)">87,456</h2>
+		</div>
+		<div class="divider"></div>
+		<div class="stat">
+			<h6 class="stat-header">Papers with at least one author affiliation</h6>
+			<h2 style="color: var(--primary)">40,212</h2>
+		</div>
+	</div>
+	
+	<div id="carousel" class="carousel slide" data-interval="false">
+	  <div class="carousel-indicators">
+    	<button data-target="#carousel" data-slide-to="0" class="btn dark-btn active"><i class="fa fa-map"></i> Map</button>
+	    <button data-target="#carousel" data-slide-to="1" class="btn dark-btn"><i class="fa fa-chart-bar"></i> Charts</button>
+	  </div>	
+	  <div class="carousel-inner" role="listbox">
+	    <div class="item active">
+	      <div th:replace="layouts/components :: map"></div>
+	    </div>
+	    <div class="item">
+	      <div th:replace="layouts/components :: map"></div>
+	    </div>
+	  </div>
+	</div>
+	
+	<div class="stats-updates">
+		<div class="card">
+		  <div class="card-body">
+		  	<div class="">
+		  		<h4 class="card-title">World Data</h4>
+		   		<input class="form-control searchbox" type="search" placeholder="Search" aria-label="Search">
+		  	</div>
+		    <table class="data-table">
+		    	<thead>
+		    		<tr class="table-header">
+		    			<td>Location</td>
+		    			<td>Publications</td>
+		    			<td>Institutions</td>
+		    			<td>Authors</td>
+		    		</tr>
+		    	</thead>
+		    	<tbody>
+		    		<tr class="table-body">
+		    			<td>Worldwide</td>
+		    			<td>87,546</td>
+		    			<td>12,345</td>
+		    			<td>504,345</td>
+		    		</tr>
+		    	</tbody>
+		    </table>
+		  </div>
+		</div>
+		<div class="card">
+		  <div class="card-body">
+		    <h4 class="card-title">Latest Publications</h4>
+		  </div>
+		</div>
+	</div>
+	
+</body>
+</html>
+

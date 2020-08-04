@@ -9,17 +9,18 @@
 			<button type="submit" class="btn btn-outline-success my-2 my-sm-0" id="submit"><i class="fa fa-search"></i></button>
 		</form>
 		<h3>Search Results</h3>
-		<table class="table">
+		<table class="table table-striped">
 			<thead>
 				<tr>
 					<th scope="col">Matched Publications</th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr>
-					<th scope="row">
-						<div th:each="pub, iStat : ${matchedPublicationsPage}">
-							<b><a th:href="@{'/paper/' + ${pub.paperId}}">[[${#strings.defaultString(pub.metadata.title,
+
+				<div th:each="pub, iStat : ${matchedPublicationsPage}">
+					<tr>
+						<th scope="row"><b><a
+								th:href="@{'/paper/' + ${pub.paperId}}">[[${#strings.defaultString(pub.metadata.title,
 									'No title available')}]]</a></b> <br>
 
 							<div th:each="author, iterstat : ${pub.metadata.authors}"
@@ -28,15 +29,13 @@
 									[[${#strings.listJoin(author.middle,',')}]] [[${author.last}]]</b>
 								<b th:if="${author.name != null}">[[${author.name}]]</b> <span
 									th:text="!${iterstat.last} ? ',': ''"></span>
-							</div>
-
-						</div>
-					</th>
-				</tr>
+							</div></th>
+					</tr>
+				</div>
 			</tbody>
 		</table>
 
-<div th:if="${totalPages > 0}"
+		<div th:if="${totalPages > 0}"
 			class="pagination" th:each="pageNumber : ${pageNumbers}">
 			<a
 				th:href="@{/search(size=${#lists.size(matchedPublicationsPage)}, page=${pageNumber}, search=${query}, totalPages=${totalPages})}"

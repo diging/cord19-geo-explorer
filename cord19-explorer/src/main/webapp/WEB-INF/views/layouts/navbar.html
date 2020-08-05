@@ -3,9 +3,9 @@
 		<a class="navbar-brand">CORD19 Geo Explorer</a>
 	    <div style="display: flex">
 		    <button class="btn primary-btn" type="submit" style="margin-right: 40px;">Login</button>
-		    <form action="#" class="form" style="position: relative">
-			    <button class="btn btn-outline-success form_icon" type="submit"><i class="fa fa-search"></i></button>
-			    <input class="form-control searchbox form_input" type="search" placeholder="Search" aria-label="Search">
+		    <form th:action="@{'/search'}" method="GET" class="form" style="position: relative">
+			    <button class="btn btn-outline-success form_icon" type="submit" id="submit"><i class="fa fa-search"></i></button>
+			    <input class="form-control searchbox form_input" type="search" placeholder="Search" id="search" th:name="search">
 			</form>
 	    </div>
 	</div>

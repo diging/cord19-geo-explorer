@@ -38,79 +38,97 @@
    		 </span>
    		</span> 
    		</div>
-			<table class="table table-striped">
+				<table class="table table-striped table-bordered">
 					<thead>
 						<tr>
 						</tr>
 					</thead>
 					<tbody>
 						<tr>
-							<th scope="row"><b>cordId: </b><span
-								th:if="${publication.cordId != null}">[[${publication.cordId}]]</span>
+							<th scope="row"><b>cordId: </b></th>
+							<th scope="col"><span th:if="${publication.cordId != null}">[[${publication.cordId}]]</span>
 							</th>
 						</tr>
 						<tr>
-							<th scope="row"><b>sha: </b><span
-								th:if="${publication.sha != null}">[[${publication.sha}]]</span>
+							<th scope="row"><b>sha: </b></th>
+							<th scope="col"><span th:if="${publication.sha != null}">[[${publication.sha}]]</span>
 							</th>
 						</tr>
 						<tr>
-							<th scope="row"><b>paperId: </b><span
-								th:if="${publication.paperId != null}">[[${publication.paperId}]]</span>
+							<th scope="row"><b>paperId: </b></th>
+							<th scope="col"><span th:if="${publication.paperId != null}">[[${publication.paperId}]]</span>
 							</th>
 						</tr>
 						<tr>
-							<th scope="row"><b>doi: </b><span th:if="${publication.doi != null}">[[${publication.doi}]]</span>
+							<th scope="row"><b>doi: </b></th>
+							<th scope="col"><span th:if="${publication.doi != null}">[[${publication.doi}]]</span>
 							</th>
 						</tr>
 						<tr>
-							<th scope="row"><b>pmcid: </b><span th:if="${publication.pmcid != null}">[[${publication.pmcid}]]</span><br>
+							<th scope="row"><b>pmcid: </b></th>
+							<th scope="col"><span th:if="${publication.pmcid != null}">[[${publication.pmcid}]]</span><br>
 							</th>
 						</tr>
 						<tr>
-							<th scope="row"><b>pubmedId: </b><span th:if="${publication.pubmedId != null}">[[${publication.pubmedId}]]</span>
+							<th scope="row"><b>pubmedId: </b></th>
+							<th scope="col"><span
+								th:if="${publication.pubmedId != null}">[[${publication.pubmedId}]]</span>
 							</th>
 						</tr>
 						<tr>
-							<th scope="row"><b>license: </b><span th:if="${publication.license != null}">[[${publication.license}]]</span>
+							<th scope="row"><b>license: </b></th>
+							<th scope="col"><span th:if="${publication.license != null}">[[${publication.license}]]</span>
 							</th>
 						</tr>
 						<tr>
-							<th scope="row"><b>sourceX: </b><span th:if="${publication.sourceX != null}">[[${publication.sourceX}]]</span>
+							<th scope="row"><b>sourceX: </b></th>
+							<th scope="col"><span th:if="${publication.sourceX != null}">[[${publication.sourceX}]]</span>
 							</th>
 						</tr>
 						<tr>
-							<th scope="row"><b>publishTime: </b><span th:if="${publication.publishTime != null}">[[${publication.publishTime}]]</span>
+							<th scope="row"><b>publishTime: </b></th>
+							<th scope="col"><span
+								th:if="${publication.publishTime != null}">[[${publication.publishTime}]]</span>
 							</th>
 						</tr>
 						<tr>
-							<th scope="row"><b>publishYear: </b><span th:if="${publication.publishYear != null}">[[${publication.publishYear}]]</span>
+							<th scope="row"><b>publishYear: </b></th>
+							<th scope="col"><span
+								th:if="${publication.publishYear != null}">[[${publication.publishYear}]]</span>
 							</th>
 						</tr>
 						<tr>
-							<th scope="row"><b>journal: </b><span th:if="${publication.journal != null}">[[${publication.journal}]]</span>
+							<th scope="row"><b>journal: </b></th>
+							<th scope="col"><span th:if="${publication.journal != null}">[[${publication.journal}]]</span>
 							</th>
 						</tr>
 						<tr>
-							<th scope="row"><b>msAcademicPaperId: </b><span th:if="${publication.msAcademicPaperId != null}">[[${publication.msAcademicPaperId}]]</span>
+							<th scope="row"><b>msAcademicPaperId: </b></th>
+							<th scope="col"><span
+								th:if="${publication.msAcademicPaperId != null}">[[${publication.msAcademicPaperId}]]</span>
 							</th>
 						</tr>
 						<tr>
-							<th scope="row"><b>hasPdfParse: </b><span th:if="${publication.hasPdfParse != null}">[[${publication.hasPdfParse}]]</span>
+							<th scope="row"><b>hasPdfParse: </b></th>
+							<th scope="col"><span
+								th:if="${publication.hasPdfParse != null}">[[${publication.hasPdfParse}]]</span>
 							</th>
 						</tr>
 						<tr>
-							<th scope="row"><b>url: </b><span th:if="${publication.url != null}"><a th:href ="${publication.url}" target=_blank>[[${publication.url}]]</a></span>
+							<th scope="row"><b>url: </b></th>
+							<th scope="col"><span th:if="${publication.url != null}"><a
+									th:href="${publication.url}" target=_blank>[[${publication.url}]]</a></span>
 							</th>
 						</tr>
 						<tr>
-							<th scope="row"><b>whoCovidence: </b><span th:if="${publication.whoCovidence != null}">[[${publication.whoCovidence}]]</span>
+							<th scope="row"><b>whoCovidence: </b></th>
+							<th scope="col"><span
+								th:if="${publication.whoCovidence != null}">[[${publication.whoCovidence}]]</span>
 							</th>
 						</tr>
-						
 					</tbody>
 				</table>
-   		</div>
+			</div>
    		
    		  <div style="padding-top: 20px;" class="col-sm-12">
    		  

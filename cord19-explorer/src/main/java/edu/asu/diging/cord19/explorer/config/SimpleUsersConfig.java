@@ -2,11 +2,13 @@ package edu.asu.diging.cord19.explorer.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 
 import edu.asu.diging.simpleusers.core.config.SimpleUsers;
 import edu.asu.diging.simpleusers.core.config.SimpleUsersConfiguration;
 
 @Configuration
+@PropertySource({"classpath:config.properties", "${appConfigFile:classpath:}/app.properties"})
 public class SimpleUsersConfig implements SimpleUsersConfiguration {
 
     @Value("${email_user}")

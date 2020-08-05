@@ -23,7 +23,7 @@ public class PublicationSeachProviderImpl implements PublicationSearchProvider {
         return mongoTemplate.count(new Query().addCriteria(regex), PublicationImpl.class);
     }
 
-    /*
+    /**
      * Returns a {@code List<PublicationImpl>} instance representing the
      * publication titles matched with the input parameter 'title' . 
      * 
@@ -35,7 +35,7 @@ public class PublicationSeachProviderImpl implements PublicationSearchProvider {
      * 
      * @return List of PublicationImpl instances containing the 'title' string
      * 
-     */
+     **/
     @Override
     public List<PublicationImpl> getRequestedPage(String title, Long currentPage, Integer size) {
         Criteria regex = Criteria.where("metadata.title").regex(".*" + title + ".*", "i");

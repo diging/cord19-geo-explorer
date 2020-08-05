@@ -30,7 +30,7 @@
 								style="padding-bottom: 10px; display: inline">
 								<b th:if="${author.name == null}">[[${author.first}]]
 									[[${#strings.listJoin(author.middle,',')}]] [[${author.last}]]</b>
-								<b th:if="${author.name != null}">[[${author.name}]]</b> <span
+								<b th:if="${author.name != null}">[[${author.name}]]</b><span
 									th:text="!${iterstat.last} ? ',': ''"></span>
 							</div></th>
 					</tr>

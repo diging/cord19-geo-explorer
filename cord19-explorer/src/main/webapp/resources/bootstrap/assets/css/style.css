@@ -14,6 +14,20 @@
 html, body {
 	background: var(--bg-color);
 	font-family: var(--main-font);
+	height: 100%;
+}
+
+textarea, input {
+  	padding:10px;
+	font-family: 'Font Awesome\ 5 Free';
+    font-style: normal !important;
+    content:"\f002";
+    text-decoration: inherit;
+}
+
+a{
+	color: var(--primary) !important;
+	font-weight: 600 !important;	
 }
 
 .navbar {
@@ -39,7 +53,8 @@ html, body {
 }
 
 .primary-btn:hover {
-	opacity: 70%;
+	opacity: 80%;
+	color: white !important;
 }
 
 .dark-btn {
@@ -55,7 +70,7 @@ html, body {
 
 .navbar-brand {
 	font-family: var(--main-font);
-	color: white;
+	color: white !important;
 	font-size: 600;
 	letter-spacing: 2px;
 }
@@ -82,7 +97,8 @@ html, body {
 
 .stat-header {
 	text-transform: uppercase;
-	letter-spacing: 3px
+	letter-spacing: 3px !important;
+	margin-top: 30px !important;
 }
 
 .divider {
@@ -140,7 +156,7 @@ html, body {
     margin: 60px auto;
     display: grid;
     grid-template-columns: 2fr 1fr;
-    grid-column-gap: 60px;
+    grid-gap: 60px;
 }
 
 .card {
@@ -192,4 +208,42 @@ td, th {
     height: unset !important;
     margin: 0; 
     background-color: var(--primary)!important;
+}
+
+.charts {
+	display: grid;
+	grid-template-columns: auto auto auto;
+	grid-template-rows: auto auto;
+	grid-gap: 30px;
+	height: 700px;
+	width: 80%;
+	padding: 50px 0;
+	margin: auto;	
+}
+
+#chart4 {
+   grid-column-start: 1;
+   grid-column-end: 4;
+}
+
+@media screen and (max-width: 1200px) {
+	.stats-updates {
+		grid-template-columns: 1fr;
+	}
+}
+
+.form_icon {
+  	position: absolute;
+	pointer-events: none;
+	z-index: 5;
+	right: 0;
+	background: none;
+	color: white;
+}
+.form_input {
+	position: relative;
+	z-index: 3;
+}
+.form_input:placeholder-shown {
+	z-index: 1;
 }

@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-import edu.asu.diging.cord19.explorer.core.model.impl.AffiliationImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.PersonImpl;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, defaultImpl = PersonImpl.class)
@@ -26,12 +25,20 @@ public interface Person {
 
     void setSuffix(String suffix);
 
-    AffiliationImpl getAffiliation();
+    Affiliation getAffiliation();
 
-    void setAffiliation(AffiliationImpl affiliation);
+    void setAffiliation(Affiliation affiliation);
 
     String getEmail();
 
     void setEmail(String email);
+
+    void setName(String name);
+
+    String getName();
+
+    void setUri(String uri);
+
+    String getUri();
 
 }

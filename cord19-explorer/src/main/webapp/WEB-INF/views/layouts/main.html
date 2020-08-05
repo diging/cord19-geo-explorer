@@ -43,16 +43,76 @@
 	      	<nav>
 	          <ul class="nav nav-pills pull-right">
 	          	
-	          	
+	          	<li role="presentation">
+	          		<a th:href="@{/stats}" >Basic Stats</a>
+	          	</li>
 	          	<li sec:authorize="hasRole('ADMIN')" role="presentation">
 	          		<a th:href="@{/admin/user/list}" >Users</a>
 	          	</li>
 	          	<li sec:authorize="hasRole('ADMIN')" role="presentation">
 	          		<a th:href="@{/auth/task}" >Tasks</a>
 	          	</li>
-	          	<li sec:authorize="hasRole('ADMIN')" role="presentation">
-	          		<a th:href="@{/auth/import}" >Import</a>
+	          	<li sec:authorize="hasRole('ADMIN')" role="presentation" class="dropdown">
+	          		<a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+				      Cleaning <span class="caret"></span>
+				    </a>
+				    <ul class="dropdown-menu">
+				      <li sec:authorize="hasRole('ADMIN')" role="presentation">
+			          	<a th:href="@{/auth/affiliations}" >Clean Affiliations</a>
+			          </li>
+			          <li sec:authorize="hasRole('ADMIN')" role="presentation">
+		          		<a th:href="@{/auth/publications/clean}" >Remove Duplicates</a>
+		          	  </li>
+				    </ul>
+	          		
 	          	</li>
+	          	
+	          	<li sec:authorize="hasRole('ADMIN')" role="presentation" class="dropdown">
+	          		<a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+				      Import <span class="caret"></span>
+				    </a>
+				    <ul class="dropdown-menu">
+				      <li sec:authorize="hasRole('ADMIN')" role="presentation">
+			          		<a th:href="@{/auth/import}" >Import</a>
+			          </li>
+				      <li sec:authorize="hasRole('ADMIN')" role="presentation">
+		          		<a th:href="@{/auth/metadata/import}" >Metadata Import</a>
+		          	  </li>
+				    </ul>
+	          		
+	          	</li>
+	          	<li sec:authorize="hasRole('ADMIN')" role="presentation" class="dropdown">
+	          		<a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+				      Export <span class="caret"></span>
+				    </a>
+				    <ul class="dropdown-menu">
+				      <li role="presentation">
+				      	<a th:href="@{/auth/export}" >Export</a>
+				      </li>
+				      <li role="presentation">
+				      	<a th:href="@{/auth/export/list}" >List exports</a>
+				      </li>
+				    </ul>
+	          		
+	          	</li>
+	          	<li sec:authorize="hasRole('ADMIN')" role="presentation" class="dropdown">
+	          		<a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+				      Arxiv <span class="caret"></span>
+				    </a>
+				    <ul class="dropdown-menu">
+				      <li role="presentation">
+				      	<a th:href="@{/arxiv/publications}" >Arxiv Publications</a>
+				      </li>
+				      <li role="presentation">
+				      	<a th:href="@{/auth/import/arxiv}" >Import from Arxiv</a>
+				      </li>
+				      <li role="presentation">
+				      	<a th:href="@{/auth/arxiv/delete}" >Delete Arxiv Dataset</a>
+				      </li>
+				    </ul>
+	          		
+	          	</li>
+	          	
 	          	
 	          	<li sec:authorize="isAuthenticated()" role="presentation">
 	         	 	<form th:action="@{/logout}" method="POST">

@@ -16,6 +16,7 @@ public class LocationMatchImpl implements LocationMatch {
     private String type;
     private String section;
     private List<WikipediaArticleImpl> wikipediaArticles;
+    private WikipediaArticleImpl selectedArticle;
 
     @Override
     public ObjectId getId() {
@@ -155,6 +156,16 @@ public class LocationMatchImpl implements LocationMatch {
     @Override
     public void setWikipediaArticles(List<WikipediaArticleImpl> wikipediaArticles) {
         this.wikipediaArticles = wikipediaArticles;
+    }
+
+    @Override
+    public WikipediaArticleImpl getSelectedArticle() {
+        return selectedArticle;
+    }
+
+    @Override
+    public void setSelectedArticle(WikipediaArticleImpl selectedArticle) {
+        this.selectedArticle = selectedArticle;
     }
 
 }

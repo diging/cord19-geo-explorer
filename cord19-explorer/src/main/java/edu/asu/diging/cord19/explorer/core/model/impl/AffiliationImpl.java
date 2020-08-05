@@ -1,6 +1,7 @@
 package edu.asu.diging.cord19.explorer.core.model.impl;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -16,6 +17,12 @@ public class AffiliationImpl implements Affiliation {
     private String locationRegion;
     private String locationCountry;
     private Map<String, Object> other;
+    
+    private List<WikipediaArticleImpl> wikiarticles;
+    private WikipediaArticleImpl selectedWikiarticle;
+    
+    private WikipediaSelectionStatus selectionStatus;
+    private String selectionCheckedOn;
 
     @JsonProperty("location")
     private void unpackLocation(Map<String, Object> location) {
@@ -168,6 +175,46 @@ public class AffiliationImpl implements Affiliation {
     @Override
     public void setOther(Map<String, Object> other) {
         this.other = other;
+    }
+
+    @Override
+    public List<WikipediaArticleImpl> getWikiarticles() {
+        return wikiarticles;
+    }
+
+    @Override
+    public void setWikiarticles(List<WikipediaArticleImpl> wikiarticles) {
+        this.wikiarticles = wikiarticles;
+    }
+
+    @Override
+    public WikipediaArticleImpl getSelectedWikiarticle() {
+        return selectedWikiarticle;
+    }
+
+    @Override
+    public void setSelectedWikiarticle(WikipediaArticleImpl selectedWikiarticle) {
+        this.selectedWikiarticle = selectedWikiarticle;
+    }
+
+    @Override
+    public WikipediaSelectionStatus getSelectionStatus() {
+        return selectionStatus;
+    }
+
+    @Override
+    public void setSelectionStatus(WikipediaSelectionStatus selectionStatus) {
+        this.selectionStatus = selectionStatus;
+    }
+
+    @Override
+    public String getSelectionCheckedOn() {
+        return selectionCheckedOn;
+    }
+
+    @Override
+    public void setSelectionCheckedOn(String selectionCheckedOn) {
+        this.selectionCheckedOn = selectionCheckedOn;
     }
 
 }

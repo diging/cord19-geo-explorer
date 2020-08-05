@@ -9,7 +9,6 @@ import org.springframework.data.annotation.Id;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import edu.asu.diging.cord19.explorer.core.model.LocationMatch;
 import edu.asu.diging.cord19.explorer.core.model.Metadata;
 import edu.asu.diging.cord19.explorer.core.model.Publication;
 
@@ -26,6 +25,7 @@ public class PublicationImpl implements Publication {
     private String doi;
     private String pmcid;
     private String pubmedId;
+    private String arxivId;
     private String license;
     private String sourceX;
     private String publishTime;
@@ -34,9 +34,16 @@ public class PublicationImpl implements Publication {
     private String msAcademicPaperId;
     private boolean hasPdfParse;
     private boolean hasPmcXmlParse;
+    private String pdfJsonFiles;
+    private String pmcJsonFiles;
     private String fulltextFile;
     private String url;
+    private String documentUrl;
+    private String documentType;
     private String whoCovidence;
+    
+    private String database;
+    private boolean duplicate;
 
     @JsonProperty("abstract")
     private List<ParagraphImpl> abstracts;
@@ -48,6 +55,10 @@ public class PublicationImpl implements Publication {
     private Map<String, RefEntryImpl> refEntries;
     @JsonProperty("back_matter")
     private List<ParagraphImpl> backMatter;
+    
+    private List<CategoryImpl> categories;
+    private CategoryImpl primaryCategory;
+    private String comment;
 
     public ObjectId getId() {
         return id;
@@ -209,6 +220,16 @@ public class PublicationImpl implements Publication {
     @Override
     public void setPubmedId(String pubmedId) {
         this.pubmedId = pubmedId;
+    }
+
+    @Override
+    public String getArxivId() {
+        return arxivId;
+    }
+
+    @Override
+    public void setArxivId(String arxivId) {
+        this.arxivId = arxivId;
     }
 
     /*
@@ -391,6 +412,26 @@ public class PublicationImpl implements Publication {
         this.hasPmcXmlParse = hasPmcXmlParse;
     }
 
+    @Override
+    public String getPdfJsonFiles() {
+        return pdfJsonFiles;
+    }
+
+    @Override
+    public void setPdfJsonFiles(String pdfJsonFiles) {
+        this.pdfJsonFiles = pdfJsonFiles;
+    }
+
+    @Override
+    public String getPmcJsonFiles() {
+        return pmcJsonFiles;
+    }
+
+    @Override
+    public void setPmcJsonFiles(String pmcJsonFiles) {
+        this.pmcJsonFiles = pmcJsonFiles;
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -436,6 +477,26 @@ public class PublicationImpl implements Publication {
         this.url = url;
     }
 
+    @Override
+    public String getDocumentUrl() {
+        return documentUrl;
+    }
+
+    @Override
+    public void setDocumentUrl(String documentUrl) {
+        this.documentUrl = documentUrl;
+    }
+
+    @Override
+    public String getDocumentType() {
+        return documentType;
+    }
+
+    @Override
+    public void setDocumentType(String documentType) {
+        this.documentType = documentType;
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -457,6 +518,26 @@ public class PublicationImpl implements Publication {
     @Override
     public void setWhoCovidence(String whoCovidence) {
         this.whoCovidence = whoCovidence;
+    }
+
+    @Override
+    public String getDatabase() {
+        return database;
+    }
+
+    @Override
+    public void setDatabase(String database) {
+        this.database = database;
+    }
+
+    @Override
+    public boolean isDuplicate() {
+        return duplicate;
+    }
+
+    @Override
+    public void setDuplicate(boolean duplicate) {
+        this.duplicate = duplicate;
     }
 
     /*
@@ -567,6 +648,36 @@ public class PublicationImpl implements Publication {
     @Override
     public void setBackMatter(List<ParagraphImpl> backMatter) {
         this.backMatter = backMatter;
+    }
+
+    @Override
+    public List<CategoryImpl> getCategories() {
+        return categories;
+    }
+
+    @Override
+    public void setCategories(List<CategoryImpl> categories) {
+        this.categories = categories;
+    }
+
+    @Override
+    public CategoryImpl getPrimaryCategory() {
+        return primaryCategory;
+    }
+
+    @Override
+    public void setPrimaryCategory(CategoryImpl primaryCategory) {
+        this.primaryCategory = primaryCategory;
+    }
+
+    @Override
+    public String getComment() {
+        return comment;
+    }
+
+    @Override
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 
 }

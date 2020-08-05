@@ -2,8 +2,7 @@ package edu.asu.diging.cord19.explorer.core.model.impl;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
+import edu.asu.diging.cord19.explorer.core.model.Affiliation;
 import edu.asu.diging.cord19.explorer.core.model.Person;
 
 public class PersonImpl implements Person {
@@ -14,6 +13,8 @@ public class PersonImpl implements Person {
     private String suffix;
     private AffiliationImpl affiliation;
     private String email;
+    private String name;
+    private String uri;
 
     /*
      * (non-Javadoc)
@@ -108,7 +109,7 @@ public class PersonImpl implements Person {
      * @see edu.asu.diging.cord19.explorer.core.model.impl.Person#getAffiliation()
      */
     @Override
-    public AffiliationImpl getAffiliation() {
+    public Affiliation getAffiliation() {
         return affiliation;
     }
 
@@ -120,8 +121,8 @@ public class PersonImpl implements Person {
      * util.List)
      */
     @Override
-    public void setAffiliation(AffiliationImpl affiliation) {
-        this.affiliation = affiliation;
+    public void setAffiliation(Affiliation affiliation) {
+        this.affiliation = (AffiliationImpl)affiliation;
     }
 
     /*
@@ -144,6 +145,32 @@ public class PersonImpl implements Person {
     @Override
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    @Override
+    public String getName() {
+        if (name != null && !name.isEmpty()) {
+            return name;
+        }
+        
+        String fName = first != null ? first : "";
+        String lName = last != null ? last : "";
+        return fName + " " + lName;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getUri() {
+        return uri;
+    }
+
+    @Override
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 
 }

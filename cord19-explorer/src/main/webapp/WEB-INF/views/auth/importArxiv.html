@@ -1,0 +1,21 @@
+<html layout:decorate="~{layouts/main}">
+  <head>
+    <title>CORD-19 Geo Explorer</title>
+  </head>
+  <body>
+   <div layout:fragment="content">
+      <h2>Import from Arxiv</h2>
+      
+      <form action="#" th:action="@{/auth/import/arxiv}" method="POST">
+      	<div>
+      	<label>What do you want to search for in Arxiv? </label>
+      	<input class="form-control" type="text" name="searchTerm">
+      	<small>Please provide an Arxiv query string.</small>
+      	</div>
+      	<p>
+      	<button class="btn btn-primary" type="submit">Start Import</button>
+      	</p>
+      </form>
+   </div>
+  </body>
+</html>

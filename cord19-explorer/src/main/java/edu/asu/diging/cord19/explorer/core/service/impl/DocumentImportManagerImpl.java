@@ -7,9 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import edu.asu.diging.cord19.explorer.core.data.TaskRepository;
-import edu.asu.diging.cord19.explorer.core.model.task.impl.ImportTaskImpl;
-import edu.asu.diging.cord19.explorer.core.service.DocImporter;
+import edu.asu.diging.cord19.explorer.core.model.task.TaskType;
+import edu.asu.diging.cord19.explorer.core.model.task.impl.TaskImpl;
 import edu.asu.diging.cord19.explorer.core.service.DocumentImportManager;
+import edu.asu.diging.cord19.explorer.core.service.worker.DocImporter;
 
 @Service
 public class DocumentImportManagerImpl implements DocumentImportManager {
@@ -28,9 +29,10 @@ public class DocumentImportManagerImpl implements DocumentImportManager {
      */
     @Override
     public String startImport(String path) throws IOException {
-        ImportTaskImpl task = new ImportTaskImpl();
+        TaskImpl task = new TaskImpl();
         task.setDateStarted(OffsetDateTime.now());
         task.setProcessed(0);
+        task.setType(TaskType.IMPORT);
         task = taskRepo.save(task);
 
         /*
@@ -40,13 +42,31 @@ public class DocumentImportManagerImpl implements DocumentImportManager {
 
         return task.getId();
     }
+    
+    @Override
+    public String startMetadataImport(String pathToFile) throws IOException {
+        TaskImpl task = new TaskImpl();
+        task.setDateStarted(OffsetDateTime.now());
+        task.setProcessed(0);
+        task.setType(TaskType.IMPORT);
+        task = taskRepo.save(task);
+
+        /*
+         * Start async import
+         */
+        importer.importMetadata(task.getId(), pathToFile);
+
+        return task.getId();
+    }
 
     @Override
     public String startYearExtraction() {
-        ImportTaskImpl task = new ImportTaskImpl();
+        TaskImpl task = new TaskImpl();
         task.setDateStarted(OffsetDateTime.now());
         task.setProcessed(0);
+        task.setType(TaskType.IMPORT);
         task = taskRepo.save(task);
+        
 
         importer.extractYears(task.getId());
 
@@ -55,11 +75,12 @@ public class DocumentImportManagerImpl implements DocumentImportManager {
 
     @Override
     public String startLocationExtraction() throws ClassCastException, ClassNotFoundException, IOException {
-        ImportTaskImpl task = new ImportTaskImpl();
+        TaskImpl task = new TaskImpl();
         task.setDateStarted(OffsetDateTime.now());
         task.setProcessed(0);
+        task.setType(TaskType.IMPORT);
         task = taskRepo.save(task);
-
+        
         importer.extractLocations(task.getId());
 
         return task.getId();
@@ -67,12 +88,38 @@ public class DocumentImportManagerImpl implements DocumentImportManager {
 
     @Override
     public String startLocationMatchCleaning() {
-        ImportTaskImpl task = new ImportTaskImpl();
+        TaskImpl task = new TaskImpl();
         task.setDateStarted(OffsetDateTime.now());
         task.setProcessed(0);
         task = taskRepo.save(task);
 
         importer.removeUnvalid(task.getId());
+
+        return task.getId();
+    }
+    
+    @Override
+    public String startLocationMatchSelection() {
+        TaskImpl task = new TaskImpl();
+        task.setDateStarted(OffsetDateTime.now());
+        task.setProcessed(0);
+        task.setType(TaskType.IMPORT);
+        task = taskRepo.save(task);
+
+        importer.selectLocationMatches(task.getId());
+
+        return task.getId();
+    }
+    
+    @Override
+    public String startAffiliationCleaning(boolean reprocess) {
+        TaskImpl task = new TaskImpl();
+        task.setDateStarted(OffsetDateTime.now());
+        task.setProcessed(0);
+        task.setType(TaskType.IMPORT);
+        task = taskRepo.save(task);
+
+        importer.cleanAffiliations(task.getId(), reprocess);
 
         return task.getId();
     }

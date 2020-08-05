@@ -7,7 +7,7 @@
    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js"></script>
    <script>
    $(function() {
-	   $(".paraText").mark("[[${location}]]");
+	   $(".paraText").mark("[[${location}]]", { "separateWordSearch": false});
    });
    </script>
    <style>
@@ -20,7 +20,7 @@
    	<div class="row">
    		<div th:each="pub : ${publications}">
    		  
-		    <b>[[${pub.metadata.title}]]</b>
+		    <b><a th:href="@{'/paper/' + ${pub.paperId}}">[[${#strings.defaultString(pub.metadata.title, 'No title available')}]]</a></b>
 		    <ul>
 		      <li th:each="para : ${pub.bodyText}">
 		      	<i th:text="*{para.section != ''} ? *{para.section}: 'No Section title'"></i>

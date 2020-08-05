@@ -7,6 +7,7 @@ public class RefEntryImpl implements RefEntry {
     private String text;
     private String type;
     private String latex;
+    private String html;
 
     /*
      * (non-Javadoc)
@@ -60,6 +61,16 @@ public class RefEntryImpl implements RefEntry {
     @Override
     public void setLatex(String latex) {
         this.latex = latex;
+    }
+
+    @Override
+    public String getHtml() {
+        return html;
+    }
+
+    @Override
+    public void setHtml(String html) {
+        this.html = html;
     }
 
 }

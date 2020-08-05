@@ -41,4 +41,8 @@ public interface LocationMatch {
 
     List<WikipediaArticleImpl> getWikipediaArticles();
 
+    void setSelectedArticle(WikipediaArticleImpl selectedArticle);
+
+    WikipediaArticleImpl getSelectedArticle();
+
 }

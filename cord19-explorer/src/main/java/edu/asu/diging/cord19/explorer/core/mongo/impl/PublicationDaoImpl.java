@@ -3,8 +3,19 @@ package edu.asu.diging.cord19.explorer.core.mongo.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.CountOperation;
+import org.springframework.data.mongodb.core.aggregation.GroupOperation;
+import org.springframework.data.mongodb.core.aggregation.LimitOperation;
+import org.springframework.data.mongodb.core.aggregation.SkipOperation;
+import org.springframework.data.mongodb.core.aggregation.SortOperation;
+import org.springframework.data.mongodb.core.aggregation.UnwindOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
@@ -31,13 +42,99 @@ public class PublicationDaoImpl implements PublicationDao {
     public List<String> getCountries() {
         String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
         DistinctIterable<String> output = mongoTemplate.getCollection(collection)
-                .distinct("metadata.authors.affiliation.locationCountry", String.class);
+                .distinct("metadata.authors.affiliation.institution", String.class);
         List<String> results = new ArrayList<>();
         MongoCursor<String> it = output.iterator();
         while (it.hasNext()) {
             results.add(it.next());
         }
         return results;
+    }
+
+    @Override
+    public List<String> getCountriesTop() {
+        String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
+        DistinctIterable<String> output = mongoTemplate.getCollection(collection)
+                .distinct("metadata.authors.affiliation.institution", String.class);
+        List<String> results = new ArrayList<>();
+        MongoCursor<String> it = output.iterator();
+        int i = 0;
+        while (it.hasNext() && i < 50) {
+            results.add(it.next());
+            i++;
+        }
+        return results;
+    }
+
+    @Override
+    public List<AffiliationPaperAggregationOutput> getAffiliationsAndArticles(long start, long pageSize) {
+        UnwindOperation unwind = Aggregation.unwind("metadata.authors");
+
+        GroupOperation group = Aggregation.group("metadata.authors.affiliation.institution").first("metadata.authors.affiliation.selectedWikiarticle.title").as("wiki")
+                .first("metadata.authors.affiliation.selectionStatus").as("status")
+                .first("metadata.authors.affiliation.locationSettlement").as("settlement")
+                .first("metadata.authors.affiliation.locationCountry").as("country")
+                .first("metadata.authors.affiliation.selectedWikiarticle.coordinates").as("coord")
+                .first("metadata.authors.affiliation.selectedWikiarticle.locationType").as("locType");
+
+        SortOperation sort = Aggregation.sort(Sort.by(Order.asc("_id")));
+
+        SkipOperation skip = Aggregation.skip(start);
+        LimitOperation limit = Aggregation.limit(pageSize);
+
+        Aggregation aggregation = Aggregation.newAggregation(unwind, group, sort, skip, limit);
+
+        AggregationResults<AffiliationPaperAggregationOutput> results = mongoTemplate.aggregate(aggregation,
+                PublicationImpl.class, AffiliationPaperAggregationOutput.class);
+        return results.getMappedResults();
+    }
+    
+    @Override
+    public long getTotalAffiliation() {
+        UnwindOperation unwind = Aggregation.unwind("metadata.authors");
+
+        GroupOperation group = Aggregation.group("metadata.authors.affiliation.institution");
+
+        CountOperation count = Aggregation.count().as("total");
+        Aggregation aggregation = Aggregation.newAggregation(unwind, group, count);
+        
+        AggregationResults<Document> results = mongoTemplate.aggregate(aggregation,
+                PublicationImpl.class, Document.class);
+        return results.getRawResults().getLong("count");
+    }
+
+    @Override
+    public List<String> getDistinctAffiliations() {
+        String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
+        DistinctIterable<String> output = mongoTemplate.getCollection(collection)
+                .distinct("metadata.authors.affiliation.selectedWikiarticle.title", String.class);
+        List<String> results = new ArrayList<>();
+        MongoCursor<String> it = output.iterator();
+        while (it.hasNext()) {
+            results.add(it.next());
+        }
+        return results;
+    }
+
+    @Override
+    public List<String> getDistinctAffiliationsTop() {
+        String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
+        DistinctIterable<String> output = mongoTemplate.getCollection(collection)
+                .distinct("metadata.authors.affiliation.selectedWikiarticle.title", String.class);
+        List<String> results = new ArrayList<>();
+        MongoCursor<String> it = output.iterator();
+        int i = 0;
+        while (it.hasNext() && i < 50) {
+            results.add(it.next());
+            i++;
+        }
+        return results;
+    }
+
+    @Override
+    public long getDistinctAffiliationCount() {
+        Query query = new Query(Criteria.where("metadata.authors.affiliation.selectedWikiarticle.title").ne(null));
+        return mongoTemplate.count(query, PublicationImpl.class);
     }
 
     @Override
@@ -48,7 +145,7 @@ public class PublicationDaoImpl implements PublicationDao {
 
     @Override
     public long getAffiliationCount() {
-        Query query = new Query(Criteria.where("metadata.authors.affiliation.locationCountry").ne(null));
+        Query query = new Query(Criteria.where("metadata.authors.affiliation.institution").ne(null));
         return mongoTemplate.count(query, PublicationImpl.class);
     }
 
@@ -90,16 +187,51 @@ public class PublicationDaoImpl implements PublicationDao {
     }
 
     @Override
+    public long getCountriesInTextCount() {
+        Query query = new Query(Criteria.where("bodyText.locationMatches.selectedArticle").ne(null));
+        return mongoTemplate.count(query, PublicationImpl.class);
+    }
+
+    @Override
     public List<String> getCountriesInText() {
         String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
+        Criteria criteria = Criteria.where("bodyText.locationMatches.selectedArticle").ne(null);
+        Query query = new Query();
+        query.addCriteria(criteria);
+
         DistinctIterable<String> output = mongoTemplate.getCollection(collection)
-                .distinct("bodyText.locationMatches.locationName", String.class);
+                .distinct("bodyText.locationMatches.locationName", query.getQueryObject(), String.class);
         List<String> results = new ArrayList<>();
         MongoCursor<String> it = output.iterator();
         while (it.hasNext()) {
             results.add(it.next());
         }
         return results;
+    }
+
+    @Override
+    public List<String> getCountriesInTextTop() {
+        String collection = mongoTemplate.getCollectionName(PublicationImpl.class);
+        Criteria criteria = Criteria.where("bodyText.locationMatches.selectedArticle").ne(null);
+        Query query = new Query();
+        query.addCriteria(criteria);
+
+        DistinctIterable<String> output = mongoTemplate.getCollection(collection)
+                .distinct("bodyText.locationMatches.locationName", query.getQueryObject(), String.class);
+        List<String> results = new ArrayList<>();
+        MongoCursor<String> it = output.iterator();
+        int i = 0;
+        while (it.hasNext() && i < 50) {
+            results.add(it.next());
+            i++;
+        }
+        return results;
+    }
+
+    @Override
+    public long getCountOfPublicationsWithLocation() {
+        Query query = new Query(Criteria.where("metadata.authors.affiliation.selectedWikiarticle").ne(null));
+        return mongoTemplate.count(query, PublicationImpl.class);
     }
 
 }

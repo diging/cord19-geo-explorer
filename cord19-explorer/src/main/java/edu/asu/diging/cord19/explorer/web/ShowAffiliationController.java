@@ -1,5 +1,7 @@
 package edu.asu.diging.cord19.explorer.web;
 
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
@@ -10,17 +12,19 @@ import edu.asu.diging.cord19.explorer.core.mongo.PublicationDao;
 
 @Controller
 public class ShowAffiliationController {
-    
+
     @Autowired
     private PublicationDao pubDao;
 
     @RequestMapping("/affiliations")
     public String get(Model model, Pageable pageable) {
-        model.addAttribute("affs", pubDao.getAffiliationsAndArticles(pageable.getOffset(), pageable.getPageSize()));
+        model.addAttribute("affs", pubDao.getAffiliationsAndArticles(pageable.getOffset(), pageable.getPageSize())
+                .stream().filter(a -> a.getId() != null).collect(Collectors.toList()));
         long affCount = pubDao.getAffiliationCount();
         model.addAttribute("total", affCount);
         model.addAttribute("page", pageable.getPageNumber());
-        model.addAttribute("pageCount", affCount/pageable.getPageSize() + (affCount%pageable.getPageSize() > 0 ? 1 : 0));
+        model.addAttribute("pageCount",
+                affCount / pageable.getPageSize() + (affCount % pageable.getPageSize() > 0 ? 1 : 0));
         return "affiliations";
     }
 }

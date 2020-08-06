@@ -160,7 +160,7 @@ a{
 }
 
 .card {
-	background: var(--raised-8);
+	background: var(--raised-8) !important;
 	border-radius: 5px;
 	padding: 25px;
 }
@@ -246,4 +246,20 @@ td, th {
 }
 .form_input:placeholder-shown {
 	z-index: 1;
+}
+
+.table-striped>tbody>tr:nth-of-type(odd) {
+    background-color: var(--raised-8) !important;
+}
+
+.authors-list {
+	color: var(--content-6);
+	padding-bottom: 10px;
+	display: inline;
+}
+
+.coming-soon {
+	color: var(--content-6);
+	margin-top: 40px;
+	text-align: center;
 }

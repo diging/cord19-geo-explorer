@@ -214,18 +214,22 @@ public class DocImporterImpl implements DocImporter {
             logger.debug("Parsing metadata entry: "  + entry.getId());
             
             Publication pub = null;
-            if (entry.getPmcid() != null && !entry.getPmcid().isEmpty()) {
+            if (entry.getPmcid() != null && !entry.getPmcid().trim().isEmpty()) {
                 pub = pubRepo.findFirstByPaperId(entry.getPmcid());
                 if (pub == null) {
                     pub = pubRepo.findFirstByPmcid(entry.getPmcid());
                 }
             } 
-            if (pub == null && entry.getPubmedId() != null && !entry.getPubmedId().isEmpty()) {
+            if (pub == null && entry.getPubmedId() != null && !entry.getPubmedId().trim().isEmpty()) {
                 pub = pubRepo.findFirstByPubmedId(entry.getPubmedId());
             }
             
             if (pub == null && entry.getDoi() != null && !entry.getDoi().isEmpty()) {
                 pub = pubRepo.findFirstByDoi(entry.getDoi());
+            }
+            
+            if (pub == null && entry.getId() != null && !entry.getId().trim().isEmpty()) {
+                pub = pubRepo.findFirstByPaperId(entry.getId().trim());
             }
             
             if (pub == null) {

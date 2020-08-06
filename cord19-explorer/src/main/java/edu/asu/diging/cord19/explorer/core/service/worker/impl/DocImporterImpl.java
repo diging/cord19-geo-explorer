@@ -42,7 +42,6 @@ import com.opencsv.bean.CsvToBeanBuilder;
 
 import edu.asu.diging.cord19.explorer.core.data.TaskRepository;
 import edu.asu.diging.cord19.explorer.core.model.LocationMatch;
-import edu.asu.diging.cord19.explorer.core.model.Person;
 import edu.asu.diging.cord19.explorer.core.model.Publication;
 import edu.asu.diging.cord19.explorer.core.model.impl.MetadataImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.ParagraphImpl;
@@ -53,10 +52,12 @@ import edu.asu.diging.cord19.explorer.core.model.task.TaskStatus;
 import edu.asu.diging.cord19.explorer.core.model.task.impl.TaskImpl;
 import edu.asu.diging.cord19.explorer.core.mongo.PublicationRepository;
 import edu.asu.diging.cord19.explorer.core.service.worker.AffiliationCleaner;
+import edu.asu.diging.cord19.explorer.core.service.worker.DimensionsMapper;
 import edu.asu.diging.cord19.explorer.core.service.worker.DocImporter;
 import edu.asu.diging.cord19.explorer.core.service.worker.TextLocationMatcher;
 import edu.asu.diging.pubmeta.util.service.AuthorsParser;
 import edu.asu.diging.pubmeta.util.service.impl.AuthorsParserImpl;
+import edu.asu.diging.pubmeta.util.service.impl.DimensionsParserImpl;
 
 @Component
 @PropertySource({ "classpath:config.properties", "${appConfigFile:classpath:}/app.properties",
@@ -73,7 +74,7 @@ public class DocImporterImpl implements DocImporter {
 
     @Value("${app.data.path}")
     private String appdataPath;
-
+        
     @Autowired
     private TaskRepository taskRepo;
 
@@ -88,7 +89,10 @@ public class DocImporterImpl implements DocImporter {
 
     @Autowired
     private MongoTemplate mongoTemplate;
-
+    
+    @Autowired
+    private DimensionsMapper dimensionsMapper;
+    
     private ObjectMapper mapper;
     private AuthorsParser authorParser;
 
@@ -171,7 +175,7 @@ public class DocImporterImpl implements DocImporter {
         while (it.hasNext()) {
             MetadataEntry entry = it.next();
             logger.debug("Parsing metadata entry: "  + entry.getCord_uid());
-            PublicationImpl pub = null;
+            Publication pub = null;
             if (entry.getSha() != null && !entry.getSha().isEmpty()) {
                 pub = pubRepo.findFirstByPaperId(entry.getSha());
             }
@@ -191,53 +195,107 @@ public class DocImporterImpl implements DocImporter {
                 pub.setPaperId(paperId);
             }
 
-            
-            pub.setHasPdfParse(entry.getPdfJsonFiles() != null && !entry.getPdfJsonFiles().trim().isEmpty());
-            pub.setPdfJsonFiles(entry.getPdfJsonFiles());
-            pub.setCordId(entry.getCord_uid());
-            pub.setDoi(entry.getDoi());
-            pub.setHasPmcXmlParse(entry.getPmcJsonFiles() != null && entry.getPmcJsonFiles().trim().isEmpty());
-            pub.setPmcJsonFiles(entry.getPmcJsonFiles());
-            pub.setJournal(entry.getJournal() != null ? entry.getJournal().trim() : null);
-            pub.setLicense(entry.getLicense() != null ? entry.getLicense().trim() : null);
-            pub.setMsAcademicPaperId(entry.getMsAcademicPaperId() != null ? entry.getMsAcademicPaperId().trim() : null);
-            pub.setPmcid(entry.getPmcid() != null ? entry.getPmcid().trim() : null);
-            pub.setPublishTime(entry.getPublishTime() != null ? entry.getPublishTime().trim() : "");
-            pub.setPubmedId(entry.getPubmed_id());
-            pub.setSha(entry.getSha());
-            pub.setSourceX(entry.getSourceX());
-            pub.setUrl(entry.getUrl());
-            pub.setWhoCovidence(entry.getWhoCov() != null ? entry.getWhoCov().trim() : entry.getWhoCov());
-            pub.setArxivId(entry.getArxivId() != null ? entry.getArxivId().trim() : null);
-            if (pub.getMetadata() == null) {
-                if (pub.getMetadata() == null) {
-                    pub.setMetadata(new MetadataImpl());
-                }
-            }
-            
-            if (pub.getMetadata().getTitle() == null || pub.getMetadata().getTitle().isEmpty()) {
-                pub.getMetadata().setTitle(entry.getTitle());
-            }
-            
-            if (pub.getMetadata().getAuthors() == null) {
-                pub.getMetadata().setAuthors(new ArrayList<>());
-            }
-            
-            if (pub.getMetadata().getAuthors().isEmpty()) {
-                List<edu.asu.diging.pubmeta.util.model.Person> authors = authorParser.parseAuthorString(entry.getAuthors());
-                for (edu.asu.diging.pubmeta.util.model.Person author : authors) {
-                    PersonImpl person = new PersonImpl();
-                    person.setLast(author.getLastName());
-                    person.setFirst(author.getFirstName());
-                    person.setMiddle(author.getMiddleNames());
-                    pub.getMetadata().getAuthors().add(person);
-                }
-            }
+            fillPublication(entry, pub);
             extractYear(pub);
-            pubRepo.save(pub);
+            pubRepo.save((PublicationImpl)pub);
             
         }
         
+    }
+    
+    private CsvParseResult parseDimensionsCsv(String metadataFilename) throws IOException {
+        DimensionsParserImpl parser = new DimensionsParserImpl(metadataFilename);
+        
+        CsvParseResult result = new CsvParseResult();
+        
+        while (parser.hasNext()) {
+            edu.asu.diging.pubmeta.util.model.Publication entry = parser.next();
+            result.setProcessed(result.getProcessed()+1);
+            logger.debug("Parsing metadata entry: "  + entry.getId());
+            
+            Publication pub = null;
+            if (entry.getPmcid() != null && !entry.getPmcid().isEmpty()) {
+                pub = pubRepo.findFirstByPaperId(entry.getPmcid());
+                if (pub == null) {
+                    pub = pubRepo.findFirstByPmcid(entry.getPmcid());
+                }
+            } 
+            if (pub == null && entry.getPubmedId() != null && !entry.getPubmedId().isEmpty()) {
+                pub = pubRepo.findFirstByPubmedId(entry.getPubmedId());
+            }
+            
+            if (pub == null && entry.getDoi() != null && !entry.getDoi().isEmpty()) {
+                pub = pubRepo.findFirstByDoi(entry.getDoi());
+            }
+            
+            if (pub == null) {
+                pub = new PublicationImpl();
+                String paperId = entry.getPmcid() != null ? entry.getPmcid() : entry.getPubmedId();
+                if (paperId == null || paperId.isEmpty()) {
+                    paperId = entry.getId();
+                }
+                pub.setPaperId(paperId);
+                pub.setDatabase(Publication.DATABASE_DIMENSIONS);
+                result.setAdded(result.getAdded()+1);
+            } else {
+                result.setUpdated(result.getUpdated()+1);
+            }
+            
+            if (pub.getMetadata() == null) {
+                pub.setMetadata(new MetadataImpl());
+            }
+            
+            dimensionsMapper.map(entry, pub);
+            
+            pubRepo.save((PublicationImpl)pub);
+        }
+        
+        return result;
+    }
+
+
+    private void fillPublication(MetadataEntry entry, Publication pub) {
+        pub.setHasPdfParse(entry.getPdfJsonFiles() != null && !entry.getPdfJsonFiles().trim().isEmpty());
+        pub.setPdfJsonFiles(entry.getPdfJsonFiles());
+        pub.setCordId(entry.getCord_uid());
+        pub.setDoi(entry.getDoi());
+        pub.setHasPmcXmlParse(entry.getPmcJsonFiles() != null && entry.getPmcJsonFiles().trim().isEmpty());
+        pub.setPmcJsonFiles(entry.getPmcJsonFiles());
+        pub.setJournal(entry.getJournal() != null ? entry.getJournal().trim() : null);
+        pub.setLicense(entry.getLicense() != null ? entry.getLicense().trim() : null);
+        pub.setMsAcademicPaperId(entry.getMsAcademicPaperId() != null ? entry.getMsAcademicPaperId().trim() : null);
+        pub.setPmcid(entry.getPmcid() != null ? entry.getPmcid().trim() : null);
+        pub.setPublishTime(entry.getPublishTime() != null ? entry.getPublishTime().trim() : "");
+        pub.setPubmedId(entry.getPubmed_id());
+        pub.setSha(entry.getSha());
+        pub.setSourceX(entry.getSourceX());
+        pub.setUrl(entry.getUrl());
+        pub.setWhoCovidence(entry.getWhoCov() != null ? entry.getWhoCov().trim() : entry.getWhoCov());
+        pub.setArxivId(entry.getArxivId() != null ? entry.getArxivId().trim() : null);
+        if (pub.getMetadata() == null) {
+            if (pub.getMetadata() == null) {
+                pub.setMetadata(new MetadataImpl());
+            }
+        }
+        
+        if (pub.getMetadata().getTitle() == null || pub.getMetadata().getTitle().isEmpty()) {
+            pub.getMetadata().setTitle(entry.getTitle());
+        }
+        
+        if (pub.getMetadata().getAuthors() == null) {
+            pub.getMetadata().setAuthors(new ArrayList<>());
+        }
+        
+        if (pub.getMetadata().getAuthors().isEmpty()) {
+            List<edu.asu.diging.pubmeta.util.model.Person> authors = authorParser.parseAuthorString(entry.getAuthors());
+            for (edu.asu.diging.pubmeta.util.model.Person author : authors) {
+                PersonImpl person = new PersonImpl();
+                person.setLast(author.getLastName());
+                person.setFirst(author.getFirstName());
+                person.setMiddle(author.getMiddleNames());
+                pub.getMetadata().getAuthors().add(person);
+            }
+        }
     }
 
     private void storeFile(File f, Task task, BufferedWriter writer)
@@ -260,7 +318,7 @@ public class DocImporterImpl implements DocImporter {
             writer.write(match.getLocationName());
             writer.flush();
         }
-        affCleaner.processAffiliations(publication);
+        affCleaner.processAuthorAffiliations(publication);
         pubRepo.save(publication);
         task.setProcessed(task.getProcessed() + 1);
         logger.debug("Stored: " + publication.getPaperId());
@@ -290,6 +348,33 @@ public class DocImporterImpl implements DocImporter {
         taskRepo.save((TaskImpl) task);
     }
 
+    
+    @Override
+    @Async
+    public void importDimensionsMetadata(String taskId, String metadataFile) {
+        Optional<TaskImpl> optional = taskRepo.findById(taskId);
+        if (!optional.isPresent()) {
+            return;
+        }
+
+        Task task = optional.get();
+        task.setStatus(TaskStatus.PROCESSING);
+        
+        try {
+            CsvParseResult result = parseDimensionsCsv(metadataFile);
+            task.setStatus(TaskStatus.DONE);
+            task.setProcessed(result.getProcessed());
+            logger.info(String.format("Dimensions CSV Import ----- Processed: %s, Updated: %s, Added: %s, Skipped: %s", result.getProcessed(), result.getUpdated(), result.getAdded(), result.getSkipped()));
+        } catch (IOException e) {
+            logger.error("Could not parse metadata file.", e);
+            task.setStatus(TaskStatus.FAILURE);
+        }
+        
+        task.setDateEnded(OffsetDateTime.now());
+        taskRepo.save((TaskImpl) task);
+    }
+
+    
     @Override
     @Async
     public void cleanAffiliations(String taskId, boolean reprocess) {
@@ -316,7 +401,7 @@ public class DocImporterImpl implements DocImporter {
             while (docs.hasNext()) {
                 PublicationImpl pub = docs.next();
                 logger.info(String.format("Cleaning affiliations %d of %d for: %s", counter, total, pub.getPaperId()));
-                affCleaner.processAffiliations(pub);
+                affCleaner.processAuthorAffiliations(pub);
                 pubRepo.save(pub);
                 counter++;
             }

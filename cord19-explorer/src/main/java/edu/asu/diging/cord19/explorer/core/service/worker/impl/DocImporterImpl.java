@@ -235,6 +235,7 @@ public class DocImporterImpl implements DocImporter {
                     paperId = entry.getId();
                 }
                 pub.setPaperId(paperId);
+                pub.setDatabase(Publication.DATABASE_DIMENSIONS);
                 result.setAdded(result.getAdded()+1);
             } else {
                 result.setUpdated(result.getUpdated()+1);

@@ -15,6 +15,7 @@ import edu.asu.diging.cord19.explorer.core.model.impl.RefEntryImpl;
 public interface Publication {
     
     final static String DATABASE_ARXIV = "arxiv";
+    final static String DATABASE_DIMENSIONS = "dimensions";
 
     String getCordId();
 

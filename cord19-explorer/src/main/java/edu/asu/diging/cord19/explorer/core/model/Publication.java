@@ -147,4 +147,40 @@ public interface Publication {
     void setDuplicate(boolean duplicate);
 
     boolean isDuplicate();
+
+    void setExtraData(Map<String, Object> extraData);
+
+    Map<String, Object> getExtraData();
+
+    void setFunder(String funder);
+
+    String getFunder();
+
+    void setMeshTerms(List<String> meshTerms);
+
+    List<String> getMeshTerms();
+
+    void setIssue(String issue);
+
+    String getIssue();
+
+    void setVolume(String volume);
+
+    String getVolume();
+
+    void setPages(String pages);
+
+    String getPages();
+
+    void setPublicationType(PublicationType publicationType);
+
+    PublicationType getPublicationType();
+
+    void setRecentCitations(int recentCitations);
+
+    int getRecentCitations();
+
+    void setTimesCited(int timesCited);
+
+    int getTimesCited();
 }

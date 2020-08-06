@@ -68,11 +68,11 @@ public class DocumentCleanerImpl implements DocumentCleaner {
         try {
             while (it.hasNext()) {
                 Publication pub = it.next();
-                PublicationImpl duplicate = pubRepo.findFirstByPaperId(pub.getPmcid());
+                Publication duplicate = pubRepo.findFirstByPaperId(pub.getPmcid());
                 if (duplicate != null && !pub.getPaperId().equals(duplicate.getPaperId())) {
                     duplicate.setDuplicate(true);
                     mongoTemplate.save(duplicate, duplicateCollection);
-                    pubRepo.delete(duplicate);
+                    pubRepo.delete((PublicationImpl)duplicate);
                     count++;
                 }
             }

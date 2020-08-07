@@ -63,6 +63,9 @@
 	          	<li sec:authorize="hasRole('ADMIN')" role="presentation">
 	          		<a th:href="@{/auth/import}" >Import</a>
 	          	</li>
+	          	<li sec:authorize="hasRole('ADMIN')" role="presentation">
+	          		<a th:href="@{/auth/locate}" >Match Locations</a>
+	          	</li>
 	          	
 	          	<li sec:authorize="isAuthenticated()" role="presentation">
 	         	 	<form th:action="@{/logout}" method="POST">

@@ -26,4 +26,6 @@ public interface PublicationDao {
 
     long getCountriesInTextCount();
 
+    String getCollection();
+
 }

@@ -134,4 +134,10 @@ public class PublicationDaoImpl implements PublicationDao {
         return results;
     }
 
+    @Override
+    public String getCollection() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

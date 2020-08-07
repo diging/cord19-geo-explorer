@@ -3,12 +3,20 @@
 		<a th:href="@{/}" class="navbar-brand">CORD19 Geo Explorer</a>
 	    <div style="display: flex">
 	    	<form th:action="@{/login}">
-	    		<button class="btn primary-btn" type="submit" style="margin-right: 40px;">Login</button>
+	    		<button sec:authorize="!isAuthenticated()" class="btn primary-btn" type="submit" style="margin-right: 40px;">Login</button>
 	    	</form>
 		    <form th:action="@{'/search'}" method="GET" class="form" style="position: relative">
 			    <button class="btn btn-outline-success form_icon" type="submit" id="submit"><i class="fa fa-search"></i></button>
 			    <input class="form-control searchbox form_input" type="search" placeholder="Search" id="search" th:name="search">
 			</form>
+			<ul>
+				<li sec:authorize="isAuthenticated()" role="presentation">
+	         	 	<form th:action="@{/logout}" method="POST">
+	         	 	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+	  				<button class="btn primary-btn" type="submit" style="margin-right: 40px;">Logout</button>
+	         	 	</form>
+	         	 </li>
+			</ul>
 	    </div>
 	</div>
 	

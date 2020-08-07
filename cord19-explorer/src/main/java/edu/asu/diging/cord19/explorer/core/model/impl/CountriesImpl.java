@@ -12,15 +12,16 @@ import edu.asu.diging.cord19.explorer.core.model.Country;
 public class CountriesImpl implements Country {
     
     @Id
-    private ObjectId id;
+    private ObjectId _id;
     
-    private String countryCode;
+    private String id;
     @JsonProperty("properties")
     private PropertiesImpl properties;
     @JsonProperty("geometry")
     private GeometryImpl geometry;
     private int selectedWikipediaCount;
     private String type;
+    private String center;
     
     
     public String getType() {
@@ -51,19 +52,19 @@ public class CountriesImpl implements Country {
     }
 
     public ObjectId getId() {
-        return id;
+        return _id;
     }
 
-    public void setId(ObjectId id) {
-        this.id = id;
+    public void setId(ObjectId _id) {
+        this._id = _id;
     }
 
     public String getCountryCode() {
-        return countryCode;
+        return id;
     }
 
     public void setCountryCode(String countryCode) {
-        this.countryCode = countryCode;
+        this.id = countryCode;
     }
 
     public GeometryImpl getGeometry() {
@@ -72,6 +73,14 @@ public class CountriesImpl implements Country {
 
     public void setGeometry(GeometryImpl geometry) {
         this.geometry = geometry;
+    }
+
+    public String getCenter() {
+        return center;
+    }
+
+    public void setCenter(String center) {
+        this.center = center;
     }
     
     

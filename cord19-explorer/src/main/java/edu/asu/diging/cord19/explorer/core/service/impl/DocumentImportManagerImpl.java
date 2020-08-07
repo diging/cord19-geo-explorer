@@ -58,6 +58,22 @@ public class DocumentImportManagerImpl implements DocumentImportManager {
 
         return task.getId();
     }
+    
+    @Override
+    public String startDimensionsMetadataImport(String pathToFile) throws IOException {
+        TaskImpl task = new TaskImpl();
+        task.setDateStarted(OffsetDateTime.now());
+        task.setProcessed(0);
+        task.setType(TaskType.IMPORT);
+        task = taskRepo.save(task);
+
+        /*
+         * Start async import
+         */
+        importer.importDimensionsMetadata(task.getId(), pathToFile);
+
+        return task.getId();
+    }
 
     @Override
     public String startYearExtraction() {

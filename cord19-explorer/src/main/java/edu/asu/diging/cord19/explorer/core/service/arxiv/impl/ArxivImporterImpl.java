@@ -129,10 +129,13 @@ public class ArxivImporterImpl implements ArxivImporter {
     private void handleEntries(Feed feed) {
         for (Entry entry : feed.getEntries()) {
             String arxivId = getArxivId(entry.getId());
-            if (pubRepo.findFirstByArxivId(arxivId) == null) {
-                PublicationImpl pub = (PublicationImpl)parseEntry(entry);
-                repo.save(pub);
+            Publication pub = pubRepo.findFirstByArxivId(arxivId);
+            if (pub == null) {
+                pub = parseEntry(entry);
+            } else {
+                parseArxivExtraInfo(entry, pub);
             }
+            repo.save((PublicationImpl)pub);
         }
     }
 
@@ -140,7 +143,6 @@ public class ArxivImporterImpl implements ArxivImporter {
         Publication pub = new PublicationImpl();
         pub.setDatabase(Publication.DATABASE_ARXIV);
         
-        setAbstract(entry, pub);
         setDate(entry, pub);
         
         pub.setMetadata(new MetadataImpl());
@@ -148,13 +150,23 @@ public class ArxivImporterImpl implements ArxivImporter {
         
         setIds(entry, pub);
         setAuthors(entry, pub);
+        
+        parseArxivExtraInfo(entry, pub);
+        
+        affCleaner.processAuthorAffiliations(pub);
+        return pub;
+    }
+    
+    private void parseArxivExtraInfo(Entry entry, Publication pub) {
+        
+        if (pub.getAbstracts() == null || pub.getAbstracts().isEmpty()) {
+            setAbstract(entry, pub);
+        }
+        
         setPdfLink(entry, pub);
         setHtmlLink(entry, pub);
         setCategories(entry, pub);
         setArxivData(entry, pub);
-        
-        affCleaner.processAffiliations(pub);
-        return pub;
     }
 
     private void setArxivData(Entry entry, Publication pub) {

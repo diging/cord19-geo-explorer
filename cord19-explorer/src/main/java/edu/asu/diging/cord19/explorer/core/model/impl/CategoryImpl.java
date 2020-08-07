@@ -8,6 +8,14 @@ public class CategoryImpl implements Category {
     private String label;
     private String scheme;
     
+    public CategoryImpl() {}
+    
+    public CategoryImpl(String term, String scheme, String label) {
+        this.term = term;
+        this.label = label;
+        this.scheme = scheme;
+    }
+    
     /* (non-Javadoc)
      * @see edu.asu.diging.cord19.explorer.core.model.impl.Category#getTerm()
      */

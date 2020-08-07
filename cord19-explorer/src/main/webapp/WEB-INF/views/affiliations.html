@@ -43,8 +43,9 @@
       <thead>
       <tr>
       	<th>Institution</th>
-      	<th>Selected Wiki article</th>
-      	<th>Coordinates</th>
+      	<th>Location</th>
+      	<th>Linked Publications</th>
+      	<th>Linked authors</th>
       </tr>
       </thead>
        <tr th:each="aff, iter : ${affs}" th:classappend="(${aff.status} == 'INCORRECT' ? 'danger' : '') + (${aff.status} == 'CORRECT_REGION' ? 'warning' : '') + (${aff.status} == 'CORRECT' ? 'success' : '')" >
@@ -53,15 +54,20 @@
       		 <br>[[${aff.settlement}]], [[${aff.country}]]
       	</td>
       	<td th:attr="id=${'name-' + iter.index}">
+      	<i th:if="${aff.locType == 'CURATED'}" class="fas fa-user-check" title ="Checked"></i>
+      		<i th:if="${aff.locType == 'CITY'}" class="fas fa-city" title ="City"></i>
+      		<i th:if="${aff.locType == 'COUNTRY'}" class="far fa-flag" title ="Country"></i>
       		<a th:if="${aff.wiki}" target="_blank" th:href="'https://en.wikipedia.org/wiki/' + ${aff.wiki}">
       		[[${aff.wiki}]]
-      		</a><br>
-      		<i th:if="${aff.locType == 'CURATED'}" class="fas fa-user-check"></i>
-      		<i th:if="${aff.locType == 'CITY'}" class="fas fa-city"></i>
-      		<i th:if="${aff.locType == 'COUNTRY'}" class="far fa-flag"></i>
+      		</a>
       	</td>
       	<td>
-      		<span th:text="${aff.coord}"></span>
+      		<span th:if="${aff.paperId != null}">[[${#lists.size(aff.paperId)}]]</span>
+      	
+      	</td>
+      	<td>
+      		<span th:if="${aff.authors != null}">[[${#lists.size(aff.authors)}]]</span>
+      	
       	</td>
       	</tr>
       	</table>

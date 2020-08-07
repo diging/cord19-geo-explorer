@@ -1,17 +1,21 @@
 package edu.asu.diging.cord19.explorer.core.mongo.impl;
 
 import java.util.List;
+import java.util.Set;
+
+import edu.asu.diging.pubmeta.util.model.impl.PersonImpl;
 
 public class AffiliationPaperAggregationOutput {
 
     private String id;
-    private List<String> paperId;
+    private Set<String> paperId;
     private String settlement;
     private String country;
     private String wiki;
     private String coord;
     private String status;
     private String locType;
+    private Set<PersonImpl> authors;
     
     public String getId() {
         return id;
@@ -19,10 +23,10 @@ public class AffiliationPaperAggregationOutput {
     public void setId(String id) {
         this.id = id;
     }
-    public List<String> getPaperId() {
+    public Set<String> getPaperId() {
         return paperId;
     }
-    public void setPaperId(List<String> paperId) {
+    public void setPaperId(Set<String> paperId) {
         this.paperId = paperId;
     }
     public String getSettlement() {
@@ -60,6 +64,12 @@ public class AffiliationPaperAggregationOutput {
     }
     public void setLocType(String locType) {
         this.locType = locType;
+    }
+    public Set<PersonImpl> getAuthors() {
+        return authors;
+    }
+    public void setAuthors(Set<PersonImpl> authors) {
+        this.authors = authors;
     }
     
 }

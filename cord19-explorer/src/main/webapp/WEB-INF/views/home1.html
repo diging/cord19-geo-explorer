@@ -1,0 +1,45 @@
+<html layout:decorate="~{layouts/main}">
+<head>
+<title>Authority Matcher</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<form th:action="@{'/search'}" method="GET" class="form-inline my-2 my-lg-0" style="float:right">
+			<input class="form-control mr-sm-2" type="search" id="search" th:name="search">
+			<button type="submit" class="btn btn-outline-success my-2 my-sm-0" id="submit"><i class="fa fa-search"></i></button>
+		</form>
+		<div class="row">
+			<div class="col-md-12">[[${publicationCount}]] publications</div>
+			<div class="col-md-3">
+				<h4>Institutions in affiliation field (total
+					[[${affiliationCount}]])</h4>
+				<div th:each="country : ${countries}">
+					<a
+						th:href="@{'/affiliation?name=' + ${#uris.escapeQueryParam(country)}}">[[${country}]]</a>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<h4>Cleaned affiliations (total:
+					[[${cleanedAffiliationCount}]])</h4>
+				<div th:each="aff : ${cleanedAffiliations}">[[${aff}]]</div>
+			</div>
+			<div class="col-md-2">
+				<h4>Publication years (total [[${yearCount}]])</h4>
+				<div th:each="year : ${years}">[[${year}]]</div>
+			</div>
+			<div class="col-md-2">
+				<h4>Countries in text ([[${textCountriesCount}]])</h4>
+				<div th:each="country : ${textCountries}">
+					<a
+						th:href="@{'/location?name=' + ${#uris.escapeQueryParam(country)}}">[[${country}]]</a>
+				</div>
+			</div>
+			<div class="col-md-2">
+				<h4>Journals (total [[${journalCount}]])</h4>
+				<div th:each="journal : ${journals}">[[${journal}]]</div>
+			</div>
+		</div>
+
+	</div>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<html layout:decorate="~{layouts/main}">
+<head>
+<title>Authority Matcher</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<form th:action="@{'/search'}" method="GET" class="form-inline my-2 my-lg-0" style="float:right">
+			<input class="form-control mr-sm-2" type="search" id="search" th:name="search">
+			<button type="submit" class="btn btn-outline-success my-2 my-sm-0" id="submit"><i class="fa fa-search"></i></button>
+		</form>
+		<h3>Search Results</h3>
+		<div>
+   		Total: [[${total}]] affiliations
+   		</div>
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th scope="col">Matched Publications</th>
+				</tr>
+			</thead>
+			<tbody>
+
+				<div th:each="aff, iStat : ${matchedAffiliationsPage}">
+					<tr>
+						<th scope="row">
+						<b><a th:href="@{'/paper/' + ${aff.id}}">[[${#strings.defaultString(aff.id,
+									'No title available')}]]</a></b> <br>
+						</th>
+						<!-- <th scope="row"><b><a
+								th:href="@{'/paper/' + ${pub.paperId}}">[[${#strings.defaultString(pub.metadata.title,
+									'No title available')}]]</a></b> <br>
+
+							<div th:each="author, iterstat : ${pub.metadata.authors}"
+								style="padding-bottom: 10px; display: inline">
+								<b th:if="${author.name == null}">[[${author.first}]]
+									[[${#strings.listJoin(author.middle,',')}]] [[${author.last}]]</b>
+								<b th:if="${author.name != null}">[[${author.name}]]</b><span
+									th:text="!${iterstat.last} ? ',': ''"></span>
+							</div></th> -->
+					</tr>
+				</div>
+			</tbody>
+		</table>
+
+		<!-- <div th:if="${totalPages > 0}"
+			class="pagination" th:each="pageNumber : ${pageNumbers}">
+			<a
+				th:href="@{/search(size=${#lists.size(matchedAffiliationsPage)}, page=${pageNumber}, search=${query}, totalPages=${totalPages})}"
+				th:text=${pageNumber}></a>
+		</div>
+		
+		<nav>
+		  <ul class="pagination">
+		  	<li th:if="${page != 0}"><a href="#" th:href="@{/search(page=0, search=${query})}" aria-label="First"><span aria-hidden="true">&laquo;&laquo;</span></a></li>
+		  	<li th:if="${page == 0}" class="disabled"><a href="#" aria-label="First"><span aria-hidden="true">&laquo;&laquo;</span></a></li>
+		  	
+		    <li th:if="${page - 1 >= 0}"><a href="#" th:href="@{/search(page=${page-1}, search=${query})}" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+		    <li th:if="${page - 1 < 0}" class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+		    
+		    <li th:if="${page - 4 >= 0}"><a href="#" th:href="@{/search(page=${page-5}, search=${query})}">[[${page-3}]]</a></li>
+		    <li th:if="${page - 3 >= 0}"><a href="#" th:href="@{/search(page=${page-3}, search=${query})}">[[${page-2}]]</a></li>
+		    <li th:if="${page - 2 >= 0}"><a href="#" th:href="@{/search(page=${page-2}, search=${query})}">[[${page-1}]]</a></li>
+		    <li th:if="${page - 1 >= 0}"><a href="#" th:href="@{/search(page=${page-1}, search=${query})}">[[${page}]]</a></li>
+		    
+		    <li class="active"><a href="#">[[${page+1}]]</a></li>
+		    
+		    <li th:if="${page + 1 < pageCount}"><a href="#" th:href="@{/search(page=${page+1}, search=${query})}">[[${page+2}]]</a></li>
+		    <li th:if="${page + 2 < pageCount}"><a href="#" th:href="@{/search(page=${page+2}, search=${query})}">[[${page+3}]]</a></li>
+		    <li th:if="${page + 3 < pageCount}"><a href="#" th:href="@{/search(page=${page+3}, search=${query})}">[[${page+4}]]</a></li>
+		    <li th:if="${page + 4 < pageCount}"><a href="#" th:href="@{/search(page=${page+4}, search=${query})}">[[${page+5}]]</a></li>
+		    
+		    <li th:if="${page + 1 < pageCount}"><a href="#" th:href="@{/search(page=${page+1}, search=${query})}" aria-label="Previous"><span aria-hidden="true">&raquo;</span></a></li>
+		    <li th:if="${page + 1 >= pageCount}" class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&raquo;</span></a></li>
+		    
+		    <li th:if="${page != pageCount-1}"><a href="#" th:href="@{/search(page=${pageCount-1}, search=${query})}" aria-label="Last"><span aria-hidden="true">&raquo;&raquo;</span></a></li>
+		  	<li th:if="${page == pageCount-1}" class="disabled"><a href="#" aria-label="Last"><span aria-hidden="true">&raquo;&raquo;</span></a></li>
+		  	
+		  </ul>
+		</nav>	 -->
+		
+		
+		
+		
+		</body>
+</html>

@@ -15,46 +15,34 @@ import org.springframework.data.mongodb.core.aggregation.SkipOperation;
 import org.springframework.data.mongodb.core.aggregation.SortOperation;
 import org.springframework.data.mongodb.core.aggregation.UnwindOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
 import edu.asu.diging.cord19.explorer.core.mongo.AffiliationSearchProvider;
 
-
 @Service
 public class AffiliationSearchProviderImpl implements AffiliationSearchProvider {
 
-
     @Autowired
     private MongoTemplate mongoTemplate;
-    
-    @Override
-    public long searchResultSize(String title) {
-        Criteria regex = Criteria.where("metadata.authors.affiliation.selectedWikiarticle.title").regex(".*" + title + ".*", "i");
-        return mongoTemplate.count(new Query().addCriteria(regex), String.class);
-    }
-    
+
     @Override
     public List<AffiliationPaperAggregationOutput> getRequestedPage(String title, Long currentPage, Integer size) {
-        
-        
         UnwindOperation unwind = Aggregation.unwind("metadata.authors");
-        GroupOperation group = Aggregation.group("metadata.authors.affiliation.institution").first("metadata.authors.affiliation.selectedWikiarticle.title").as("wiki");
-        
+        GroupOperation group = Aggregation.group("metadata.authors.affiliation.institution")
+                .first("metadata.authors.affiliation.selectedWikiarticle.title").as("wiki");
         SortOperation sort = Aggregation.sort(Sort.by(Order.asc("_id")));
         SkipOperation skip = Aggregation.skip(currentPage);
         LimitOperation limit = Aggregation.limit(size);
         Criteria regex = Criteria.where("wiki").regex(".*" + title + ".*", "i");
         MatchOperation match = Aggregation.match(regex);
-        
+
         Aggregation aggregation = Aggregation.newAggregation(unwind, group, match, sort, skip, limit);
 
         AggregationResults<AffiliationPaperAggregationOutput> results = mongoTemplate.aggregate(aggregation,
                 PublicationImpl.class, AffiliationPaperAggregationOutput.class);
-        
+
         return results.getMappedResults();
     }
-    
-    
+
 }

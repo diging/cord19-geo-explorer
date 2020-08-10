@@ -25,10 +25,10 @@ public class AffiliationResultsController {
             @PageableDefault(size = 20) Pageable pageable) {
         List<AffiliationPaperAggregationOutput> matchedPage = affSearchProvider.getRequestedPage(query, (long)pageable.getPageNumber(),
                 pageable.getPageSize());
-        long pubCount = matchedPage.size();
-        model.addAttribute("total", pubCount);
+        long affCount = matchedPage.size();
+        model.addAttribute("total", affCount);
         model.addAttribute("matchedAffiliationsPage", matchedPage);
-        model.addAttribute("pageCount", pubCount/pageable.getPageSize() + (pubCount%pageable.getPageSize() > 0 ? 1 : 0));
+        model.addAttribute("pageCount", affCount/pageable.getPageSize() + (affCount%pageable.getPageSize() > 0 ? 1 : 0));
         model.addAttribute("query", query);
         model.addAttribute("page", pageable.getPageNumber());
         return "affResults";

@@ -6,7 +6,5 @@ import edu.asu.diging.cord19.explorer.core.mongo.impl.AffiliationPaperAggregatio
 
 public interface AffiliationSearchProvider {
 
-    long searchResultSize(String title);
-    
     List<AffiliationPaperAggregationOutput> getRequestedPage(String title, Long currentPage, Integer size);
 }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import edu.asu.diging.cord19.explorer.core.mongo.AffiliationSearchProvider;
+import edu.asu.diging.cord19.explorer.core.mongo.impl.AffiliationPaperAggregationOutput;
 
 @Controller
 public class AffiliationResultsController {
@@ -22,9 +23,9 @@ public class AffiliationResultsController {
     @RequestMapping(value = "/affSearch")
     public String search(@RequestParam("search") String query, Model model,
             @PageableDefault(size = 20) Pageable pageable) {
-        List<String> matchedPage = affSearchProvider.getRequestedPage(query, (long)pageable.getPageNumber(),
+        List<AffiliationPaperAggregationOutput> matchedPage = affSearchProvider.getRequestedPage(query, (long)pageable.getPageNumber(),
                 pageable.getPageSize());
-        long pubCount = affSearchProvider.searchResultSize(query);
+        long pubCount = matchedPage.size();
         model.addAttribute("total", pubCount);
         model.addAttribute("matchedAffiliationsPage", matchedPage);
         model.addAttribute("pageCount", pubCount/pageable.getPageSize() + (pubCount%pageable.getPageSize() > 0 ? 1 : 0));

@@ -81,6 +81,7 @@ public class PublicationDaoImpl implements PublicationDao {
 
         SkipOperation skip = Aggregation.skip(start);
         LimitOperation limit = Aggregation.limit(pageSize);
+        
 
         Aggregation aggregation = Aggregation.newAggregation(unwind, group, sort, skip, limit);
 

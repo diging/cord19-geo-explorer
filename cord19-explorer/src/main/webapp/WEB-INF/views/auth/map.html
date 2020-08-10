@@ -12,15 +12,14 @@
    <span hidden id="high" th:text="${high}"></span>
    <script>
    $(document).ready(function(){
-	   // Your code here
 	   loadMap();
 	   
 	});
    function loadMap() {
-	   console.log("ready");
 	   
 		// mapid is the id of the div where the map will appear
-		var map = L.map('mapid').setView([47, 2], 5);   // center position + zoom
+		// center position + zoom
+		var map = L.map('mapid').setView([47, 2], 5);
 		// Add a tile to the map = a background. Comes from OpenStreetmap
 		L.tileLayer(
 		    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -32,30 +31,25 @@
 		L.svg().addTo(map);
 		let high = $('#high').text();
 		let low = $('#low').text();
-		console.log(high);
 		scaler = high/100;
 		let countries = $('#countries').text();
-		let p = countries.split("],");
-		p.forEach(function (item, index) {
-			let x = item.split("=");
-			let t = x[1].split(', {');
-			  console.log();
+		let country = countries.split("],");
+		country.forEach(function (item, index) {
+			let coordString = item.split("=");
+			let coordMapString = coordString[1].split(', {');
 			  try{
-			  	let y = "{" + t[1];
-			  	coords = JSON.parse(y)
+			  	let  coordMapStringCleaned = "{" + coordMapString[1];
+			  	coords = JSON.parse(coordMapStringCleaned)
 			  	var latlng = L.latLng(coords)
 				// Create data for circles:
-				rad =  Number(t[0].split('[')[1])
+				rad =  Number(coordMapString[0].split('[')[1])
 				finalRad = rad/scaler
 				L.circleMarker(latlng).setRadius(finalRad).addTo(map);
 			  	
 			  } catch(err) {
 				  console.log(err);
 			  }
-
-			  
-			  
-			});
+		});
 
 		
 		

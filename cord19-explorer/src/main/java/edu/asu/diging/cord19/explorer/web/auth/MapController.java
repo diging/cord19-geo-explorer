@@ -52,39 +52,29 @@ public class MapController {
     public String show(Model model) throws IOException {
         
         HashMap<String, List<String>> countriesMap = new HashMap<String, List<String>>();
-        AtomicInteger high = new AtomicInteger(0);
-        AtomicInteger low = new AtomicInteger(0);
+        //Is Atomic Int the best way to this?
+        AtomicInteger highCount = new AtomicInteger(0);
+        AtomicInteger lowCount = new AtomicInteger(0);
         try (CloseableIterator<CountriesImpl> countries = mongoTemplate.stream(new Query().noCursorTimeout(), CountriesImpl.class)) {
             while(countries.hasNext()) {
                 CountriesImpl country = countries.next();
-                System.out.println(country.getSelectedWikipediaCount());
                 if(country.getSelectedWikipediaCount() > 0) {
-                    System.out.println(country.getProperties().getName());
                     ArrayList<String> properties = new ArrayList<String>();
-                    int count = country.getSelectedWikipediaCount();
                     properties.add(Integer.toString(country.getSelectedWikipediaCount()));
-                    properties.add(country.getCenter());
-                    if(country.getSelectedWikipediaCount() > high.intValue()) {
-                        high.set(country.getSelectedWikipediaCount());
+                    properties.add(country.getCenter());     
+                    if(country.getSelectedWikipediaCount() > highCount.intValue()) {
+                        highCount.set(country.getSelectedWikipediaCount());
                     }
-                    if(country.getSelectedWikipediaCount() < low.intValue()) {
-                        low.set(country.getSelectedWikipediaCount());
+                    if(country.getSelectedWikipediaCount() < lowCount.intValue()) {
+                        lowCount.set(country.getSelectedWikipediaCount());
                     }
-                        
                     countriesMap.put(country.getProperties().getName(), properties);
-                    
                 }
             }
-            
         }
-        //final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        //ObjectMapper mapper = new ObjectMapper();
-        //String x = mapper.writeValueAsString(countryList);
-        System.out.println("Countries");
-        System.out.println(countriesMap);
         model.addAttribute("countries", countriesMap);
-        model.addAttribute("low", low);
-        model.addAttribute("high", high);
+        model.addAttribute("low", lowCount);
+        model.addAttribute("high", highCount);
         
         return "auth/map";
     }
@@ -93,58 +83,47 @@ public class MapController {
 
     @RequestMapping(value = "/auth/map/gather", method = RequestMethod.POST)
     public String gather() throws ClassCastException, ClassNotFoundException, IOException {
-
-        
         try (CloseableIterator<CountriesImpl> countries = mongoTemplate.stream(new Query().noCursorTimeout(), CountriesImpl.class)) {
             while (countries.hasNext()) {
                 CountriesImpl country = countries.next();
                 String countryName = country.getProperties().getName();
-                String countryCode = country.getCountryCode();
-
-                
                 if(country.getGeometry().getType().equalsIgnoreCase("multipolygon")) {
-                    System.out.println(country.getProperties().getName());
                     ArrayList<ArrayList<ArrayList<?>>> countryCoords = country.getGeometry().getCoordinatesList();
-                    //System.out.println("New Coord");
-                    System.out.println(countryCoords);
                     country.setSelectedWikipediaCount(0);  
                     Iterator<ArrayList<ArrayList<?>>> countryCoordsIter = countryCoords.iterator();
                     while(countryCoordsIter.hasNext()) {
-                        ArrayList<ArrayList<?>> coord = countryCoordsIter.next();
+                        ArrayList<ArrayList<?>> coordList = countryCoordsIter.next();
                         final ArrayList<Coordinate> points = new ArrayList<Coordinate>();
-                        for(Object x : coord) {
-                            if (x instanceof ArrayList) {
-                                //System.out.println("Multi");
-                                
-                                for(Object y : (ArrayList<?>)x) {
-                                    System.out.println(y); 
-                                    if (y instanceof ArrayList) {
-                                        //add points
-										double x1 = 0.0;
-										double y1 = 0.0;
-					
-                                        ArrayList<?> coords = (ArrayList<?>)y;
-
+                        for(Object coord : coordList) {
+                            if (coord instanceof ArrayList) {
+                                for(Object innerCoorList : (ArrayList<?>)coord) {
+                                    if (innerCoorList instanceof ArrayList) {
+                                        //add points if not in list
+										double x = 0.0;
+										double y = 0.0;
+                                        ArrayList<?> coords = (ArrayList<?>)innerCoorList;
+                                        
 										try {
-											x1 = (double) coords.get(1);
+											x = (double) coords.get(1);
 										} catch(Exception e) {
-											x1 = (double) ((Integer) coords.get(1)).intValue();
+											x = (double) ((Integer) coords.get(1)).intValue();
 										}
 										try {
-											y1 = (double) coords.get(0);
+											y = (double) coords.get(0);
 										} catch(Exception e) {
-											y1 = (double) ((Integer) coords.get(0)).intValue();
+											y = (double) ((Integer) coords.get(0)).intValue();
 										}
-										if(x1 == 0.0) {
+										//TODO: not sure what to do with malformed data yet
+										if(x == 0.0) {
 											System.out.println('x');
-											System.out.println(coord);
+											System.out.println(coordList);
 										}
-										if(y1 == 0.0) {
+										if(y == 0.0) {
 											System.out.println('y');
-											System.out.println(coord);
+											System.out.println(coordList);
 										}
 				
-                                        points.add(new Coordinate(x1, y1));
+                                        points.add(new Coordinate(x, y));
                                     }
 								}
 								final GeometryFactory gf = new GeometryFactory();
@@ -157,27 +136,21 @@ public class MapController {
 										for(PersonImpl author : authors) {
 											if(author.getAffiliation().getSelectedWikiarticle() != null) {
 												CleanedCoordinatesImpl cleanedCoords = author.getAffiliation().getSelectedWikiarticle().getCleanedCoords();
-                                                    try { 
-                                                        Double cleanedX = cleanedCoords.getCoordinates().get(0);
-                                                        Double cleanedY = cleanedCoords.getCoordinates().get(1);
-                                                        Coordinate coordToFind = new Coordinate(cleanedX, cleanedY);
-                                                        Point point = gf.createPoint(coordToFind);
-                                                     	if(point.within(polygon)) {
-                                                            country.incrementSelectedWikipediaCount();
-                                                            System.out.println("Found in");
-                                                            System.out.println(countryName);
-                                                            System.out.println(author.getFirst().concat(" ").concat(author.getLast()));
-                                                            System.out.println(pub.getPaperId());
-                                                            System.out.println(cleanedCoords.getCoordinates());
-                                                        }
-                                                    } catch(Exception e) {
-                                                       //System.out.println("no coords");
+                                                try { 
+                                                    Double cleanedX = cleanedCoords.getCoordinates().get(0);
+                                                    Double cleanedY = cleanedCoords.getCoordinates().get(1);
+                                                    Coordinate coordToFind = new Coordinate(cleanedX, cleanedY);
+                                                    Point point = gf.createPoint(coordToFind);
+                                                 	if(point.within(polygon)) {
+                                                        country.incrementSelectedWikipediaCount();
                                                     }
+                                                } catch(Exception e) {
+                                                   System.out.println("no coords");
+                                                }
 											}
 										}
 									}
 								}
-                                //((ArrayList)x)
                             }
                         }
                     }
@@ -185,8 +158,6 @@ public class MapController {
          	}
     	}
        
-        
-        
         return "redirect:/";
     }
     

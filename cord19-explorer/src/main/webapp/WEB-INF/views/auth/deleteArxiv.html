@@ -3,7 +3,8 @@
     <title>CORD-19 Geo Explorer</title>
   </head>
   <body>
-   <div layout:fragment="content">
+   <div th:replace="layouts/navbar :: navbar"></div>
+   <div layout:fragment="content" class="content">
       <h2>Delete Import from Arxiv</h2>
       
       <form action="#" th:action="@{/auth/arxiv/delete}" method="POST">
@@ -12,7 +13,7 @@
       	This cannot be undone.
       	</p>
       	<p>
-      	<button class="btn btn-primary" type="submit">Yes, delete</button>
+      	<button class="btn primary-btn" type="submit">Yes, delete</button>
       	</p>
       </form>
    </div>

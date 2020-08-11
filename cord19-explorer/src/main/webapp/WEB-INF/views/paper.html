@@ -8,8 +8,8 @@
          <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js"></script>
          <style>
             mark{
-            background: #efd489;
-            color: black;
+            background: var(--primary);
+            color: white;
             }
             mark.locationNotFound {
             background: #e4dae6;
@@ -19,7 +19,7 @@
          <h3>[[${#strings.defaultString(publication.metadata.title, 'No title available')}]] <span th:if="${publication.publishYear != '' && publication.publishYear > 0}">([[${publication.publishYear}]])</span></h3>
          <div class="row">
             <div class="col-sm-12">
-               by:
+               <p style="color: white; display: inline;">by:</p>
                <div th:each="author, iterstat : ${publication.metadata.authors}" class="authors-list">
                   <b th:if="${author.name == null}">[[${author.first}]] [[${#strings.listJoin(author.middle,',')}]] [[${author.last}]]</b>
                   <b th:if="${author.name != null}">[[${author.name}]]</b>

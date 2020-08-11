@@ -3,12 +3,14 @@
     <title>CORD-19 Geo Explorer</title>
   </head>
   <body>
-   <div layout:fragment="content">
+   <div th:replace="layouts/navbar :: navbar"></div>
+   <div layout:fragment="content" class="content">
       <h2>Affiliations</h2>
       
-      	<div>
-   		Total: [[${total}]] affiliations
-   		</div>
+      	<h5 style="color: var(--content-6)">
+      		Total: [[${total}]] affiliations
+      	</h5>
+   			
 	   	<nav>
 		  <ul class="pagination">
 		  	<li th:if="${page != 0}"><a href="#" th:href="@{'/auth/affiliations?page=0'}" aria-label="First"><span aria-hidden="true">&laquo;&laquo;</span></a></li>
@@ -39,55 +41,58 @@
 		</nav>
       
       <table class="table table-striped">
-      <thead>
-      <tr>
-      	<th>Institution</th>
-      	<th>Selected Wiki article</th>
-      	<th>Coordinates</th>
-      	<th></th>
-      	<th>Status</th>
-      </tr>
-      </thead>
-      <tr th:each="aff, iter : ${affs}" th:classappend="(${aff.status} == 'INCORRECT' ? 'danger' : '') + (${aff.status} == 'CORRECT_REGION' ? 'warning' : '') + (${aff.status} == 'CORRECT' ? 'success' : '')" >
-      	<td>
-      		 <a th:href="@{'/affiliation?name=' + ${#uris.escapeQueryParam(aff.id)}}"><span th:text="${aff.id}"></span></a>
-      		 <br>[[${aff.settlement}]], [[${aff.country}]]
-      	</td>
-      	<td th:attr="id=${'name-' + iter.index}">
-      		<a th:if="${aff.wiki}" target="_blank" th:href="'https://en.wikipedia.org/wiki/' + ${aff.wiki}">
-      		[[${aff.wiki}]]
-      		</a><br>
-      		<i th:if="${aff.locType == 'CURATED'}" class="fas fa-user-check"></i>
-      		<i th:if="${aff.locType == 'CITY'}" class="fas fa-city"></i>
-      		<i th:if="${aff.locType == 'COUNTRY'}" class="far fa-flag"></i>
-      	</td>
-      	<td>
-      		<span th:text="${aff.coord}"></span>
-      	</td>
-      	<td>
-      		<a href="#"><i class="fas fa-tools aff-fix" th:attr="data-index=${iter.index}, data-title=${aff.id}, data-city=${aff.settlement}, data-country=${aff.country}"></i></a>
-      	</td>
-      	<td>
-      		<form th:action="@{'/auth/affiliation/status'}" method="POST">
-      		<input type="hidden" name="affiliation" th:value="${aff.id}">
-      		<input type="hidden" name="status" value="INCORRECT">
-      		<input type="hidden" name="page" th:value="${page}">
-      		<button type="submit" class="btn btn-xs btn-danger">Incorrect</button>
-      		</form>
-      		<form th:action="@{'/auth/affiliation/status'}" method="POST">
-      		<input type="hidden" name="affiliation" th:value="${aff.id}">
-      		<input type="hidden" name="status" value="CORRECT_REGION">
-      		<input type="hidden" name="page" th:value="${page}">
-      		<button type="submit" class="btn btn-xs btn-warning">Correct region</button>
-      		</form>
-      		<form th:action="@{'/auth/affiliation/status'}" method="POST">
-      		<input type="hidden" name="affiliation" th:value="${aff.id}">
-      		<input type="hidden" name="status" value="CORRECT">
-      		<input type="hidden" name="page" th:value="${page}">
-      		<button type="submit" class="btn btn-xs btn-success">Correct</button>
-      		</form>
-      	</td>
-      </tr>
+	      <thead class="table-header">
+	      <tr>
+	      	<th>Institution</th>
+	      	<th>Selected Wiki article</th>
+	      	<th>Coordinates</th>
+	      	<th></th>
+	      	<th>Status</th>
+	      </tr>
+	      </thead>
+	      <tbody class="table-body">
+	      	<tr th:each="aff, iter : ${affs}" th:classappend="(${aff.status} == 'INCORRECT' ? 'danger' : '') + (${aff.status} == 'CORRECT_REGION' ? 'warning' : '') + (${aff.status} == 'CORRECT' ? 'success' : '')" >
+	      	<td>
+	      		 <a th:href="@{'/affiliation?name=' + ${#uris.escapeQueryParam(aff.id)}}"><span th:text="${aff.id}"></span></a>
+	      		 <br>[[${aff.settlement}]], [[${aff.country}]]
+	      	</td>
+	      	<td th:attr="id=${'name-' + iter.index}">
+	      		<a th:if="${aff.wiki}" target="_blank" th:href="'https://en.wikipedia.org/wiki/' + ${aff.wiki}">
+	      		[[${aff.wiki}]]
+	      		</a><br>
+	      		<i th:if="${aff.locType == 'CURATED'}" class="fas fa-user-check"></i>
+	      		<i th:if="${aff.locType == 'CITY'}" class="fas fa-city"></i>
+	      		<i th:if="${aff.locType == 'COUNTRY'}" class="far fa-flag"></i>
+	      	</td>
+	      	<td>
+	      		<span th:text="${aff.coord}"></span>
+	      	</td>
+	      	<td>
+	      		<a href="#"><i class="fas fa-tools aff-fix" th:attr="data-index=${iter.index}, data-title=${aff.id}, data-city=${aff.settlement}, data-country=${aff.country}"></i></a>
+	      	</td>
+	      	<td>
+	      		<form th:action="@{'/auth/affiliation/status'}" method="POST">
+	      		<input type="hidden" name="affiliation" th:value="${aff.id}">
+	      		<input type="hidden" name="status" value="INCORRECT">
+	      		<input type="hidden" name="page" th:value="${page}">
+	      		<button type="submit" class="btn btn-xs btn-danger">Incorrect</button>
+	      		</form>
+	      		<form th:action="@{'/auth/affiliation/status'}" method="POST">
+	      		<input type="hidden" name="affiliation" th:value="${aff.id}">
+	      		<input type="hidden" name="status" value="CORRECT_REGION">
+	      		<input type="hidden" name="page" th:value="${page}">
+	      		<button type="submit" class="btn btn-xs btn-warning">Correct region</button>
+	      		</form>
+	      		<form th:action="@{'/auth/affiliation/status'}" method="POST">
+	      		<input type="hidden" name="affiliation" th:value="${aff.id}">
+	      		<input type="hidden" name="status" value="CORRECT">
+	      		<input type="hidden" name="page" th:value="${page}">
+	      		<button type="submit" class="btn btn-xs btn-success">Correct</button>
+	      		</form>
+	      	</td>
+	      	</tr>
+	      </tbody>
+	  
       </table>
       
       <script>

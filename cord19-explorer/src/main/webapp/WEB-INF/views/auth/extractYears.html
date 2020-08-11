@@ -3,12 +3,13 @@
     <title>CORD-19 Geo Explorer</title>
   </head>
   <body>
-   <div layout:fragment="content">
+   <div th:replace="layouts/navbar :: navbar"></div>
+   <div layout:fragment="content" class="content">
       <h2>Start Year Extraction</h2>
       
       <form action="#" th:action="@{/auth/extract/years}" method="POST">
       	<p>
-      	<button class="btn btn-primary" type="submit">Start Process</button>
+      	<button class="btn primary-btn" type="submit">Start Process</button>
       	</p>
       </form>
    </div>

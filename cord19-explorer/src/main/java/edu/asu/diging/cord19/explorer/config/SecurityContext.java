@@ -22,13 +22,14 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.formLogin().and().logout().deleteCookies("JSESSIONID").logoutSuccessUrl("/").and().exceptionHandling()
-                .accessDeniedPage("/403")
+        http.formLogin().loginPage("/login").loginProcessingUrl("/login/authenticate").failureUrl("/loginFailed").and()
+                .logout().deleteCookies("JSESSIONID").logoutUrl("/logout").logoutSuccessUrl("/login").and()
+                .exceptionHandling().accessDeniedPage("/403")
                 // Configures url based authorization
                 .and().authorizeRequests()
                 // Anyone can access the urls
-                .antMatchers("/", "/resources/**", "/register", "/location/**", "/paper/**", "/affiliation/**",
-                        "/arxiv/**", "/stats", "/search", "/affiliations")
+                .antMatchers("/", "/resources/**", "/login", "/loginFailed", "/logout", "/register", "/location/**",
+                        "/paper/**", "/affiliation/**", "/arxiv/**", "/stats", "/search", "/affiliations")
                 .permitAll()
                 // The rest of the our application is protected.
                 .antMatchers("/users/**", "/admin/**", "/auth/**").hasRole("ADMIN").anyRequest().hasRole("USER");

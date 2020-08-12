@@ -1,9 +1,21 @@
-body, p, table, div, input {
-	font-family: 'Raleway', sans-serif;
+body, input {
+	font-family: var(--main-font);
+	background: var(--bg-color);
 }
 
-h4 {
-	margin-top: 25px;
+h1,h2,h3,h4,h5,h6 {
+	color: white;
+	font-size: 600;
+	margin: 10px 0 25px 0;
+}
+
+p {
+	color: rgba(255,255,255, 0.6);
+}
+
+label {
+	color: white;
+	margin-bottom: 20px;
 }
 
 .row {

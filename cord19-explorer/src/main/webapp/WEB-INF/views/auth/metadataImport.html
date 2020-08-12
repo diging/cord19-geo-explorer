@@ -16,6 +16,18 @@
       	<button class="btn btn-primary" type="submit">Start Import</button>
       	</p>
       </form>
+      
+      <h2>Import Dimensions Metadata File</h2>
+      <form action="#" th:action="@{/auth/metadata/import} + '?type=dimensions'" method="POST">
+      	<div>
+      	<label>Which file should be imported </label>
+      	<input class="form-control" type="text" name="filepath">
+      	<small>Please provide absolute path.</small>
+      	</div>
+      	<p>
+      	<button class="btn btn-primary" type="submit">Start Import</button>
+      	</p>
+      </form>
    </div>
   </body>
 </html>

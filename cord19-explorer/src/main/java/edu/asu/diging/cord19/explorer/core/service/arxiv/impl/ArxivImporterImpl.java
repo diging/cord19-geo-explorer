@@ -153,7 +153,7 @@ public class ArxivImporterImpl implements ArxivImporter {
         
         parseArxivExtraInfo(entry, pub);
         
-        affCleaner.processAffiliations(pub);
+        affCleaner.processAuthorAffiliations(pub);
         return pub;
     }
     

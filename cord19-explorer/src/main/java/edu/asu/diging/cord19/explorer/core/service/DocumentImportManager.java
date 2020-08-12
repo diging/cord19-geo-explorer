@@ -18,4 +18,6 @@ public interface DocumentImportManager {
 
     String startMetadataImport(String pathToFile) throws IOException;
 
+    String startDimensionsMetadataImport(String pathToFile) throws IOException;
+
 }

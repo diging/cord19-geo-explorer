@@ -1,45 +1,106 @@
 <html layout:decorate="~{layouts/main}">
-<head>
-<title>Authority Matcher</title>
-</head>
-<body>
-	<div layout:fragment="content">
-		<form th:action="@{'/search'}" method="GET" class="form-inline my-2 my-lg-0" style="float:right">
-			<input class="form-control mr-sm-2" type="search" id="search" th:name="search">
-			<button type="submit" class="btn btn-outline-success my-2 my-sm-0" id="submit"><i class="fa fa-search"></i></button>
-		</form>
-		<div class="row">
-			<div class="col-md-12">[[${publicationCount}]] publications</div>
-			<div class="col-md-3">
-				<h4>Institutions in affiliation field (total
-					[[${affiliationCount}]])</h4>
-				<div th:each="country : ${countries}">
-					<a
-						th:href="@{'/affiliation?name=' + ${#uris.escapeQueryParam(country)}}">[[${country}]]</a>
-				</div>
-			</div>
-			<div class="col-md-3">
-				<h4>Cleaned affiliations (total:
-					[[${cleanedAffiliationCount}]])</h4>
-				<div th:each="aff : ${cleanedAffiliations}">[[${aff}]]</div>
-			</div>
-			<div class="col-md-2">
-				<h4>Publication years (total [[${yearCount}]])</h4>
-				<div th:each="year : ${years}">[[${year}]]</div>
-			</div>
-			<div class="col-md-2">
-				<h4>Countries in text ([[${textCountriesCount}]])</h4>
-				<div th:each="country : ${textCountries}">
-					<a
-						th:href="@{'/location?name=' + ${#uris.escapeQueryParam(country)}}">[[${country}]]</a>
-				</div>
-			</div>
-			<div class="col-md-2">
-				<h4>Journals (total [[${journalCount}]])</h4>
-				<div th:each="journal : ${journals}">[[${journal}]]</div>
-			</div>
-		</div>
 
+<head>
+	<script>
+		$('#filterModal').on('shown.bs.modal', function () {
+		  $('#filterBtn').trigger('focus')
+		});
+		$( function() {
+		    $( "#slider-range" ).slider({
+		      range: true,
+		      min: 2016,
+		      max: 2020,
+		      values: [2017, 2019 ],
+		      slide: function( event, ui ) {
+		        $( "#amount" ).val(ui.values[ 0 ] + " - " + ui.values[ 1 ] );
+		      }
+		    });
+		    $( "#amount" ).val($( "#slider-range" ).slider( "values", 0 ) +
+		      " - " + $( "#slider-range" ).slider( "values", 1 ) );
+		  } );
+		$('.carousel').carousel('pause');
+	</script>
+</head>
+
+<body>
+	<div th:replace="layouts/navbar :: navbar"></div>
+	
+	<div class="top-stats" layout:fragment="content">
+		<div class="stat">
+			<h6 class="stat-header">Countries with publications</h6>
+			<h2 style="color: var(--primary)">42</h2>
+		</div>
+		<div class="divider"></div>
+		<div class="stat">
+			<h6 class="stat-header">Total Authors</h6>
+			<h2 style="color: var(--primary)">[[${authorCount}]]</h2>
+		</div>
+		<div class="divider"></div>
+		<div class="stat">
+			<h6 class="stat-header">Total Publications</h6>
+			<h2 style="color: var(--primary)">[[${totalPublications}]]</h2>
+		</div>
+		<div class="divider"></div>
+		<div class="stat">
+			<h6 class="stat-header">Papers with at least one author affiliation</h6>
+			<h2 style="color: var(--primary)">[[${paperWithAffCount}]]</h2>
+		</div>
 	</div>
+	
+	<div id="carousel" class="carousel slide" data-interval="false">
+	  <div class="carousel-indicators">
+    	<button data-target="#carousel" data-slide-to="0" class="btn dark-btn active"><i class="fa fa-map"></i> Map</button>
+	    <!-- <button data-target="#carousel" data-slide-to="1" class="btn dark-btn"><i class="fa fa-chart-bar"></i> Charts</button> -->
+	  </div>	
+	  <div class="carousel-inner" role="listbox">
+	    <div class="item active">
+	      <div th:replace="layouts/components :: map"></div>
+	    </div>
+	    <!-- <div class="item">
+	      <div th:replace="layouts/components :: charts"></div>
+	    </div> -->
+	  </div>
+	</div>
+	
+	<div class="stats-updates">
+		<div class="card">
+		  <div class="card-body">
+		  	<div class="">
+		  		<h4 class="card-title">World Data</h4>
+		   		<form action="#" class="form" style="position: relative">
+				    <button class="btn btn-outline-success form_icon" type="submit"><i class="fa fa-search"></i></button>
+				    <input class="form-control searchbox form_input" type="search" placeholder="Search" aria-label="Search">
+				</form>
+		  	</div>
+		    <table class="data-table">
+		    	<thead>
+		    		<tr class="table-header">
+		    			<td>Location</td>
+		    			<td>Publications</td>
+		    			<td>Journals</td>
+		    			<td>Authors</td>
+		    		</tr>
+		    	</thead>
+		    	<tbody>
+		    		<tr class="table-body">
+		    			<td>Worldwide</td>
+		    			<td>[[${totalPublications}]]</td>
+		    			<td>[[${journalCount}]]</td>
+		    			<td>[[${authorCount}]]</td>
+		    		</tr>
+		    	</tbody>
+		    </table>
+		    <h3 class="coming-soon">More data coming soon!</h3>
+		  </div>
+		</div>
+		<div class="card">
+		  <div class="card-body">
+		    <h4 class="card-title">Latest Publications</h4>
+		    <div th:replace="layouts/components :: latest"></div>
+		  </div>
+		</div>
+	</div>
+	
 </body>
 </html>
+

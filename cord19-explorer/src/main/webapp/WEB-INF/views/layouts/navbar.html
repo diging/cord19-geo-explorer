@@ -2,6 +2,10 @@
 	<div class="nav-content">
 		<a th:href="@{/}" class="navbar-brand">CORD19 Geo Explorer</a>
 	    <div style="display: flex">
+	    
+	    <div sec:authorize="isAnonymous()" role="presentation">
+	          		<a th:href="@{/affiliations}" >Affiliations</a>
+	          	</div>
 	    	<form th:action="@{/login}">
 	    		<button sec:authorize="!isAuthenticated()" class="btn primary-btn" type="submit" style="margin-right: 40px;">Login</button>
 	    	</form>

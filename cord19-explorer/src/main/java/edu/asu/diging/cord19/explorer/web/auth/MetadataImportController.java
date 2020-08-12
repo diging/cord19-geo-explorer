@@ -23,8 +23,13 @@ public class MetadataImportController {
     }
 
     @RequestMapping(value = "/auth/metadata/import", method = RequestMethod.POST)
-    public String startImport(@RequestParam("filepath") String filepath) throws IOException {
-        importManager.startMetadataImport(filepath);
+    public String startImport(@RequestParam("filepath") String filepath, @RequestParam(value="type", defaultValue="cord19") String type) throws IOException {
+        
+        if (type.equals("dimensions")) {
+            importManager.startDimensionsMetadataImport(filepath);
+        } else {
+            importManager.startMetadataImport(filepath);
+        }
 
         return "auth/metadataImportStarted";
     }

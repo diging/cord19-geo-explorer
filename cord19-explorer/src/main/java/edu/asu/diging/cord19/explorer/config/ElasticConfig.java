@@ -53,7 +53,7 @@ public class ElasticConfig extends ElasticsearchConfigurationSupport {
     public RestHighLevelClient elasticsearchRestClient() {
         logger.info("Connecting to ES at: " + host);
         TerminalClientConfigurationBuilder builder = ClientConfiguration.builder()
-                .connectedTo(host).withConnectTimeout(connectTimeout);
+                .connectedTo(host).withConnectTimeout(connectTimeout).withSocketTimeout(connectTimeout);
                 //.usingSsl();
         if (user != null && !user.trim().isEmpty()) {
             logger.info("Using user info: " + user);

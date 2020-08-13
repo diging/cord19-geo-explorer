@@ -129,11 +129,12 @@ a{
 	top: 2%;
 }
 
-.modal {
+.mod-pos {
 	top: unset !important;
 	bottom:unset !important;
 	left: unset !important;
 	right: unset !important;
+	overflow-y: unset !important;
 }
 
 .modal-dialog {
@@ -144,6 +145,8 @@ a{
 .modal-content {
 	background: var(--bg-color) !important;
 }
+
+
 
 .modal-header {
 	padding: 0 !important;

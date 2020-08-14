@@ -3,12 +3,13 @@
     <title>CORD-19 Geo Explorer</title>
   </head>
   <body>
-   <div layout:fragment="content">
+   <div th:replace="layouts/navbar :: navbar"></div>
+   <div layout:fragment="content" class="content">
       <h2>Export Dataset</h2>
       
       <form action="#" th:action="@{/auth/export/start}" method="POST">
       	<p>
-      	<button class="btn btn-primary" type="submit">Start Export</button>
+      	<button class="btn primary-btn" type="submit">Start Export</button>
       	</p>
       </form>
    </div>

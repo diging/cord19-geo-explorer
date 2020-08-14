@@ -19,6 +19,7 @@
 		      " - " + $( "#slider-range" ).slider( "values", 1 ) );
 		  } );
 		$('.carousel').carousel('pause');
+		
 	</script>
 </head>
 
@@ -44,6 +45,9 @@
 		<div class="stat">
 			<h6 class="stat-header">Papers with at least one author affiliation</h6>
 			<h2 style="color: var(--primary)">[[${paperWithAffCount}]]</h2>
+		</div>
+		<div class="basic-stats">
+			<a th:href="@{/stats}"><i class="fa fa-chevron-right"></i></a>
 		</div>
 	</div>
 	

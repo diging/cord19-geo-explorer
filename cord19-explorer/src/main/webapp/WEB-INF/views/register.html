@@ -3,38 +3,39 @@
     <title>Authority Matcher</title>
   </head>
   <body>
-  <div layout:fragment="content">
+  <div th:replace="layouts/navbar :: navbar"></div>
+  <div layout:fragment="content" class="login-form">
   <h2>Create new Account</h2>
   
 	<form action="#" th:action="@{/register}" method="POST" th:object="${user}">
-		<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+		<input class="searchbox" type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
 		
-		<label>Username: </label>
-		<input th:field="*{username}" class="form-control input-sm"></input>
-		<p class="text-danger" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></p>
+		<label class="col-sm-12" style="text-align: left">Username: </label>
+		<input th:field="*{username}" class="form-control col-sm-12 searchbox"></input>
+		<p class="text-danger" style="text-align: left" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></p>
 	
-		<label>First name:</label>
-		<input th:field="*{firstName}" class="form-control input-sm"></input>
+		<label class="col-sm-12" style="text-align: left">First name:</label>
+		<input th:field="*{firstName}" class="form-control input-sm searchbox"></input>
 		<p class="text-danger" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></p>
 		
-		<label>Last name:</label>
-		<input th:field="*{lastName}" class="form-control input-sm"></input>
-		<p class="text-danger" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></p>
+		<label class="col-sm-12" style="text-align: left">Last name:</label>
+		<input th:field="*{lastName}" class="form-control input-sm searchbox"></input>
+		<p class="text-danger" style="text-align: left" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></p>
 		
-		<label>Email:</label>
-		<input th:field="*{email}" class="form-control input-sm"></input>
-		<p class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
+		<label class="col-sm-12" style="text-align: left">Email:</label>
+		<input th:field="*{email}" class="form-control input-sm searchbox"></input>
+		<p class="text-danger" style="text-align: left" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></p>
 		
-		<label>Password:</label>
-		<input type="password" th:field="*{password}" class="form-control input-sm"></password>
-		<p class="text-danger" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
+		<label class="col-sm-12" style="text-align: left">Password:</label>
+		<input type="password" th:field="*{password}" class="form-control input-sm searchbox"></password>
+		<p class="text-danger" style="text-align: left" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></p>
 		
-		<label>Confirm Password:</label>
-		<input type="password" th:field="*{confirmPassword}" class="form-control input-sm"></password>
-		<p class="text-danger" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></p>
+		<label class="col-sm-12" style="text-align: left">Confirm Password:</label>
+		<input type="password" th:field="*{confirmPassword}" class="form-control input-sm searchbox"></password>
+		<p class="text-danger" style="text-align: left" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></p>
 	
 		<div style="padding-top: 20px;">
-		<button class="btn btn-sm btn-primary pull-right">Create Account</button>
+		<button class="btn primary-btn">Create Account</button>
 		</div>
 	</form>
 

@@ -3,12 +3,9 @@
 <title>Authority Matcher</title>
 </head>
 <body>
-	<div layout:fragment="content">
-		<div class="col-sm"></div>
-		<div class="jumbotron col-sm">
+<div th:replace="layouts/navbar :: navbar"></div>
+	<div layout:fragment="content" class="login-form">
 			<h2 class="col-sm">Reset Request Email Sent</h2>
-
-
 			<p class="col-sm">If you have an account with the email address
 				you've specified, an email has been sent with instructions how to
 				reset your password.</p>

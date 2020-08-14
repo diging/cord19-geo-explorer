@@ -1,27 +1,16 @@
 <!DOCTYPE html>
-<html>
+<html layout:decorate="~{layouts/main}">
 <head>
-<meta charset="UTF-8">
 <title>Authority Matcher</title>
 </head>
 <body>
 	<div layout:fragment="content">
 		<div class="row">
-			<div class="col-sm"></div>
 			<div class="jumbotron col-sm">
 				<h3 class="col-sm">Enter your new Password:</h3>
-				<p class="col-sm">
-				
-				<div th:if="${param.error}">
-					<div class="alert alert-danger" role="alert">
-						<div class="error" th:if="${param.error == 'noPassword'}">
-							<p class="errorMsg">Please provide a password.</p>
-						</div>
-						<div th:if test="${param.error == 'notMatching'}">
-							<p class="errorMsg">The passwords you entered do not match.</p>
-						</div>
-					</div>
-					<form class="form-horizontal" th:action="/password/change" method="POST">
+				<div th:if="${#strings.equals(#request.getParameter('error'), 'noPassword')}"> Please provide a password.</div>
+				<div th:if="${#strings.equals(#request.getParameter('error'), 'notMatching')}"> The passwords you entered do not match.</div>
+				<form class="form-horizontal" th:action="@{/password/change}" method="POST">
 						<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
 						<label>New Password:</label> 
 						<input class="form-control" type="password" name="password"> 
@@ -29,7 +18,6 @@
 						<input class="form-control" type="password" name="passwordRepeat">
 						<input style="margin-top: 20px;" type="submit" class="btn btn-primary" value="Submit" />
 					</form>
-				</div>
 				<div class="col-sm"></div>
 		</div>
 	</div>

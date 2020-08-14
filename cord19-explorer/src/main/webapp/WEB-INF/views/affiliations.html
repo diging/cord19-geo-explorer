@@ -4,12 +4,13 @@
  <title>CORD-19 Geo Explorer</title>
 </head>
 <body>
-	<div layout:fragment="content">
+	<div th:replace="layouts/navbar :: navbar"></div>
+	<div layout:fragment="content" class="content">
 		<h2>Affiliations</h2>
 		
-		<div>
+		<h5>
    		Total: [[${total}]] affiliations
-   		</div>
+   		</h5>
    		<nav>
 		  <ul class="pagination">
 		  	<li th:if="${page != 0}"><a href="#" th:href="@{'/affiliations?page=0'}" aria-label="First"><span aria-hidden="true">&laquo;&laquo;</span></a></li>
@@ -40,7 +41,7 @@
 		</nav>
 		
 	<table class="table table-striped">
-      <thead>
+      <thead class="table-header">
       <tr>
       	<th>Institution</th>
       	<th>Location</th>
@@ -48,6 +49,7 @@
       	<th>Linked authors</th>
       </tr>
       </thead>
+      <tbody class="table-body">
        <tr th:each="aff, iter : ${affs}" th:classappend="(${aff.status} == 'INCORRECT' ? 'danger' : '') + (${aff.status} == 'CORRECT_REGION' ? 'warning' : '') + (${aff.status} == 'CORRECT' ? 'success' : '')" >
       	<td>
       		 <a th:href="@{'/affiliation?name=' + ${#uris.escapeQueryParam(aff.id)}}"><span th:text="${aff.id}"></span></a>
@@ -70,6 +72,7 @@
       	
       	</td>
       	</tr>
+      	</tbody>
       	</table>
 </body>
 </html>

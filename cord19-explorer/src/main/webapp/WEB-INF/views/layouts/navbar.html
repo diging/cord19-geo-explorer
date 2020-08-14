@@ -4,7 +4,7 @@
 	   		<span sec:authorize="isAuthenticated()" onclick="openNav()" class="btn dark-btn"><i class="fa fa-bars"></i></span>	
 	      	<a th:href="@{/}" class="navbar-brand">CORD19 Geo Explorer</a>
 	   	</div>
-	   	<div sec:authorize="isAnonymous()" role="presentation">
+	   	<div role="presentation">
 	          		<a th:href="@{/affiliations}" >Affiliations</a>
 	     </div>
       <div style="display: flex">

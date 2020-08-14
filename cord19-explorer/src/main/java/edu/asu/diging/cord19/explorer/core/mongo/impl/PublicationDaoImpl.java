@@ -78,8 +78,8 @@ public class PublicationDaoImpl implements PublicationDao {
                 .first("metadata.authors.affiliation.selectedWikiarticle.coordinates").as("coord")
                 .first("metadata.authors.affiliation.selectedWikiarticle.locationType").as("locType")
                 .push("paperId").as("paperId").push(new BasicDBObject
-                        ("first", "$first").append
-                        ("author", "$last")).as("authors");
+                        ("firstName", "$metadata.authors.first").append
+                        ("lastName", "$metadata.authors.last")).as("authors");
 
 
         SortOperation sort = Aggregation.sort(Sort.by(Order.asc("_id")));

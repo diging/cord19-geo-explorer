@@ -1,183 +1,174 @@
 <html layout:decorate="~{layouts/main}">
-  <head>
-    <title>CORD19 Geo Explorer</title>
-  </head>
-  <body>
-   <div layout:fragment="content">
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js"></script>
-   <style>
-	mark{
-	    background: #efd489;
-	    color: black;
-	}
-	
-	mark.locationNotFound {
-		background: #e4dae6;
-	    color: #111111;
-	}
-   </style>
-   
-   <h3>[[${#strings.defaultString(publication.metadata.title, 'No title available')}]] <span th:if="${publication.publishYear != '' && publication.publishYear > 0}">([[${publication.publishYear}]])</span></h3>
-   		
-   	<div class="row">
-   		<div class="col-sm-12">
-   		by:
-   		<div th:each="author, iterstat : ${publication.metadata.authors}" style="padding-bottom: 10px;">
-   		<b th:if="${author.name == null}">[[${author.first}]] [[${#strings.listJoin(author.middle,',')}]] [[${author.last}]]</b>
-   		<b th:if="${author.name != null}">[[${author.name}]]</b>
-   		<span th:if="${author.affiliation != null}" th:remove="tag">
-   		<span th:if="${author.affiliation.institution != null || author.affiliation.locationSettlement != null || author.affiliation.locationRegion != null || author.affiliation.locationCountry != null}" th:remove="tag"> 
-   		<br>
-   		<span th:if="${author.affiliation.institution != null}">[[${author.affiliation.institution}]],</span> 
-   		 <span th:if="${author.affiliation.locationSettlement != null}" th:remove="tag">[[${author.affiliation.locationSettlement}]],</span> 
-   		 <span th:if="${author.affiliation.locationRegion != null}" th:remove="tag">[[${author.affiliation.locationRegion}]],</span> 
-   		 <span th:if="${author.affiliation.locationCountry != null}" th:remove="tag">[[${author.affiliation.locationCountry}]]</span>
-   		 <span th:if="${author.affiliation.selectedWikiarticle != null}"><span class="label label-info">matched</span> <i>[[${author.affiliation.selectedWikiarticle.title}]]</i> ([[${author.affiliation.selectedWikiarticle.coordinates}]])</span>
-   		 <span th:if="${author.email != null}">[[${author.email}]] </span>
-   		 <span th:if="${author.uri != null}">[[${author.uri}]] </span>
-   		 </span>
-   		</span> 
-   		</div>
-				<table class="table table-striped table-bordered">
-					<thead>
-						<tr>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<th scope="row"><b>cordId: </b></th>
-							<th scope="col"><span th:if="${publication.cordId != null}">[[${publication.cordId}]]</span>
-							</th>
-						</tr>
-						<tr>
-							<th scope="row"><b>sha: </b></th>
-							<th scope="col"><span th:if="${publication.sha != null}">[[${publication.sha}]]</span>
-							</th>
-						</tr>
-						<tr>
-							<th scope="row"><b>paperId: </b></th>
-							<th scope="col"><span th:if="${publication.paperId != null}">[[${publication.paperId}]]</span>
-							</th>
-						</tr>
-						<tr>
-							<th scope="row"><b>doi: </b></th>
-							<th scope="col"><span th:if="${publication.doi != null}">[[${publication.doi}]]</span>
-							</th>
-						</tr>
-						<tr>
-							<th scope="row"><b>pmcid: </b></th>
-							<th scope="col"><span th:if="${publication.pmcid != null}">[[${publication.pmcid}]]</span><br>
-							</th>
-						</tr>
-						<tr>
-							<th scope="row"><b>pubmedId: </b></th>
-							<th scope="col"><span
-								th:if="${publication.pubmedId != null}">[[${publication.pubmedId}]]</span>
-							</th>
-						</tr>
-						<tr>
-							<th scope="row"><b>license: </b></th>
-							<th scope="col"><span th:if="${publication.license != null}">[[${publication.license}]]</span>
-							</th>
-						</tr>
-						<tr>
-							<th scope="row"><b>sourceX: </b></th>
-							<th scope="col"><span th:if="${publication.sourceX != null}">[[${publication.sourceX}]]</span>
-							</th>
-						</tr>
-						<tr>
-							<th scope="row"><b>publishTime: </b></th>
-							<th scope="col"><span
-								th:if="${publication.publishTime != null}">[[${publication.publishTime}]]</span>
-							</th>
-						</tr>
-						<tr>
-							<th scope="row"><b>publishYear: </b></th>
-							<th scope="col"><span
-								th:if="${publication.publishYear != null}">[[${publication.publishYear}]]</span>
-							</th>
-						</tr>
-						<tr>
-							<th scope="row"><b>journal: </b></th>
-							<th scope="col"><span th:if="${publication.journal != null}">[[${publication.journal}]]</span>
-							</th>
-						</tr>
-						<tr>
-							<th scope="row"><b>msAcademicPaperId: </b></th>
-							<th scope="col"><span
-								th:if="${publication.msAcademicPaperId != null}">[[${publication.msAcademicPaperId}]]</span>
-							</th>
-						</tr>
-						<tr>
-							<th scope="row"><b>hasPdfParse: </b></th>
-							<th scope="col"><span
-								th:if="${publication.hasPdfParse != null}">[[${publication.hasPdfParse}]]</span>
-							</th>
-						</tr>
-						<tr>
-							<th scope="row"><b>url: </b></th>
-							<th scope="col"><span th:if="${publication.url != null}"><a
-									th:href="${publication.url}" target=_blank>[[${publication.url}]]</a></span>
-							</th>
-						</tr>
-						<tr>
-							<th scope="row"><b>whoCovidence: </b></th>
-							<th scope="col"><span
-								th:if="${publication.whoCovidence != null}">[[${publication.whoCovidence}]]</span>
-							</th>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-   		
-   		  <div style="padding-top: 20px;" class="col-sm-12">
-   		  
-   		  <div class="list-group">
-	      <div th:each="section : ${sections}" th:remove="tag">
-   		  <div th:if="${section.paragraphs != null}" th:remove="tag">
-	      <span th:each="para : ${section.paragraphs}" th:remove="tag">
-	      <span th:if="${para.locationMatches != null}" th:remove="tag">
-	      
-	      <a href="#" class="list-group-item" th:each="match : ${para.locationMatches}" th:classappend="${match.selectedArticle != null} ? '' : disabled">
-		    <p class="list-group-item-text">
-		    <b>[[${match.locationName}]]</b><br>
-		    [[${match.selectedArticle?.title}]] <span th:if="${match.selectedArticle != null}" th:remove="tag">([[${match.selectedArticle?.coordinates}]])</span>
-		    </p>
-		  </a>
-	      
-		  </span>
-	      </span>
-	      </div>
-	      </div>
-		  </div>
-	      
-	      
-	      <div th:each="section : ${sections}">
-	      <h3 th:text="*{section.title != ''} ? *{section.title}: 'No Section title'"></h3>
-	      <span th:each="para : ${section.paragraphs}">
-	      <script th:inline="javascript" th:if="${not #lists.isEmpty(para.locationMatches)}">
-	      $(function() {
-	      	[# th:each="match, iStat : ${para.locationMatches}" ]
-	      	[# th:if="${match != null && match.selectedArticle != null}" ]
-	     	var title = [[${match.selectedArticle.title}]]
-	        $("#[(${#ids.next('para')})]").mark("[(${match.locationName})]", { "separateWordSearch": false, "className": "wiki-[(${#ids.next('para')})]-[(${iStat.index})]"})
-	        $("mark.wiki-[(${#ids.next('para')})]-[(${iStat.index})]").wrap( "<a href='https://en.wikipedia.org/wiki/"+title+"' target=_blank></a>" );
-	        $("mark.wiki-[(${#ids.next('para')})]-[(${iStat.index})]").attr('title', title);
-	      	[/]
-	      	[# th:if="${match != null && match.selectedArticle == null}" ]
-		    $("#[(${#ids.next('para')})]").mark("[(${match.locationName})]", { "separateWordSearch": false, "className": "locationNotFound"})	
-		    [/]
-	      	[/]
-	      });
-	      </script>
-	      <p th:id="${#ids.seq('para')}" class="paraText">
-	      [[${para.text}]]
-	      </p>	 
-	      	
-	      </span>     	
-   		  </div>
-   		</div>
-     
-   </div>
-  </body>
+   <head>
+      <title>CORD19 Geo Explorer</title>
+   </head>
+   <body>
+      <div th:replace="layouts/navbar :: navbar"></div>
+      <div layout:fragment="content" class="container" style="margin: 40px auto">
+         <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/jquery.mark.min.js"></script>
+         <style>
+            mark{
+            background: var(--primary);
+            color: white;
+            }
+            mark.locationNotFound {
+            background: #e4dae6;
+            color: #111111;
+            }
+         </style>
+         <h3>[[${#strings.defaultString(publication.metadata.title, 'No title available')}]] <span th:if="${publication.publishYear != '' && publication.publishYear > 0}">([[${publication.publishYear}]])</span></h3>
+         <div class="row">
+            <div class="col-sm-12">
+               <p style="color: white; display: inline;">by:</p>
+               <div th:each="author, iterstat : ${publication.metadata.authors}" class="authors-list">
+                  <b th:if="${author.name == null}">[[${author.first}]] [[${#strings.listJoin(author.middle,',')}]] [[${author.last}]]</b>
+                  <b th:if="${author.name != null}">[[${author.name}]]</b>
+                  <span th:if="${author.affiliation != null}" th:remove="tag">
+                  <span th:if="${author.affiliation.institution != null || author.affiliation.locationSettlement != null || author.affiliation.locationRegion != null || author.affiliation.locationCountry != null}" th:remove="tag"> 
+                  <br>
+                  <span th:if="${author.affiliation.institution != null}">[[${author.affiliation.institution}]],</span> 
+                  <span th:if="${author.affiliation.locationSettlement != null}" th:remove="tag">[[${author.affiliation.locationSettlement}]],</span> 
+                  <span th:if="${author.affiliation.locationRegion != null}" th:remove="tag">[[${author.affiliation.locationRegion}]],</span> 
+                  <span th:if="${author.affiliation.locationCountry != null}" th:remove="tag">[[${author.affiliation.locationCountry}]]</span>
+                  <span th:if="${author.affiliation.selectedWikiarticle != null}"><span class="label label-info">matched</span> <i>[[${author.affiliation.selectedWikiarticle.title}]]</i> ([[${author.affiliation.selectedWikiarticle.coordinates}]])</span>
+                  <span th:if="${author.email != null}">[[${author.email}]] </span>
+                  <span th:if="${author.uri != null}">[[${author.uri}]] </span>
+                  </span>
+                  </span> 
+               </div>
+               <table class="table table-striped table-bordered" style="margin: 40px 0">
+                  <thead>
+                     <tr>
+                     </tr>
+                  </thead>
+                  <tbody class="table-body">
+                     <tr>
+                        <th scope="row"><b>cordId: </b></th>
+                        <th scope="col"><span th:if="${publication.cordId != null}">[[${publication.cordId}]]</span>
+                        </th>
+                     </tr>
+                     <tr>
+                        <th scope="row"><b>sha: </b></th>
+                        <th scope="col"><span th:if="${publication.sha != null}">[[${publication.sha}]]</span>
+                        </th>
+                     </tr>
+                     <tr>
+                        <th scope="row"><b>paperId: </b></th>
+                        <th scope="col"><span th:if="${publication.paperId != null}">[[${publication.paperId}]]</span>
+                        </th>
+                     </tr>
+                     <tr>
+                        <th scope="row"><b>doi: </b></th>
+                        <th scope="col"><span th:if="${publication.doi != null}">[[${publication.doi}]]</span>
+                        </th>
+                     </tr>
+                     <tr>
+                        <th scope="row"><b>pmcid: </b></th>
+                        <th scope="col"><span th:if="${publication.pmcid != null}">[[${publication.pmcid}]]</span><br>
+                        </th>
+                     </tr>
+                     <tr>
+                        <th scope="row"><b>pubmedId: </b></th>
+                        <th scope="col"><span
+                           th:if="${publication.pubmedId != null}">[[${publication.pubmedId}]]</span>
+                        </th>
+                     </tr>
+                     <tr>
+                        <th scope="row"><b>license: </b></th>
+                        <th scope="col"><span th:if="${publication.license != null}">[[${publication.license}]]</span>
+                        </th>
+                     </tr>
+                     <tr>
+                        <th scope="row"><b>sourceX: </b></th>
+                        <th scope="col"><span th:if="${publication.sourceX != null}">[[${publication.sourceX}]]</span>
+                        </th>
+                     </tr>
+                     <tr>
+                        <th scope="row"><b>publishTime: </b></th>
+                        <th scope="col"><span
+                           th:if="${publication.publishTime != null}">[[${publication.publishTime}]]</span>
+                        </th>
+                     </tr>
+                     <tr>
+                        <th scope="row"><b>publishYear: </b></th>
+                        <th scope="col"><span
+                           th:if="${publication.publishYear != null}">[[${publication.publishYear}]]</span>
+                        </th>
+                     </tr>
+                     <tr>
+                        <th scope="row"><b>journal: </b></th>
+                        <th scope="col"><span th:if="${publication.journal != null}">[[${publication.journal}]]</span>
+                        </th>
+                     </tr>
+                     <tr>
+                        <th scope="row"><b>msAcademicPaperId: </b></th>
+                        <th scope="col"><span
+                           th:if="${publication.msAcademicPaperId != null}">[[${publication.msAcademicPaperId}]]</span>
+                        </th>
+                     </tr>
+                     <tr>
+                        <th scope="row"><b>hasPdfParse: </b></th>
+                        <th scope="col"><span
+                           th:if="${publication.hasPdfParse != null}">[[${publication.hasPdfParse}]]</span>
+                        </th>
+                     </tr>
+                     <tr>
+                        <th scope="row"><b>url: </b></th>
+                        <th scope="col"><span th:if="${publication.url != null}"><a
+                           th:href="${publication.url}" target=_blank>[[${publication.url}]]</a></span>
+                        </th>
+                     </tr>
+                     <tr>
+                        <th scope="row"><b>whoCovidence: </b></th>
+                        <th scope="col"><span
+                           th:if="${publication.whoCovidence != null}">[[${publication.whoCovidence}]]</span>
+                        </th>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+            <div style="padding-top: 20px;" class="col-sm-12">
+               <div class="list-group">
+                  <div th:each="section : ${sections}" th:remove="tag">
+                     <div th:if="${section.paragraphs != null}" th:remove="tag">
+                        <span th:each="para : ${section.paragraphs}" th:remove="tag">
+                           <span th:if="${para.locationMatches != null}" th:remove="tag">
+                              <a href="#" class="list-group-item card" th:each="match : ${para.locationMatches}" th:classappend="${match.selectedArticle != null} ? '' : disabled">
+                                 <p class="list-group-item-text">
+                                    <b style="color: var(--primary) !important">[[${match.locationName}]]</b><br>
+                                    [[${match.selectedArticle?.title}]] <span th:if="${match.selectedArticle != null}" th:remove="tag">([[${match.selectedArticle?.coordinates}]])</span>
+                                 </p>
+                              </a>
+                           </span>
+                        </span>
+                     </div>
+                  </div>
+               </div>
+               <div th:each="section : ${sections}">
+                  <h3 th:text="*{section.title != ''} ? *{section.title}: 'No Section title'"></h3>
+                  <span th:each="para : ${section.paragraphs}">
+                     <script th:inline="javascript" th:if="${not #lists.isEmpty(para.locationMatches)}">
+                        $(function() {
+                        	[# th:each="match, iStat : ${para.locationMatches}" ]
+                        	[# th:if="${match != null && match.selectedArticle != null}" ]
+                        var title = [[${match.selectedArticle.title}]]
+                          $("#[(${#ids.next('para')})]").mark("[(${match.locationName})]", { "separateWordSearch": false, "className": "wiki-[(${#ids.next('para')})]-[(${iStat.index})]"})
+                          $("mark.wiki-[(${#ids.next('para')})]-[(${iStat.index})]").wrap( "<a href='https://en.wikipedia.org/wiki/"+title+"' target=_blank></a>" );
+                          $("mark.wiki-[(${#ids.next('para')})]-[(${iStat.index})]").attr('title', title);
+                        	[/]
+                        	[# th:if="${match != null && match.selectedArticle == null}" ]
+                        $("#[(${#ids.next('para')})]").mark("[(${match.locationName})]", { "separateWordSearch": false, "className": "locationNotFound"})	
+                        [/]
+                        	[/]
+                        });
+                     </script>
+                     <p th:id="${#ids.seq('para')}" class="paraText">
+                        [[${para.text}]]
+                     </p>
+                  </span>
+               </div>
+            </div>
+         </div>
+      </div>
+   </body>
 </html>

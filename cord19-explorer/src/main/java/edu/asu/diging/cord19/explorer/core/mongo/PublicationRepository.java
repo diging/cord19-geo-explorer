@@ -10,9 +10,15 @@ import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
 
 public interface PublicationRepository extends MongoRepository<PublicationImpl, String> {
 
-    PublicationImpl findFirstByPaperId(String paperId);
+    Publication findFirstByPaperId(String paperId);
     
     Publication findFirstByArxivId(String arxivId);
+    
+    Publication findFirstByPmcid(String pmcid);
+    
+    Publication findFirstByPubmedId(String pubmedId);
+    
+    Publication findFirstByDoi(String doi);
 
     List<PublicationImpl> findByBodyTextLocationMatchesLocationName(String location);
     

@@ -215,7 +215,7 @@ public class PublicationDaoImpl implements PublicationDao {
         Criteria criteria = Criteria.where("bodyText.locationMatches.selectedArticle").ne(null);
         Query query = new Query();
         query.addCriteria(criteria);
-
+        
         DistinctIterable<String> output = mongoTemplate.getCollection(collection)
                 .distinct("bodyText.locationMatches.locationName", query.getQueryObject(), String.class);
         List<String> results = new ArrayList<>();

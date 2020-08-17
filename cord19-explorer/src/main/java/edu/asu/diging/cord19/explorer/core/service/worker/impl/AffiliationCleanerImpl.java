@@ -33,7 +33,7 @@ public class AffiliationCleanerImpl implements AffiliationCleaner {
     private WikipediaHelper wikiHelper;
 
     @Override
-    public void processAffiliations(Publication pub) {
+    public void processAuthorAffiliations(Publication pub) {
         if (pub.getMetadata() == null || pub.getMetadata().getAuthors() == null) {
             return;
         }
@@ -43,37 +43,44 @@ public class AffiliationCleanerImpl implements AffiliationCleaner {
             }
 
             Affiliation affiliation = author.getAffiliation();
+            processAffiliation(affiliation);
+        }
+    }
+    
+    @Override
+    public void processAffiliation(Affiliation affiliation) {
+        if (affiliation.getWikiarticles() == null) {
             affiliation.setWikiarticles(new ArrayList<>());
-            List<Wikientry> wikientries = null;
-            if (affiliation.getInstitution() != null && !affiliation.getInstitution().trim().isEmpty()) {
-                wikientries = elastic.searchInTitle(affiliation.getInstitution());
-                wikiHelper.findWikiarticles(affiliation, wikientries, LocationType.INSTITUTION, this::addArticleToAffiliation);
-            }
-            if (affiliation.getLocationSettlement() != null && !affiliation.getLocationSettlement().trim().isEmpty()) {
-                wikientries = elastic.searchInTitle(affiliation.getLocationSettlement());
-                wikiHelper.findWikiarticles(affiliation, wikientries, LocationType.CITY, this::addArticleToAffiliation);
-            }
-            String locationRegion = affiliation.getLocationRegion();
-            String country = affiliation.getLocationCountry();
-            if (locationRegion != null && locationRegion.length() == 2) {
-                if (isCountryUSA(country)) {
-                    String state = env.getProperty(locationRegion);
-                    if (state != null && !state.trim().isEmpty()) {
-                        locationRegion = state;
-                    }
+        }
+        List<Wikientry> wikientries = null;
+        if (affiliation.getInstitution() != null && !affiliation.getInstitution().trim().isEmpty()) {
+            wikientries = elastic.searchInTitle(affiliation.getInstitution());
+            wikiHelper.findWikiarticles(affiliation, wikientries, LocationType.INSTITUTION, this::addArticleToAffiliation);
+        }
+        if (affiliation.getLocationSettlement() != null && !affiliation.getLocationSettlement().trim().isEmpty()) {
+            wikientries = elastic.searchInTitle(affiliation.getLocationSettlement());
+            wikiHelper.findWikiarticles(affiliation, wikientries, LocationType.CITY, this::addArticleToAffiliation);
+        }
+        String locationRegion = affiliation.getLocationRegion();
+        String country = affiliation.getLocationCountry();
+        if (locationRegion != null && locationRegion.length() == 2) {
+            if (isCountryUSA(country)) {
+                String state = env.getProperty(locationRegion);
+                if (state != null && !state.trim().isEmpty()) {
+                    locationRegion = state;
                 }
             }
-            if (affiliation.getLocationRegion() != null && !affiliation.getLocationRegion().trim().isEmpty()) {
-                wikientries = elastic.searchInTitle(locationRegion);
-                wikiHelper.findWikiarticles(affiliation, wikientries, LocationType.REGION, this::addArticleToAffiliation);
-            }
-            if (affiliation.getLocationCountry() != null && !affiliation.getLocationCountry().trim().isEmpty()) {
-                wikientries = elastic.searchInTitle(affiliation.getLocationCountry());
-                wikiHelper.findWikiarticles(affiliation, wikientries, LocationType.COUNTRY, this::addArticleToAffiliation);
-            }
-
-            selectArticle(affiliation);
         }
+        if (affiliation.getLocationRegion() != null && !affiliation.getLocationRegion().trim().isEmpty()) {
+            wikientries = elastic.searchInTitle(locationRegion);
+            wikiHelper.findWikiarticles(affiliation, wikientries, LocationType.REGION, this::addArticleToAffiliation);
+        }
+        if (affiliation.getLocationCountry() != null && !affiliation.getLocationCountry().trim().isEmpty()) {
+            wikientries = elastic.searchInTitle(affiliation.getLocationCountry());
+            wikiHelper.findWikiarticles(affiliation, wikientries, LocationType.COUNTRY, this::addArticleToAffiliation);
+        }
+
+        selectArticle(affiliation);
     }
     
     

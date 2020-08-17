@@ -3,36 +3,20 @@
 <title>Authority Matcher</title>
 </head>
 <body>
-	<div layout:fragment="content">
-		<form th:action="@{'/search'}" method="GET" class="form-inline my-2 my-lg-0" style="float:right">
-			<input class="form-control mr-sm-2" type="search" id="search" th:name="search">
-			<button type="submit" class="btn btn-outline-success my-2 my-sm-0" id="submit"><i class="fa fa-search"></i></button>
-		</form>
-		<h3>Search Results</h3>
-		<div>
-   		Total: [[${total}]] publications
-   		</div>
+	<div th:replace="layouts/navbar :: navbar"></div>
+	
+	<div layout:fragment="content" class="content">
+		<h3>[[${total}]] results for <span style="color: var(--primary)">"[[${query}]]"</span></h3>
 		<table class="table table-striped">
-			<thead>
-				<tr>
-					<th scope="col">Matched Publications</th>
-				</tr>
-			</thead>
 			<tbody>
-
 				<div th:each="pub, iStat : ${matchedPublicationsPage}">
 					<tr>
-						<th scope="row"><b><a
-								th:href="@{'/paper/' + ${pub.paperId}}">[[${#strings.defaultString(pub.metadata.title,
-									'No title available')}]]</a></b> <br>
-
-							<div th:each="author, iterstat : ${pub.metadata.authors}"
-								style="padding-bottom: 10px; display: inline">
-								<b th:if="${author.name == null}">[[${author.first}]]
-									[[${#strings.listJoin(author.middle,',')}]] [[${author.last}]]</b>
-								<b th:if="${author.name != null}">[[${author.name}]]</b><span
-									th:text="!${iterstat.last} ? ',': ''"></span>
-							</div></th>
+						<th scope="row" style="border: none;"><b><a th:href="@{'/paper/' + ${pub.paperId}}">[[${#strings.defaultString(pub.metadata.title, 'No title available')}]]</a></b> <br>
+							<div th:each="author, iterstat : ${pub.metadata.authors}" class="authors-list">
+								<b th:if="${author.name == null}">[[${author.first}]] [[${#strings.listJoin(author.middle,',')}]] [[${author.last}]]</b>
+								<b th:if="${author.name != null}">[[${author.name}]]</b><span th:text="!${iterstat.last} ? ',': ''"></span>
+							</div>
+						</th>
 					</tr>
 				</div>
 			</tbody>

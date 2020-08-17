@@ -3,17 +3,29 @@
     <title>CORD-19 Geo Explorer</title>
   </head>
   <body>
-   <div layout:fragment="content">
+   <div th:replace="layouts/navbar :: navbar"></div>
+   <div layout:fragment="content" class="content">
       <h2>Import Metadata File</h2>
       
       <form action="#" th:action="@{/auth/metadata/import}" method="POST">
       	<div>
       	<label>Which file should be imported </label>
-      	<input class="form-control" type="text" name="filepath">
-      	<small>Please provide absolute path.</small>
+      	<input class="form-control searchbox" type="text" name="filepath">
+      	<p>*Please provide absolute path.</p>
       	</div>
       	<p>
-      	<button class="btn btn-primary" type="submit">Start Import</button>
+      	<button class="btn primary-btn" type="submit">Start Import</button>
+      	</p>
+      </form>
+      <h2 style="margin-top: 40px;">Import Dimensions Metadata File</h2>
+      <form action="#" th:action="@{/auth/metadata/import} + '?type=dimensions'" method="POST">
+      	<div>
+      	<label>Which file should be imported </label>
+      	<input class="form-control searchbox" type="text" name="filepath">
+      	<p>*Please provide absolute path.</p>
+      	</div>
+      	<p>
+      	<button class="btn primary-btn" type="submit">Start Import</button>
       	</p>
       </form>
    </div>

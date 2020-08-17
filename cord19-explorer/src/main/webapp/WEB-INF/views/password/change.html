@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layouts/main}">
+<head>
+<title>Authority Matcher</title>
+</head>
+<body>
+<div th:replace="layouts/navbar :: navbar"></div>
+	<div layout:fragment="content" class="login-form">
+		<div class="row">
+				<h3 class="col-sm">Enter your new Password:</h3>
+				<div th:if="${#strings.equals(#request.getParameter('error'), 'noPassword')}"> Please provide a password.</div>
+				<div th:if="${#strings.equals(#request.getParameter('error'), 'notMatching')}"> The passwords you entered do not match.</div>
+				<form class="form-horizontal" th:action="@{/password/change}" method="POST">
+						<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" /> 
+						<label class="form-control" style="text-align:left">New Password:</label> 
+						<input class="form-control searchbox" type="password" name="password"> 
+						<label class="form-control" style="margin-top: 20px;text-align: left">Repeat new Password:</label> 
+						<input class="form-control searchbox" type="password" name="passwordRepeat">
+						<input style="margin-top: 20px;" type="submit" class="btn btn-primary" value="Submit" />
+					</form>
+	</div>
+</body>
+</html>

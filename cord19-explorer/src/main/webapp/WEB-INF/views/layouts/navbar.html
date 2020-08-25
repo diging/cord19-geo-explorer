@@ -5,15 +5,45 @@
 	    	<form th:action="@{/login}">
 	    		<button sec:authorize="!isAuthenticated()" class="btn primary-btn" type="submit" style="margin-right: 40px;">Login</button>
 	    	</form>
-		    <form th:action="@{'/search'}" method="GET" class="form" style="position: relative">
+		   <!--  <form th:action="@{'/search'}" method="GET" class="form" style="position: relative">
 			    <button class="btn btn-outline-success form_icon" type="submit" id="submit"><i class="fa fa-search"></i></button>
 			    <input class="form-control searchbox form_input" type="search" placeholder="Search" id="search" th:name="search">
+			</form> -->
+
+			<form th:action="@{'/search'}" method="GET" class="form"
+				style="position: relative">
+				<button class="btn btn-outline-success form_icon" type="submit"
+					id="submit">
+					Search
+				</button>
+				<input class="form-control searchbox form_input" type="search"
+					placeholder="Search" id="search" th:name="search">
+				<div class="nav-search-scope nav-sprite">
+					<div class="nav-search-facade" data-value="search-alias=aps">
+					</div>
+
+					<select aria-describedby="searchDropdownDescription"
+						class="nav-search-dropdown searchSelect" data-nav-selected="47"
+						id="searchDropdownBox" name="url" style="display: block;"
+						tabindex="18" title="Search in" th:name="searchType">
+
+						<option value="affiliations">Affiliations</option>
+
+						<option value="publications">Publications</option>
+					</select>
+
+				</div>
 			</form>
-			<form th:action="@{/logout}" method="POST" sec:authorize="isAuthenticated()" role="presentation">
-       	 		<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-				<button class="btn primary-btn" type="submit" style="margin-left: 40px;">Logout</button>
-       	 	</form>
-	    </div>
+
+			<form th:action="@{/logout}" method="POST"
+					sec:authorize="isAuthenticated()" role="presentation">
+					<input type="hidden" name="${_csrf.parameterName}"
+						value="${_csrf.token}" />
+					<button class="btn primary-btn" type="submit"
+						style="margin-left: 40px;">Logout</button>
+				</form>
+				
+		</div>
 	</div>
 	
 	<!-- <div class="container">

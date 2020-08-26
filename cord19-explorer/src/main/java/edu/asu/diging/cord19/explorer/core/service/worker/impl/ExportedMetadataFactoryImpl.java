@@ -1,5 +1,6 @@
 package edu.asu.diging.cord19.explorer.core.service.worker.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.springframework.stereotype.Component;
@@ -44,10 +45,18 @@ public class ExportedMetadataFactoryImpl implements ExportedMetadataFactory {
         }
         mdEntry.setUrl(pub.getUrl());
         mdEntry.setWhoCovidence(pub.getWhoCovidence());
+        mdEntry.setPublicationType(pub.getPublicationType() != null ? pub.getPublicationType().name() : "");
+        mdEntry.setFunder(pub.getFunder());
+        mdEntry.setVolume(pub.getVolume());
+        mdEntry.setIssue(pub.getIssue());
+        mdEntry.setPages(pub.getPages());
+        mdEntry.setTimesCited(pub.getTimesCited());
+        mdEntry.setRecentCitations(pub.getRecentCitations());
 
         setAuthors(pub, mdEntry);
         setAbstract(pub, mdEntry);
         setCategories(pub, mdEntry);
+        setMeshTerms(pub, mdEntry);
         
         if (pub.getPrimaryCategory() != null) {
             mdEntry.setPrimaryCategory(pub.getPrimaryCategory().getTerm() + " (" + pub.getPrimaryCategory().getScheme() + ")");
@@ -91,7 +100,7 @@ public class ExportedMetadataFactoryImpl implements ExportedMetadataFactory {
                     authors.append(p.getName());
                 } else {
                     authors.append(String.join(" ",
-                            Arrays.asList(new String[] { p.getFirst(), String.join(" ", p.getMiddle()), p.getLast() })));
+                            Arrays.asList(new String[] { p.getFirst() != null ? p.getFirst() : "", String.join(" ", p.getMiddle() != null ? p.getMiddle() : new ArrayList<>()), p.getLast() != null ? p.getLast() : "" })));
                 }
                 
                 authors.append(" [");
@@ -113,5 +122,11 @@ public class ExportedMetadataFactoryImpl implements ExportedMetadataFactory {
             }
         }
         mdEntry.setAuthors(authors.toString());
+    }
+    
+    private void setMeshTerms(Publication pub, ExportedMetadataEntry mdEntry) {
+        if (pub.getMeshTerms() != null && !pub.getMeshTerms().isEmpty()) {
+            mdEntry.setMeshTerms(String.join("; ", pub.getMeshTerms()));
+        }
     }
 }

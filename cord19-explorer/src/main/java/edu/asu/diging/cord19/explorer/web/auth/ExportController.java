@@ -22,6 +22,6 @@ public class ExportController {
     @RequestMapping(value="/auth/export/start", method=RequestMethod.POST)
     public String post() {
         manager.startExport();
-        return "redirect:/auth/export/list";
+        return "redirect:/auth/export/list?sort=task.dateStarted,desc";
     }
 }

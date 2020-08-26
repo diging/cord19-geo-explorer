@@ -3,10 +3,11 @@
     <title>CORD19 Geo Explorer</title>
   </head>
   <body>
-   <div layout:fragment="content">
+   <div th:replace="layouts/navbar :: navbar"></div>
+   <div layout:fragment="content" class="content">
    	<div class="row">
    		<div>
-   		Total: [[${pubCount}]] records
+   			<h5>Total: [[${pubCount}]] records</h5>
    		</div>
 	   	<nav>
 		  <ul class="pagination">
@@ -40,8 +41,8 @@
    		<table class="table table-striped">
    		  <tr th:each="pub : ${publications}">
 		    <td>
-		    <b><a th:href="@{'/paper/' + ${pub.paperId}}">[[${pub.metadata.title}]]</a></b><br>
-		    <span th:if="${not #lists.isEmpty(pub.abstracts)}">[[${pub.abstracts[0]?.text}]]</span>
+		    <h5><a th:href="@{'/paper/' + ${pub.paperId}}">[[${pub.metadata.title}]]</a></h5><br>
+		    <p th:if="${not #lists.isEmpty(pub.abstracts)}">[[${pub.abstracts[0]?.text}]]</p>
 		    </td>
 		    
 	      </tr>

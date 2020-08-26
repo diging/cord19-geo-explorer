@@ -8,6 +8,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import edu.asu.diging.simpleusers.core.service.SimpleUsersConstants;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityContext extends WebSecurityConfigurerAdapter {
@@ -22,18 +24,19 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-    	http.formLogin()
-        .loginPage("/login")
-        .loginProcessingUrl("/login/authenticate")
-        .failureUrl("/loginFailed")
-          .and().logout().deleteCookies("JSESSIONID").logoutUrl("/logout").logoutSuccessUrl("/login").and().exceptionHandling()
-                .accessDeniedPage("/403")
+        http.formLogin().loginPage("/login").loginProcessingUrl("/login/authenticate").failureUrl("/loginFailed").and()
+                .logout().deleteCookies("JSESSIONID").logoutUrl("/logout").logoutSuccessUrl("/login").and()
+                .exceptionHandling().accessDeniedPage("/403")
                 // Configures url based authorization
                 .and().authorizeRequests()
                 // Anyone can access the urls
-                .antMatchers("/", "/resources/**","/login", "/loginFailed","/logout", "/register", "/location/**", "/paper/**", "/affiliation/**", "/arxiv/**", "/stats", "/search").permitAll()
+                .antMatchers("/", "/resources/**", "/login", "/loginFailed", "/register", "/location/**", "/paper/**",
+                        "/stats", "/affiliation/**", "/arxiv/**", "/logout", "/reset/**", "/search")
+                .permitAll()
                 // The rest of the our application is protected.
-                .antMatchers("/users/**", "/admin/**", "/auth/**").hasRole("ADMIN").anyRequest().hasRole("USER");
+                .antMatchers("/users/**", "/admin/**").hasRole("ADMIN").antMatchers("/auth/**")
+                .hasAnyRole("USER", "ADMIN").antMatchers("/password/**")
+                .hasRole(SimpleUsersConstants.CHANGE_PASSWORD_ROLE).anyRequest().hasRole("USER");
     }
 
     @Bean

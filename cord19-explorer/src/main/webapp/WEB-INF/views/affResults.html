@@ -3,19 +3,14 @@
 <title>Authority Matcher</title>
 </head>
 <body>
-	<div layout:fragment="content">
-		<form th:action="@{'/affSearch'}" method="GET" class="form-inline my-2 my-lg-0" style="float:right">
-			<input class="form-control mr-sm-2" type="search" id="search" th:name="search">
-			<button type="submit" class="btn btn-outline-success my-2 my-sm-0" id="submit"><i class="fa fa-search"></i></button>
-		</form>
-		<h3>Search Results</h3>
-		<div>
-   		Total: [[${total}]] affiliations
-   		</div>
+	<div th:replace="layouts/navbar :: navbar"></div>
+	
+	<div layout:fragment="content" class="content">
+		<h3>[[${total}]] results for <span style="color: var(--primary)">"[[${query}]]"</span></h3>
 		<table class="table table-striped">
 			<thead>
 				<tr>
-					<th scope="col">Matched Publications</th>
+					<th scope="col">Matched Affiliations</th>
 				</tr>
 			</thead>
 			<tbody>

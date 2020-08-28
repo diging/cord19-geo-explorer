@@ -32,7 +32,7 @@ public class AffiliationSearchProviderImpl implements AffiliationSearchProvider 
         GroupOperation group = Aggregation.group("metadata.authors.affiliation.institution")
                 .first("metadata.authors.affiliation.selectedWikiarticle.title").as("wiki");
         SortOperation sort = Aggregation.sort(Sort.by(Order.asc("_id")));
-        SkipOperation skip = Aggregation.skip(currentPage);
+        SkipOperation skip = Aggregation.skip(currentPage * size);
         LimitOperation limit = Aggregation.limit(size);
         Criteria regex = Criteria.where("wiki").regex(".*" + title + ".*", "i");
         MatchOperation match = Aggregation.match(regex);
@@ -43,6 +43,24 @@ public class AffiliationSearchProviderImpl implements AffiliationSearchProvider 
                 PublicationImpl.class, AffiliationPaperAggregationOutput.class);
 
         return results.getMappedResults();
+    }
+
+    @Override
+    public long searchResultSize(String title) {
+        UnwindOperation unwind = Aggregation.unwind("metadata.authors");
+        GroupOperation group = Aggregation.group("metadata.authors.affiliation.institution")
+                .first("metadata.authors.affiliation.selectedWikiarticle.title").as("wiki");
+        Criteria regex = Criteria.where("wiki").regex(".*" + title + ".*", "i");
+        MatchOperation match = Aggregation.match(regex);
+
+        Aggregation aggregation = Aggregation.newAggregation(unwind, group, match,
+                Aggregation.group().count().as("count"));
+
+        AggregationResults<AffiliationPaperAggregationOutput> results = mongoTemplate.aggregate(aggregation,
+                PublicationImpl.class, AffiliationPaperAggregationOutput.class);
+
+        return Long.parseLong(results.getMappedResults().get(0).getCount());
+
     }
 
 }

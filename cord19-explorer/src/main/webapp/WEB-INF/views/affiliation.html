@@ -7,24 +7,30 @@
    <div layout:fragment="content" class="content">
   
    <h3>[[${institution}]]</h3>
-   
-   		<div th:each="pub : ${publications}">
-   		  <h4><a th:href="@{'/paper/' + ${pub.paperId}}">[[${#strings.defaultString(pub.metadata.title, 'No title available')}]]</a></h4>
-   		  <ul>
-   		  <li th:each="author : ${pub.metadata.authors}">
-   		  <i>[[${author.affiliation.institution}]], [[${author.affiliation.locationSettlement}]], [[${author.affiliation.locationRegion}]], [[${author.affiliation.locationCountry}]]</i>
-   		  <br>
-   		  <b>Selected affiliation: </b>[[${author.affiliation?.selectedWikiarticle?.title}]] - [[${author.affiliation?.selectedWikiarticle?.coordinates}]]
-   		  <ul>
-   		  	<li th:each="wiki : ${author.affiliation?.wikiarticles}">
-   		  	[[${wiki.title}]]
-   		  	</li>
-   		  </ul>
-   		  </li>
-   		  </ul>
-		    
-	    </div>
-     
-   </div>
+
+		<div th:each="pub : ${publications}">
+			<h4>
+				<a th:href="@{'/paper/' + ${pub.paperId}}">[[${#strings.defaultString(pub.metadata.title,
+					'No title available')}]]</a>
+			</h4>
+			<ul style="color:white;">
+				<li th:each="author : ${pub.metadata.authors}"><i>[[${author.affiliation.institution}]],
+						[[${author.affiliation.locationSettlement}]],
+						[[${author.affiliation.locationRegion}]],
+						[[${author.affiliation.locationCountry}]]</i> <br> <b>Selected
+						affiliation: </b><a
+					th:href="@{https://en.wikipedia.org/wiki/__${author.affiliation?.selectedWikiarticle?.title}__}"
+					target=_blank>[[${author.affiliation?.selectedWikiarticle?.title}]]</a>
+					<span th:if="${clean != null}">- [[${author.affiliation?.selectedWikiarticle?.coordinates}]]</span>
+					<div th:if="${clean != null}">
+					<ul>
+						<li th:each="wiki : ${author.affiliation?.wikiarticles}">
+							[[${wiki.title}]]</li>
+					</ul></li>
+			</ul>
+			</div>
+		</div>
+
+	</div>
   </body>
 </html>

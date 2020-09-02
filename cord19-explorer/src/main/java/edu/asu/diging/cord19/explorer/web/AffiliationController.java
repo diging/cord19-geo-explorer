@@ -20,7 +20,7 @@ public class AffiliationController {
     private PublicationRepository pubRepo;
 
     @RequestMapping("/affiliation")
-    public String findPublications(@RequestParam("name") String affiliation, Model model) {
+    public String findPublications(@RequestParam("name") String affiliation, @RequestParam("cleaning") boolean cleaning, Model model) {
         List<PublicationImpl> pubs = pubRepo.findByMetadataAuthorsAffiliationInstitution(affiliation);
         
         for (Publication pub : pubs) {
@@ -35,7 +35,9 @@ public class AffiliationController {
             }
         }
         
-       
+       if (cleaning) {
+           model.addAttribute("clean", true);
+       }
         model.addAttribute("publications", pubs);
         model.addAttribute("institution", affiliation);
         return "affiliation";

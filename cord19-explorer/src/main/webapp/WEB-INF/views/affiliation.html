@@ -14,9 +14,9 @@
 					'No title available')}]]</a>
 			</h4>
 			<ul style="color:white;">
-				<li th:each="author : ${pub.metadata.authors}"><i>[[${author.affiliation.institution}]],
-						[[${author.affiliation.locationSettlement}]],
-						[[${author.affiliation.locationRegion}]],
+				<li th:each="author : ${pub.metadata.authors}"><i>[[${author.affiliation.institution}]]<span th:if="${author.affiliation.locationSettlement}">,</span>
+						[[${author.affiliation.locationSettlement}]]<span th:if="${author.affiliation.locationRegion}">,</span>
+						[[${author.affiliation.locationRegion}]]<span th:if="${author.affiliation.locationCountry}">,</span>
 						[[${author.affiliation.locationCountry}]]</i> <br> <b>Selected
 						affiliation: </b><a
 					th:href="@{https://en.wikipedia.org/wiki/__${author.affiliation?.selectedWikiarticle?.title}__}"

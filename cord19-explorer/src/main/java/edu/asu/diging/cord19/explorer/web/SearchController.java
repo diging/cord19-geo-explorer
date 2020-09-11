@@ -38,7 +38,7 @@ public class SearchController {
                     pageable.getPageSize());
             long affCount = affSearchProvider.searchResultSize(query);
             model.addAttribute("matchedAffiliationsPage", matchedAffiliationsList);
-            addAttribute(model, pageable, query, affCount);
+            addAttributes(model, pageable, query, affCount);
             return "affResults";
             
             
@@ -46,14 +46,14 @@ public class SearchController {
             List<PublicationImpl> matchedPublicationsList = pubSearchProvider.getRequestedPage(query, (long)pageable.getPageNumber(),
                     pageable.getPageSize());
             long pubCount = pubSearchProvider.searchResultSize(query);
-            addAttribute(model, pageable, query, pubCount);
+            addAttributes(model, pageable, query, pubCount);
             model.addAttribute("matchedPublicationsPage", matchedPublicationsList);
             return "results";
             
         }
     }
     
-    private void addAttribute(Model model,Pageable pageable, String query, long count) {
+    private void addAttributes(Model model,Pageable pageable, String query, long count) {
         model.addAttribute("total", count);
         model.addAttribute("query", query);
         model.addAttribute("page", pageable.getPageNumber());

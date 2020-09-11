@@ -59,7 +59,8 @@ public class AffiliationSearchProviderImpl implements AffiliationSearchProvider 
         AggregationResults<AffiliationPaperAggregationOutput> results = mongoTemplate.aggregate(aggregation,
                 PublicationImpl.class, AffiliationPaperAggregationOutput.class);
 
-        return Long.parseLong(results.getMappedResults().get(0).getCount());
+        return results.getMappedResults().size() != 0 ? Long.parseLong(results.getMappedResults().get(0).getCount())
+                : 0;
 
     }
 

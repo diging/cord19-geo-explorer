@@ -15,7 +15,7 @@
          </form> -->
          
          <form th:action="@{'/search'}" method="GET" class="form" style="position: relative; display: flex; align-items: center">				
-				
+				<input class="form-control searchbox form_input" type="search" placeholder="Search" id="search" th:name="search">
 				<div class="form_icon">
 					
 					<select aria-describedby="searchDropdownDescription" class="form-control searchbox" data-nav-selected="47"
@@ -28,7 +28,7 @@
 					</select>
 
 				</div>
-				<input class="form-control searchbox form_input" type="search" placeholder="Search" id="search" th:name="search">
+				
 				<button class="btn btn-outline-success form_icon" type="submit" id="submit">
 					<i class="fa fa-search"></i>
 				</button>

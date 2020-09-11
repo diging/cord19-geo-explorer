@@ -2,6 +2,7 @@ package edu.asu.diging.cord19.explorer.core.mongo;
 
 import java.util.List;
 
+import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
 import edu.asu.diging.cord19.explorer.core.mongo.impl.AffiliationPaperAggregationOutput;
 
 public interface PublicationDao {
@@ -39,5 +40,7 @@ public interface PublicationDao {
     List<AffiliationPaperAggregationOutput> getAffiliationsAndArticles(long start, long pageSize);
 
     long getTotalAffiliation();
+
+    List<PublicationImpl> getPublicationTitles(Long offset, Integer size);
 
 }

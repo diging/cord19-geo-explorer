@@ -65,6 +65,15 @@ public class PublicationDaoImpl implements PublicationDao {
         }
         return results;
     }
+    
+    @Override
+    public List<PublicationImpl> getPublicationTitles(Long offset, Integer size){
+        Criteria titles = Criteria.where("metadata.title").ne(null);
+        return mongoTemplate.find(new Query().addCriteria(titles).skip(offset).limit(size), PublicationImpl.class);
+        
+        
+        
+    }
 
     @Override
     public List<AffiliationPaperAggregationOutput> getAffiliationsAndArticles(long start, long pageSize) {

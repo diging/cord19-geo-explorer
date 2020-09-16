@@ -2,6 +2,9 @@ package edu.asu.diging.cord19.explorer.core.mongo;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
 import edu.asu.diging.cord19.explorer.core.mongo.impl.AffiliationPaperAggregationOutput;
 
@@ -41,6 +44,6 @@ public interface PublicationDao {
 
     long getTotalAffiliation();
 
-    List<PublicationImpl> getPublicationTitles(Long offset, Integer size);
+    Page<PublicationImpl> getPublications(Pageable pageable);
 
 }

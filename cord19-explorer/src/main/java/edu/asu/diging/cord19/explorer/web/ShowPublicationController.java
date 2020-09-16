@@ -17,7 +17,7 @@ public class ShowPublicationController {
 
     @RequestMapping("/publications")
     public String get(Model model, Pageable pageable) {
-        model.addAttribute("pubs", pubDao.getPublicationTitles(pageable.getOffset(), pageable.getPageSize()));
+        model.addAttribute("pubs", pubDao.getPublications(pageable));
         long pubCount = pubDao.getPublicationCount();
         model.addAttribute("total", pubCount);
         model.addAttribute("page", pageable.getPageNumber());

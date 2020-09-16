@@ -28,4 +28,10 @@
 	<script th:src="@{/resources/bootstrap/js/main.js}"></script>
 	
   </head>
+  <body>
+  	<div th:insert="layouts/navbar :: navbar"></div>
+  	<div layout:fragment="content"></div>
+   <div th:insert="layouts/footer :: footer"></div>
+  </body>
+  
 </html>

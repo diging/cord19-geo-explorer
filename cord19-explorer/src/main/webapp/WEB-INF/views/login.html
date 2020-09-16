@@ -3,7 +3,6 @@
       <title>CORD19 Geo Explorer</title>
    </head>
    <body>
-   	  <div th:replace="layouts/navbar :: navbar"></div>	
       <div layout:fragment="content">
          <div th:if="${loginError}" class="alert alert-danger">Invalid username or password</div>
          <div class="container">
@@ -39,6 +38,5 @@
             </div>
          </div>
       </div>
-      <div th:replace="layouts/footer :: footer"></div>
    </body>
 </html>

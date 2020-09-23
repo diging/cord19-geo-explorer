@@ -52,16 +52,16 @@
       <tbody class="table-body">
        <tr th:each="aff, iter : ${affs}" th:classappend="(${aff.status} == 'INCORRECT' ? 'danger' : '') + (${aff.status} == 'CORRECT_REGION' ? 'warning' : '') + (${aff.status} == 'CORRECT' ? 'success' : '')" >
       	<td>
-      		 <a th:href="@{/affiliation(name=${aff.id}, cleaning=false)}"><span th:text="${aff.id}"></span></a>
+      		 <a th:href="@{/publicAffiliation(name=${aff.id})}"><span th:text="${aff.id}"></span></a>
       		 <br>[[${aff.settlement}]], [[${aff.country}]]
       	</td>
       	<td th:attr="id=${'name-' + iter.index}">
-      	<i th:if="${aff.locType == 'CURATED'}" class="fas fa-user-check" title ="Checked"></i>
-      		<i th:if="${aff.locType == 'CITY'}" class="fas fa-city" title ="City"></i>
-      		<i th:if="${aff.locType == 'COUNTRY'}" class="far fa-flag" title ="Country"></i>
-      		<a th:if="${aff.wiki}" target="_blank" th:href="'https://en.wikipedia.org/wiki/' + ${aff.wiki}">
-      		[[${aff.wiki}]]
-      		</a>
+	      	<i th:if="${aff.locType == 'CURATED'}" class="fas fa-user-check" title ="Checked"></i>
+	      	<i th:if="${aff.locType == 'CITY'}" class="fas fa-city" title ="City"></i>
+	      	<i th:if="${aff.locType == 'COUNTRY'}" class="far fa-flag" title ="Country"></i>
+	      	<a th:if="${aff.wiki}" target="_blank" th:href="'https://en.wikipedia.org/wiki/' + ${aff.wiki}">
+	      		[[${aff.wiki}]]
+	      	</a>
       	</td>
       	<td>
       		<span th:if="${aff.paperId != null}">[[${#lists.size(aff.paperId)}]]</span>

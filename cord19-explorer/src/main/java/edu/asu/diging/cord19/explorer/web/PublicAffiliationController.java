@@ -14,12 +14,12 @@ import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
 import edu.asu.diging.cord19.explorer.core.mongo.PublicationRepository;
 
 @Controller
-public class AffiliationController {
+public class PublicAffiliationController {
 
     @Autowired
     private PublicationRepository pubRepo;
 
-    @RequestMapping("/affiliation")
+    @RequestMapping("/publicAffiliation")
     public String findPublications(@RequestParam("name") String affiliation, Model model) {
         List<PublicationImpl> pubs = pubRepo.findByMetadataAuthorsAffiliationInstitution(affiliation);
         
@@ -37,6 +37,6 @@ public class AffiliationController {
         
         model.addAttribute("publications", pubs);
         model.addAttribute("institution", affiliation);
-        return "affiliation";
+        return "publicAffiliations";
     }
 }

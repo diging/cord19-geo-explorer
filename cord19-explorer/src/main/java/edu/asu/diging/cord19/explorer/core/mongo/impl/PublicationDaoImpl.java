@@ -71,7 +71,8 @@ public class PublicationDaoImpl implements PublicationDao {
 
     @Override
     public Page<PublicationImpl> getPublications(Pageable pageable) {
-        Query query = new Query().with(pageable);
+        Query query = new Query().with(pageable).with(Sort.by(Order.asc("metadata.title")));
+        
         List<PublicationImpl> list = mongoTemplate.find(query, PublicationImpl.class);
         return PageableExecutionUtils.getPage(list, pageable,
                 () -> mongoTemplate.count(Query.of(query).limit(-1).skip(-1), PublicationImpl.class));

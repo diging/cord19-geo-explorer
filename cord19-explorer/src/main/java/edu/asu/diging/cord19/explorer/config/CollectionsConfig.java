@@ -22,8 +22,7 @@ public class CollectionsConfig {
     public void initIndexes() {
         mongoTemplate.indexOps(PublicationImpl.class) 
             .ensureIndex(
-                //new Index().on("publishYear", Sort.Direction.DESC),
-                new Index().on("metadata.title", Sort.Direction.DESC)
+                new Index().on("metadata.title", Sort.Direction.ASC)
         );
     }
 }

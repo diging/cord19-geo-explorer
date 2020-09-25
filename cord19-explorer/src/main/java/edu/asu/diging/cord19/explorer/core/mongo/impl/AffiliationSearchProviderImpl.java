@@ -18,16 +18,30 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Service;
 
 import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
-import edu.asu.diging.cord19.explorer.core.mongo.AffiliationSearchProvider;
+import edu.asu.diging.cord19.explorer.web.model.SearchType;
 
 @Service
-public class AffiliationSearchProviderImpl implements AffiliationSearchProvider {
+public class AffiliationSearchProviderImpl implements SearchProvider {
 
     @Autowired
     private MongoTemplate mongoTemplate;
 
+    /**
+     * Returns a {@code List<AffiliationPaperAggregationOutput>} instance
+     * representing the affiliations matched with the input parameter 'title' .
+     * 
+     * @param title       Aggregation title to be queried
+     * 
+     * @param currentPage index of current page starting from 0
+     * 
+     * @param size        length of result sublist
+     * 
+     * @return List of AffiliationPaperAggregationOutput instances containing the
+     *         'title' string
+     * 
+     **/
     @Override
-    public List<AffiliationPaperAggregationOutput> getRequestedPage(String title, Long currentPage, Integer size) {
+    public List<AffiliationPaperAggregationOutput> search(String title, Long currentPage, Integer size) {
         UnwindOperation unwind = Aggregation.unwind("metadata.authors");
         GroupOperation group = Aggregation.group("metadata.authors.affiliation.institution")
                 .first("metadata.authors.affiliation.selectedWikiarticle.title").as("wiki");
@@ -39,14 +53,13 @@ public class AffiliationSearchProviderImpl implements AffiliationSearchProvider 
 
         Aggregation aggregation = Aggregation.newAggregation(unwind, group, match, sort, skip, limit);
 
-        AggregationResults<AffiliationPaperAggregationOutput> results = mongoTemplate.aggregate(aggregation,
-                PublicationImpl.class, AffiliationPaperAggregationOutput.class);
+        AggregationResults<AffiliationPaperAggregationOutput> results = aggregate(aggregation);
 
         return results.getMappedResults();
     }
 
     @Override
-    public long searchResultSize(String title) {
+    public long getTotalResults(String title) {
         UnwindOperation unwind = Aggregation.unwind("metadata.authors");
         GroupOperation group = Aggregation.group("metadata.authors.affiliation.institution")
                 .first("metadata.authors.affiliation.selectedWikiarticle.title").as("wiki");
@@ -56,12 +69,20 @@ public class AffiliationSearchProviderImpl implements AffiliationSearchProvider 
         Aggregation aggregation = Aggregation.newAggregation(unwind, group, match,
                 Aggregation.group().count().as("count"));
 
-        AggregationResults<AffiliationPaperAggregationOutput> results = mongoTemplate.aggregate(aggregation,
-                PublicationImpl.class, AffiliationPaperAggregationOutput.class);
+        AggregationResults<AffiliationPaperAggregationOutput> results = aggregate(aggregation);
 
         return results.getMappedResults().size() != 0 ? Long.parseLong(results.getMappedResults().get(0).getCount())
                 : 0;
 
     }
 
+    @Override
+    public SearchType getSearchType() {
+        return SearchType.AFFILIATIONS;
+    }
+
+    private AggregationResults<AffiliationPaperAggregationOutput> aggregate(Aggregation aggregation) {
+        return mongoTemplate.aggregate(aggregation, PublicationImpl.class, AffiliationPaperAggregationOutput.class);
+
+    }
 }

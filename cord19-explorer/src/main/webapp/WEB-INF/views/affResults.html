@@ -44,22 +44,22 @@
 			    	</a>
 			    </li>
 			    <li th:if="${page - 1 < 0}" class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
-			    <li th:if="${page - 4 >= 0}"><a href="#" th:href="@{/search(page=${page-5}, searchType='AFFILIATIONS', search=${query})}">[[${page-3}]]</a></li>
-			    <li th:if="${page - 3 >= 0}"><a href="#" th:href="@{/search(page=${page-3}, searchType='AFFILIATIONS', search=${query})}">[[${page-2}]]</a></li>
-			    <li th:if="${page - 2 >= 0}"><a href="#" th:href="@{/search(page=${page-2}, searchType='AFFILIATIONS', search=${query})}">[[${page-1}]]</a></li>
-			    <li th:if="${page - 1 >= 0}"><a href="#" th:href="@{/search(page=${page-1}, searchType='AFFILIATIONS', search=${query})}">[[${page}]]</a></li>
+			    <li th:if="${page - 4 >= 0}"><a href="#" th:href="@{/AFFILIATIONS/search(page=${page-5}, search=${query})}">[[${page-3}]]</a></li>
+			    <li th:if="${page - 3 >= 0}"><a href="#" th:href="@{/AFFILIATIONS/search(page=${page-3}, search=${query})}">[[${page-2}]]</a></li>
+			    <li th:if="${page - 2 >= 0}"><a href="#" th:href="@{/AFFILIATIONS/search(page=${page-2}, search=${query})}">[[${page-1}]]</a></li>
+			    <li th:if="${page - 1 >= 0}"><a href="#" th:href="@{/AFFILIATIONS/search(page=${page-1}, search=${query})}">[[${page}]]</a></li>
 			    
 			    <li class="active"><a href="#">[[${page+1}]]</a></li>
 			    
-			    <li th:if="${page + 1 < pageCount}"><a href="#" th:href="@{/search(page=${page+1}, searchType='AFFILIATIONS', search=${query})}">[[${page+2}]]</a></li>
-			    <li th:if="${page + 2 < pageCount}"><a href="#" th:href="@{/search(page=${page+2}, searchType='AFFILIATIONS', search=${query})}">[[${page+3}]]</a></li>
-			    <li th:if="${page + 3 < pageCount}"><a href="#" th:href="@{/search(page=${page+3}, searchType='AFFILIATIONS', search=${query})}">[[${page+4}]]</a></li>
-			    <li th:if="${page + 4 < pageCount}"><a href="#" th:href="@{/search(page=${page+4}, searchType='AFFILIATIONS', search=${query})}">[[${page+5}]]</a></li>
+			    <li th:if="${page + 1 < pageCount}"><a href="#" th:href="@{/AFFILIATIONS/search(page=${page+1}, search=${query})}">[[${page+2}]]</a></li>
+			    <li th:if="${page + 2 < pageCount}"><a href="#" th:href="@{/AFFILIATIONS/search(page=${page+2}, search=${query})}">[[${page+3}]]</a></li>
+			    <li th:if="${page + 3 < pageCount}"><a href="#" th:href="@{/AFFILIATIONS/search(page=${page+3}, search=${query})}">[[${page+4}]]</a></li>
+			    <li th:if="${page + 4 < pageCount}"><a href="#" th:href="@{/AFFILIATIONS/search(page=${page+4}, search=${query})}">[[${page+5}]]</a></li>
 			    
-			    <li th:if="${page + 1 < pageCount}"><a href="#" th:href="@{/search(page=${page+1}, searchType='AFFILIATIONS', search=${query})}" aria-label="Previous"><span aria-hidden="true">&raquo;</span></a></li>
+			    <li th:if="${page + 1 < pageCount}"><a href="#" th:href="@{/AFFILIATIONS/search(page=${page+1}, search=${query})}" aria-label="Previous"><span aria-hidden="true">&raquo;</span></a></li>
 			    <li th:if="${page + 1 >= pageCount}" class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&raquo;</span></a></li>
 			    
-			    <li th:if="${page != pageCount-1}"><a href="#" th:href="@{/search(page=${pageCount-1}, searchType='AFFILIATIONS', search=${query})}" aria-label="Last"><span aria-hidden="true">&raquo;&raquo;</span></a></li>
+			    <li th:if="${page != pageCount-1}"><a href="#" th:href="@{/AFFILIATIONS/search(page=${pageCount-1}, search=${query})}" aria-label="Last"><span aria-hidden="true">&raquo;&raquo;</span></a></li>
 			  	<li th:if="${page == pageCount-1}" class="disabled"><a href="#" aria-label="Last"><span aria-hidden="true">&raquo;&raquo;</span></a></li>
 			  	
 			</ul>

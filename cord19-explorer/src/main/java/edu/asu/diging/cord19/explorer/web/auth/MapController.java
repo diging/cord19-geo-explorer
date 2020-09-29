@@ -20,16 +20,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.util.CloseableIterator;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
 
 import edu.asu.diging.cord19.explorer.core.model.impl.CleanedCoordinatesImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.CountriesImpl;
@@ -58,15 +54,15 @@ public class MapController {
         try (CloseableIterator<CountriesImpl> countries = mongoTemplate.stream(new Query().noCursorTimeout(), CountriesImpl.class)) {
             while(countries.hasNext()) {
                 CountriesImpl country = countries.next();
-                if(country.getSelectedWikipediaCount() > 0) {
+                if(country.getProperties().getSelectedWikipediaCount() > 0) {
                     ArrayList<String> properties = new ArrayList<String>();
-                    properties.add(Integer.toString(country.getSelectedWikipediaCount()));
-                    properties.add(country.getCenter());     
-                    if(country.getSelectedWikipediaCount() > highCount.intValue()) {
-                        highCount.set(country.getSelectedWikipediaCount());
+                    properties.add(Integer.toString(country.getProperties().getSelectedWikipediaCount()));
+                    properties.add(country.getProperties().getCenter());     
+                    if(country.getProperties().getSelectedWikipediaCount() > highCount.intValue()) {
+                        highCount.set(country.getProperties().getSelectedWikipediaCount());
                     }
-                    if(country.getSelectedWikipediaCount() < lowCount.intValue()) {
-                        lowCount.set(country.getSelectedWikipediaCount());
+                    if(country.getProperties().getSelectedWikipediaCount() < lowCount.intValue()) {
+                        lowCount.set(country.getProperties().getSelectedWikipediaCount());
                     }
                     countriesMap.put(country.getProperties().getName(), properties);
                 }
@@ -86,10 +82,10 @@ public class MapController {
         try (CloseableIterator<CountriesImpl> countries = mongoTemplate.stream(new Query().noCursorTimeout(), CountriesImpl.class)) {
             while (countries.hasNext()) {
                 CountriesImpl country = countries.next();
-                String countryName = country.getProperties().getName();
                 if(country.getGeometry().getType().equalsIgnoreCase("multipolygon")) {
-                    ArrayList<ArrayList<ArrayList<?>>> countryCoords = country.getGeometry().getCoordinatesList();
-                    country.setSelectedWikipediaCount(0);  
+                    ArrayList<ArrayList<ArrayList<?>>> countryCoords = country.getGeometry().getCoordinates();
+                    country.getProperties().setSelectedWikipediaCount(0);  
+                    System.out.println(country.getProperties().getSelectedWikipediaCount());
                     Iterator<ArrayList<ArrayList<?>>> countryCoordsIter = countryCoords.iterator();
                     while(countryCoordsIter.hasNext()) {
                         ArrayList<ArrayList<?>> coordList = countryCoordsIter.next();
@@ -142,10 +138,11 @@ public class MapController {
                                                     Coordinate coordToFind = new Coordinate(cleanedX, cleanedY);
                                                     Point point = gf.createPoint(coordToFind);
                                                  	if(point.within(polygon)) {
-                                                        country.incrementSelectedWikipediaCount();
+                                                        country.getProperties().incrementSelectedWikipediaCount();
+                                                        System.out.println(country.getProperties().getName());
                                                     }
                                                 } catch(Exception e) {
-                                                   System.out.println("no coords");
+                                                   //System.out.println("no coords");
                                                 }
 											}
 										}
@@ -155,11 +152,20 @@ public class MapController {
                         }
                     }
                 }
+                countriesRepo.save(country);
          	}
     	}
        
         return "redirect:/";
     }
     
+    @RequestMapping(value = "/auth/map/get", method = RequestMethod.GET)
+    public  ResponseEntity<Map<String,  List<CountriesImpl>>> get(Model model) throws IOException {
+        List<CountriesImpl> countries = countriesRepo.findAll();
+        Map<String, List<CountriesImpl>> data = new HashMap<String,  List<CountriesImpl>>();
+        data.put("countries", countries);
+        return new ResponseEntity<Map<String, List<CountriesImpl>>>(data, HttpStatus.OK);
+    
+    }
     
 }

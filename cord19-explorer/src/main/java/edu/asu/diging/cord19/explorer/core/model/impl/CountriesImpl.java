@@ -19,9 +19,7 @@ public class CountriesImpl implements Country {
     private PropertiesImpl properties;
     @JsonProperty("geometry")
     private GeometryImpl geometry;
-    private int selectedWikipediaCount;
     private String type;
-    private String center;
     
     
     public String getType() {
@@ -38,17 +36,6 @@ public class CountriesImpl implements Country {
 
     public void setProperties(PropertiesImpl properties) {
         this.properties = properties;
-    }
-    public int getSelectedWikipediaCount() {
-        return selectedWikipediaCount;
-    }
-
-    public void setSelectedWikipediaCount(int selectedWikipediaCount) {
-        this.selectedWikipediaCount = selectedWikipediaCount;
-    }
-    
-    public void incrementSelectedWikipediaCount() {
-        this.selectedWikipediaCount++;
     }
 
     public ObjectId getId() {
@@ -74,17 +61,6 @@ public class CountriesImpl implements Country {
     public void setGeometry(GeometryImpl geometry) {
         this.geometry = geometry;
     }
-
-    public String getCenter() {
-        return center;
-    }
-
-    public void setCenter(String center) {
-        this.center = center;
-    }
-    
-    
-    
     
 
 }

@@ -17,7 +17,7 @@ public class GeometryImpl {
         this.type = type;
     }
 
-    public ArrayList<ArrayList<ArrayList<?>>> getCoordinatesList() {
+    public ArrayList<ArrayList<ArrayList<?>>> getCoordinates() {
         return coordinates;
     }
 

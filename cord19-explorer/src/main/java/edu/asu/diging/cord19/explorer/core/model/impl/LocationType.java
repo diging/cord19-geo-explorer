@@ -6,5 +6,6 @@ public enum LocationType {
     CITY,
     REGION,
     COUNTRY,
-    OTHER;
+    OTHER,
+    CURATED;
 }

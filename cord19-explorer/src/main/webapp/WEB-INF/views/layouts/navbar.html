@@ -1,0 +1,106 @@
+<nav class="navbar" th:fragment="navbar">
+   <div class="nav-content">
+	   	<div style="display: flex; align-items: center;">
+	   		<span sec:authorize="isAuthenticated()" onclick="openNav()" class="btn dark-btn"><i class="fa fa-bars"></i></span>	
+	      	<a th:href="@{/}" class="navbar-brand">CORD19 Geo Explorer</a>
+	   	</div>
+      <div style="display: flex">
+         
+         <form th:action="@{/login}">
+            <button sec:authorize="!isAuthenticated()" class="btn primary-btn" type="submit" style="margin-right: 40px;">Login</button>
+         </form>
+         <form th:action="@{'/search'}" method="GET" class="form" style="position: relative">
+            <button class="btn btn-outline-success form_icon" type="submit" id="submit"><i class="fa fa-search"></i></button>
+            <input class="form-control searchbox form_input" type="search" placeholder="Search" id="search" th:name="search">
+         </form>
+         <form th:action="@{/logout}" method="POST" sec:authorize="isAuthenticated()" role="presentation">
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+            <button class="btn primary-btn" type="submit" style="margin-left: 40px;">Logout</button>
+         </form>
+      </div>
+   </div>
+   <div class="container">
+      <div th:if="${show_alert}" class="alert alert-${alert_type}" role="alert">${alert_msg}</div>
+      <!-- Content
+         <div layout:fragment="content">
+             ============================================================================
+             This content is only used for static prototyping purposes (natural templates)
+             and is therefore entirely optional, as this markup fragment will be included
+             from "fragments/header.html" at runtime.                                    
+             ============================================================================
+             <h1>Ups, something went wrong.</h1>
+             <p>
+               You should not see this. Who knows what magic you did you get here; or maybe it's just
+               a bug. Either way, just move on my friend.
+             </p>
+         </div> -->
+   </div>
+   
+   <div id="mySidenav" class="sidenav">
+	  <button class="btn dark-btn" onclick="closeNav()">&times;</button>
+	  <ul class="nav nav-pills">
+	      <li sec:authorize="hasRole('ADMIN')" role="presentation">
+	         <a th:href="@{/admin/user/list}" >Users</a>
+	      </li>
+	      <li sec:authorize="hasRole('ADMIN')" role="presentation">
+	         <a th:href="@{/auth/task}" >Tasks</a>
+	      </li>
+	      <li sec:authorize="hasRole('ADMIN')" role="presentation" class="dropdown">
+	         <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+	         Cleaning <span class="caret"></span>
+	         </a>
+	         <ul class="dropdown-menu">
+	            <li sec:authorize="hasRole('ADMIN')" role="presentation">
+	               <a th:href="@{/auth/affiliations}" >Clean Affiliations</a>
+	            </li>
+	            <li sec:authorize="hasRole('ADMIN')" role="presentation">
+	               <a th:href="@{/auth/publications/clean}" >Remove Duplicates</a>
+	            </li>
+	         </ul>
+	      </li>
+	      <li sec:authorize="hasRole('ADMIN')" role="presentation" class="dropdown">
+	         <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+	         Import <span class="caret"></span>
+	         </a>
+	         <ul class="dropdown-menu">
+	            <li sec:authorize="hasRole('ADMIN')" role="presentation">
+	               <a th:href="@{/auth/import}" >Import</a>
+	            </li>
+	            <li sec:authorize="hasRole('ADMIN')" role="presentation">
+	               <a th:href="@{/auth/metadata/import}" >Metadata Import</a>
+	            </li>
+	         </ul>
+	      </li>
+	      <li sec:authorize="hasRole('ADMIN')" role="presentation" class="dropdown">
+	         <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+	         Export <span class="caret"></span>
+	         </a>
+	         <ul class="dropdown-menu">
+	            <li role="presentation">
+	               <a th:href="@{/auth/export}" >Export</a>
+	            </li>
+	            <li role="presentation">
+	               <a th:href="@{/auth/export/list?sort=task.dateStarted,desc}" >List exports</a>
+	            </li>
+	         </ul>
+	      </li>
+	      <li sec:authorize="hasRole('ADMIN')" role="presentation" class="dropdown">
+	         <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+	         Arxiv <span class="caret"></span>
+	         </a>
+	         <ul class="dropdown-menu">
+	            <li role="presentation">
+	               <a th:href="@{/arxiv/publications}" >Arxiv Publications</a>
+	            </li>
+	            <li role="presentation">
+	               <a th:href="@{/auth/import/arxiv}" >Import from Arxiv</a>
+	            </li>
+	            <li role="presentation">
+	               <a th:href="@{/auth/arxiv/delete}" >Delete Arxiv Dataset</a>
+	            </li>
+	         </ul>
+	      </li>
+	   </ul>
+	</div>
+
+</nav>

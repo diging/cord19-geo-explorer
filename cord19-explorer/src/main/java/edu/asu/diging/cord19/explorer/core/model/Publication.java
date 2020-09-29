@@ -6,13 +6,16 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import edu.asu.diging.cord19.explorer.core.model.impl.BibEntryImpl;
-import edu.asu.diging.cord19.explorer.core.model.impl.LocationMatchImpl;
+import edu.asu.diging.cord19.explorer.core.model.impl.CategoryImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.ParagraphImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
 import edu.asu.diging.cord19.explorer.core.model.impl.RefEntryImpl;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, defaultImpl = PublicationImpl.class)
 public interface Publication {
+    
+    final static String DATABASE_ARXIV = "arxiv";
+    final static String DATABASE_DIMENSIONS = "dimensions";
 
     String getCordId();
 
@@ -105,4 +108,80 @@ public interface Publication {
     List<ParagraphImpl> getBackMatter();
 
     void setBackMatter(List<ParagraphImpl> backMatter);
+
+    void setDatabase(String database);
+
+    String getDatabase();
+
+    void setDocumentType(String documentType);
+
+    String getDocumentType();
+
+    void setDocumentUrl(String documentUrl);
+
+    String getDocumentUrl();
+
+    void setCategories(List<CategoryImpl> categories);
+
+    List<CategoryImpl> getCategories();
+
+    void setComment(String comment);
+
+    String getComment();
+
+    void setPrimaryCategory(CategoryImpl primaryCategory);
+
+    CategoryImpl getPrimaryCategory();
+
+    void setArxivId(String arxivId);
+
+    String getArxivId();
+
+    void setPdfJsonFiles(String pdfJsonFiles);
+
+    String getPdfJsonFiles();
+
+    void setPmcJsonFiles(String pmcJsonFiles);
+
+    String getPmcJsonFiles();
+
+    void setDuplicate(boolean duplicate);
+
+    boolean isDuplicate();
+
+    void setExtraData(Map<String, Object> extraData);
+
+    Map<String, Object> getExtraData();
+
+    void setFunder(String funder);
+
+    String getFunder();
+
+    void setMeshTerms(List<String> meshTerms);
+
+    List<String> getMeshTerms();
+
+    void setIssue(String issue);
+
+    String getIssue();
+
+    void setVolume(String volume);
+
+    String getVolume();
+
+    void setPages(String pages);
+
+    String getPages();
+
+    void setPublicationType(PublicationType publicationType);
+
+    PublicationType getPublicationType();
+
+    void setRecentCitations(int recentCitations);
+
+    int getRecentCitations();
+
+    void setTimesCited(int timesCited);
+
+    int getTimesCited();
 }

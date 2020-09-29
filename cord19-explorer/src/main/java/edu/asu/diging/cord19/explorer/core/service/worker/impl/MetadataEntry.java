@@ -1,4 +1,4 @@
-package edu.asu.diging.cord19.explorer.core.service.impl;
+package edu.asu.diging.cord19.explorer.core.service.worker.impl;
 
 import com.opencsv.bean.CsvBindByName;
 
@@ -24,18 +24,24 @@ public class MetadataEntry {
     private String publishTime;
     @CsvBindByName(column = "journal")
     private String journal;
-    @CsvBindByName(column = "Microsoft Academic Paper ID")
+    @CsvBindByName(column = "mag_id")
     private String MsAcademicPaperId;
-    @CsvBindByName(column = "WHO #Covidence")
+    @CsvBindByName(column = "who_covidence_id")
     private String whoCov;
-    @CsvBindByName(column = "has_pdf_parse")
-    private String hasPdfParse;
-    @CsvBindByName(column = "has_pmc_xml_parse")
-    private String hasPmcXmlParse;
+    @CsvBindByName(column = "pdf_json_files")
+    private String pdfJsonFiles;
+    @CsvBindByName(column = "pmc_json_files")
+    private String pmcJsonFiles;
     @CsvBindByName(column = "full_text_file")
     private String fullTextFile;
     @CsvBindByName(column = "url")
     private String url;
+    @CsvBindByName(column = "arxiv_id")
+    private String arxivId;
+    @CsvBindByName(column = "s2_id")
+    private String s2Id;
+    @CsvBindByName(column = "authors")
+    private String authors;
 
     public MetadataEntry() {
     }
@@ -136,20 +142,20 @@ public class MetadataEntry {
         this.whoCov = whoCov;
     }
 
-    public String getHasPdfParse() {
-        return hasPdfParse;
+    public String getPdfJsonFiles() {
+        return pdfJsonFiles;
     }
 
-    public void setHasPdfParse(String hasPdfParse) {
-        this.hasPdfParse = hasPdfParse;
+    public void setPdfJsonFiles(String pdfJsonFiles) {
+        this.pdfJsonFiles = pdfJsonFiles;
     }
 
-    public String getHasPmcXmlParse() {
-        return hasPmcXmlParse;
+    public String getPmcJsonFiles() {
+        return pmcJsonFiles;
     }
 
-    public void setHasPmcXmlParse(String hasPmcXmlParse) {
-        this.hasPmcXmlParse = hasPmcXmlParse;
+    public void setPmcJsonFiles(String pmcJsonFiles) {
+        this.pmcJsonFiles = pmcJsonFiles;
     }
 
     public String getFullTextFile() {
@@ -166,5 +172,28 @@ public class MetadataEntry {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getArxivId() {
+        return arxivId;
+    }
+
+    public void setArxivId(String arxivId) {
+        this.arxivId = arxivId;
+    }
+
+    public String getS2Id() {
+        return s2Id;
+    }
+
+    public void setS2Id(String s2Id) {
+        this.s2Id = s2Id;
+    }
+    public String getAuthors() {
+        return authors;
+    }
+
+    public void setAuthors(String authors) {
+        this.authors = authors;
     }
 }

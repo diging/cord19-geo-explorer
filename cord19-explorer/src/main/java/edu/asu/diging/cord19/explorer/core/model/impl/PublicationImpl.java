@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import edu.asu.diging.cord19.explorer.core.model.Metadata;
 import edu.asu.diging.cord19.explorer.core.model.Publication;
+import edu.asu.diging.cord19.explorer.core.model.PublicationType;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PublicationImpl implements Publication {
@@ -21,10 +22,12 @@ public class PublicationImpl implements Publication {
     private String sha;
     @JsonProperty("paper_id")
     private String paperId;
+    private PublicationType publicationType;
     private Metadata metadata;
     private String doi;
     private String pmcid;
     private String pubmedId;
+    private String arxivId;
     private String license;
     private String sourceX;
     private String publishTime;
@@ -33,9 +36,20 @@ public class PublicationImpl implements Publication {
     private String msAcademicPaperId;
     private boolean hasPdfParse;
     private boolean hasPmcXmlParse;
+    private String pdfJsonFiles;
+    private String pmcJsonFiles;
     private String fulltextFile;
     private String url;
+    private String documentUrl;
+    private String documentType;
     private String whoCovidence;
+    private String funder;
+    private String volume;
+    private String issue;
+    private String pages;
+    
+    private String database;
+    private boolean duplicate;
 
     @JsonProperty("abstract")
     private List<ParagraphImpl> abstracts;
@@ -47,6 +61,15 @@ public class PublicationImpl implements Publication {
     private Map<String, RefEntryImpl> refEntries;
     @JsonProperty("back_matter")
     private List<ParagraphImpl> backMatter;
+    
+    private List<CategoryImpl> categories;
+    private CategoryImpl primaryCategory;
+    private String comment;
+    private List<String> meshTerms;
+    private int timesCited;
+    private int recentCitations;
+    
+    private Map<String, Object> extraData;
 
     public ObjectId getId() {
         return id;
@@ -120,6 +143,16 @@ public class PublicationImpl implements Publication {
     @Override
     public void setPaperId(String paperId) {
         this.paperId = paperId;
+    }
+
+    @Override
+    public PublicationType getPublicationType() {
+        return publicationType;
+    }
+
+    @Override
+    public void setPublicationType(PublicationType publicationType) {
+        this.publicationType = publicationType;
     }
 
     /*
@@ -208,6 +241,16 @@ public class PublicationImpl implements Publication {
     @Override
     public void setPubmedId(String pubmedId) {
         this.pubmedId = pubmedId;
+    }
+
+    @Override
+    public String getArxivId() {
+        return arxivId;
+    }
+
+    @Override
+    public void setArxivId(String arxivId) {
+        this.arxivId = arxivId;
     }
 
     /*
@@ -390,6 +433,26 @@ public class PublicationImpl implements Publication {
         this.hasPmcXmlParse = hasPmcXmlParse;
     }
 
+    @Override
+    public String getPdfJsonFiles() {
+        return pdfJsonFiles;
+    }
+
+    @Override
+    public void setPdfJsonFiles(String pdfJsonFiles) {
+        this.pdfJsonFiles = pdfJsonFiles;
+    }
+
+    @Override
+    public String getPmcJsonFiles() {
+        return pmcJsonFiles;
+    }
+
+    @Override
+    public void setPmcJsonFiles(String pmcJsonFiles) {
+        this.pmcJsonFiles = pmcJsonFiles;
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -435,6 +498,26 @@ public class PublicationImpl implements Publication {
         this.url = url;
     }
 
+    @Override
+    public String getDocumentUrl() {
+        return documentUrl;
+    }
+
+    @Override
+    public void setDocumentUrl(String documentUrl) {
+        this.documentUrl = documentUrl;
+    }
+
+    @Override
+    public String getDocumentType() {
+        return documentType;
+    }
+
+    @Override
+    public void setDocumentType(String documentType) {
+        this.documentType = documentType;
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -456,6 +539,66 @@ public class PublicationImpl implements Publication {
     @Override
     public void setWhoCovidence(String whoCovidence) {
         this.whoCovidence = whoCovidence;
+    }
+
+    @Override
+    public String getFunder() {
+        return funder;
+    }
+
+    @Override
+    public void setFunder(String funder) {
+        this.funder = funder;
+    }
+
+    @Override
+    public String getDatabase() {
+        return database;
+    }
+
+    @Override
+    public String getVolume() {
+        return volume;
+    }
+
+    @Override
+    public void setVolume(String volume) {
+        this.volume = volume;
+    }
+
+    @Override
+    public String getIssue() {
+        return issue;
+    }
+
+    @Override
+    public void setIssue(String issue) {
+        this.issue = issue;
+    }
+
+    @Override
+    public String getPages() {
+        return pages;
+    }
+
+    @Override
+    public void setPages(String pages) {
+        this.pages = pages;
+    }
+
+    @Override
+    public void setDatabase(String database) {
+        this.database = database;
+    }
+
+    @Override
+    public boolean isDuplicate() {
+        return duplicate;
+    }
+
+    @Override
+    public void setDuplicate(boolean duplicate) {
+        this.duplicate = duplicate;
     }
 
     /*
@@ -568,5 +711,75 @@ public class PublicationImpl implements Publication {
         this.backMatter = backMatter;
     }
     
+
+    @Override
+    public List<CategoryImpl> getCategories() {
+        return categories;
+    }
+
+    @Override
+    public void setCategories(List<CategoryImpl> categories) {
+        this.categories = categories;
+    }
+
+    @Override
+    public CategoryImpl getPrimaryCategory() {
+        return primaryCategory;
+    }
+
+    @Override
+    public void setPrimaryCategory(CategoryImpl primaryCategory) {
+        this.primaryCategory = primaryCategory;
+    }
+
+    @Override
+    public String getComment() {
+        return comment;
+    }
+
+    @Override
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    @Override
+    public List<String> getMeshTerms() {
+        return meshTerms;
+    }
+
+    @Override
+    public void setMeshTerms(List<String> meshTerms) {
+        this.meshTerms = meshTerms;
+    }
+
+    @Override
+    public int getTimesCited() {
+        return timesCited;
+    }
+
+    @Override
+    public void setTimesCited(int timesCited) {
+        this.timesCited = timesCited;
+    }
+
+    @Override
+    public int getRecentCitations() {
+        return recentCitations;
+    }
+
+    @Override
+    public void setRecentCitations(int recentCitations) {
+        this.recentCitations = recentCitations;
+    }
+
+    @Override
+    public Map<String, Object> getExtraData() {
+        return extraData;
+    }
+
+    @Override
+    public void setExtraData(Map<String, Object> extraData) {
+        this.extraData = extraData;
+    }
 
 }

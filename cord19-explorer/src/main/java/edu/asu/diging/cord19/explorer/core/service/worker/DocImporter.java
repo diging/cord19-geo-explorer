@@ -1,4 +1,4 @@
-package edu.asu.diging.cord19.explorer.core.service;
+package edu.asu.diging.cord19.explorer.core.service.worker;
 
 import java.io.IOException;
 
@@ -15,5 +15,9 @@ public interface DocImporter {
     void cleanAffiliations(String taskId, boolean reprocess);
 
     void selectLocationMatches(String taskId);
+
+    void importMetadata(String taskId, String metadataFile);
+
+    void importDimensionsMetadata(String taskId, String metadataFile);
 
 }

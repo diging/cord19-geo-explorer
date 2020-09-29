@@ -13,6 +13,8 @@ public class PersonImpl implements Person {
     private String suffix;
     private AffiliationImpl affiliation;
     private String email;
+    private String name;
+    private String uri;
 
     /*
      * (non-Javadoc)
@@ -143,6 +145,32 @@ public class PersonImpl implements Person {
     @Override
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    @Override
+    public String getName() {
+        if (name != null && !name.isEmpty()) {
+            return name;
+        }
+        
+        String fName = first != null ? first : "";
+        String lName = last != null ? last : "";
+        return fName + " " + lName;
+    }
+
+    @Override
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getUri() {
+        return uri;
+    }
+
+    @Override
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 
 }

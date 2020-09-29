@@ -1,4 +1,4 @@
-package edu.asu.diging.cord19.explorer.core.service.impl;
+package edu.asu.diging.cord19.explorer.core.service.worker.impl;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -11,7 +11,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 import edu.asu.diging.cord19.explorer.core.exception.FileStorageException;
-import edu.asu.diging.cord19.explorer.core.service.StorageEngine;
+import edu.asu.diging.cord19.explorer.core.service.worker.StorageEngine;
 
 @Component
 @PropertySource({ "classpath:config.properties", "${appConfigFile:classpath:}/app.properties" })

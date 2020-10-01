@@ -1,7 +1,7 @@
 <nav class="navbar" th:fragment="navbar">
    <div class="nav-content">
 	   	<div style="display: flex; align-items: center;">
-	   		<span sec:authorize="isAuthenticated()" onclick="openNav()" class="btn dark-btn"><i class="fa fa-bars"></i></span>	
+	   		<span onclick="openNav()" class="btn dark-btn"><i class="fa fa-bars"></i></span>	
 	      	<a th:href="@{/}" class="navbar-brand">CORD19 Geo Explorer</a>
 	   	</div>
       <div style="display: flex">
@@ -39,6 +39,9 @@
    <div id="mySidenav" class="sidenav">
 	  <button class="btn dark-btn" onclick="closeNav()">&times;</button>
 	  <ul class="nav nav-pills">
+	      <li role="presentation">
+	         <a th:href="@{/affiliations}" >Affiliations</a>
+	      </li>
 	      <li sec:authorize="hasRole('ADMIN')" role="presentation">
 	         <a th:href="@{/admin/user/list}" >Users</a>
 	      </li>

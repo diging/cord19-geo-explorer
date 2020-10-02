@@ -40,7 +40,7 @@
 	  <button class="btn dark-btn" onclick="closeNav()">&times;</button>
 	  <ul class="nav nav-pills">
 	  	  <li role="presentation">
-	         <a th:href="@{/publications}" >Publications</a>
+	         <a th:href="@{/pubs(sort='metadata.title,desc')}" >Publications</a>
 	      </li>
 	      <li sec:authorize="hasRole('ADMIN')" role="presentation">
 	         <a th:href="@{/admin/user/list}" >Users</a>

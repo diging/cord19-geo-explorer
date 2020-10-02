@@ -26,6 +26,17 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
  	<script th:src="@{/resources/bootstrap/js/bootstrap.min.js}"></script>
 	<script th:src="@{/resources/bootstrap/js/main.js}"></script>
-	
+	<script>
+	$( document ).ready(function() {
+	    $("#searchDropdownBox").change(function() {
+	        if($(this).val() == "AFFILIATIONS"){
+	            $("#searchForm").attr("action", '[[@{/AFFILIATIONS/search}]]');
+	        }
+	        else{
+	        	$("#searchForm").attr("action", '[[@{/PUBLICATIONS/search}]]');
+	        }
+	    });
+	});			
+	</script>
   </head>
 </html>

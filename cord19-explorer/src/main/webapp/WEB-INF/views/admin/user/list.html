@@ -12,6 +12,7 @@
 				<span th:if="${not user.enabled}" class="label label-default">Account Deactivated</span>
 				<span th:if="${user.admin}" class="label label-warning">Admin User</span>
 				<span th:text="${user.username}" th:remove="tag"></span> (<span th:text="${user.firstName}" th:remove="tag"></span> <span th:text="${user.lastName}" th:remove="tag"></span>)
+				<br><span th:text="${user.email}" th:remove="tag"></span>
 				<div class="pull-right text-right">
 				<form th:if="${not user.enabled}" th:action="@{|/admin/user/${user.username}/approve|}" method="POST">
 					<button style="padding:0px" class="btn btn-link"><i class="fas fa-user-check"></i> Activate</button>

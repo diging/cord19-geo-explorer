@@ -24,6 +24,8 @@ public class Wikientry {
     private String coordinates;
     @Field(type = FieldType.Text, includeInParent = true)
     private List<String> categories;
+    
+    private String redirectsTo;
 
     public String getId() {
         return id;
@@ -79,6 +81,14 @@ public class Wikientry {
 
     public void setCategories(List<String> categories) {
         this.categories = categories;
+    }
+
+    public String getRedirectsTo() {
+        return redirectsTo;
+    }
+
+    public void setRedirectsTo(String redirectsTo) {
+        this.redirectsTo = redirectsTo;
     }
 
 }

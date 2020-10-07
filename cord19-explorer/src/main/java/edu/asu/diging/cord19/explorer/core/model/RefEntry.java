@@ -19,4 +19,8 @@ public interface RefEntry {
 
     String getLatex();
 
+    void setHtml(String html);
+
+    String getHtml();
+
 }

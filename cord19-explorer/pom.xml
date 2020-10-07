@@ -11,25 +11,48 @@
 	<properties>
 		<org.slf4j-version>1.7.26</org.slf4j-version>
 		<org.springframework-version>5.2.5.RELEASE</org.springframework-version>
-		<spring-security-version>5.3.1.RELEASE</spring-security-version>
+		<spring-security-version>5.3.3.RELEASE</spring-security-version>
 		<spring-data.version>Moore-SR6</spring-data.version>
 		<thymeleaf.version>3.0.11.RELEASE</thymeleaf.version>
-
 		<admin.password>$2a$04$oQo44vqcDIFRoYKiAXoNheurzkwX9dcNmowvTX/hsWuBMwijqn44i</admin.password>
-
+	
 		<db.driver>com.mysql.jdbc.Driver</db.driver>
 		<db.database.url>jdbc-url-to-db</db.database.url>
 		<db.user>db-user</db.user>
 		<db.password>db-password</db.password>
-
+	
+		<email.user></email.user>
+		<email.password></email.password>
+		<email.host></email.host>
+		<email.port></email.port>
+		<email.from></email.from>
+		<app.url></app.url>
+	
 		<mongo.database.name>cord19ds</mongo.database.name>
 		<mongo.database.host>localhost</mongo.database.host>
 		<mongo.database.port>27017</mongo.database.port>
-
+		<mongo.database.user></mongo.database.user>
+		<mongo.database.password></mongo.database.password>
+		<mongo.database.authdb>admin</mongo.database.authdb>
+		<mongo.duplicate.database.name>cord19ds-duplicates</mongo.duplicate.database.name>
+	
+		<elasticsearch.index>covid</elasticsearch.index>
+		<elasticsearch.host>localhost:9200</elasticsearch.host>
+		<elasticsearch.user></elasticsearch.user>
+		<elasticsearch.password></elasticsearch.password>
+		<elasticsearch.path.prefix></elasticsearch.path.prefix>
+		<!-- in ms (10000ms = 10s) -->
+		<elasticsearch.connect.timeout>60000</elasticsearch.connect.timeout>
+	
 		<file.upload.path></file.upload.path>
 		<app.data.path></app.data.path>
-
+	
 		<log.level>info</log.level>
+		<log.level.diging>debug</log.level.diging>
+	
+		<tomcat.deploy.path></tomcat.deploy.path>
+		<tomcat.app.name>cord19-geo-explorer</tomcat.app.name>
+		<tomcat.server.id>TomcatServer</tomcat.server.id>
 	</properties>
 
 	<dependencyManagement>
@@ -57,7 +80,12 @@
 		<dependency>
 			<groupId>edu.asu.diging</groupId>
 			<artifactId>simple-users</artifactId>
-			<version>1.0</version>
+			<version>1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>edu.asu.diging</groupId>
+			<artifactId>publication-metadata-util</artifactId>
+			<version>0.7</version>
 		</dependency>
 
 		<!-- Spring -->
@@ -261,14 +289,33 @@
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-elasticsearch</artifactId>
-			<version>3.2.6.RELEASE</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.rometools/rome -->
+		<dependency>
+			<groupId>com.rometools</groupId>
+			<artifactId>rome</artifactId>
+			<version>1.13.0</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.7</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-csv -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-csv</artifactId>
+			<version>1.8</version>
 		</dependency>
 
 
 	</dependencies>
 
 	<build>
-		<finalName>cord19-explorer</finalName>
+		<finalName>cord19-geo-explorer</finalName>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
@@ -310,7 +357,18 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.tomcat.maven</groupId>
+				<artifactId>tomcat7-maven-plugin</artifactId>
+				<version>2.2</version>
+				<configuration>
+					<url>${tomcat.deploy.path}</url>
+					<server>${tomcat.server.id}</server>
+					<path>/${tomcat.app.name}</path>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
 </project>
+

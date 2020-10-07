@@ -8,6 +8,7 @@ public class MetadataImpl implements Metadata {
 
     private String title;
     private List<PersonImpl> authors;
+    private List<AffiliationImpl> affiliationCountries;
 
     /*
      * (non-Javadoc)
@@ -51,6 +52,16 @@ public class MetadataImpl implements Metadata {
     @Override
     public void setAuthors(List<PersonImpl> authors) {
         this.authors = authors;
+    }
+
+    @Override
+    public List<AffiliationImpl> getAffiliationCountries() {
+        return affiliationCountries;
+    }
+
+    @Override
+    public void setAffiliationCountries(List<AffiliationImpl> affiliationCountries) {
+        this.affiliationCountries = affiliationCountries;
     }
 
 }

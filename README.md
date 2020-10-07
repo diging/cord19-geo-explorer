@@ -4,6 +4,7 @@
 
 - MySQL 
 - MongoDB
+- Elasticsearch
 
 ## Setup
 

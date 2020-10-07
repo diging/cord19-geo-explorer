@@ -1,15 +1,17 @@
 <factorypath>
-    <factorypathentry kind="VARJAR" id="M2_REPO/edu/asu/diging/simple-users/1.0/simple-users-1.0.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/edu/asu/diging/simple-users/1.1/simple-users-1.1.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/spring-context-support/5.2.5.RELEASE/spring-context-support-5.2.5.RELEASE.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/javax/persistence/javax.persistence-api/2.2/javax.persistence-api-2.2.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/javax/validation/validation-api/2.0.1.Final/validation-api-2.0.1.Final.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="VARJAR" id="M2_REPO/org/hibernate/validator/hibernate-validator/6.0.13.Final/hibernate-validator-6.0.13.Final.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/org/hibernate/validator/hibernate-validator/6.1.0.Final/hibernate-validator-6.1.0.Final.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/jakarta/validation/jakarta.validation-api/2.0.2/jakarta.validation-api-2.0.2.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/hibernate/validator/hibernate-validator-annotation-processor/6.0.13.Final/hibernate-validator-annotation-processor-6.0.13.Final.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="VARJAR" id="M2_REPO/commons-beanutils/commons-beanutils/1.9.3/commons-beanutils-1.9.3.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/commons-beanutils/commons-beanutils/1.9.4/commons-beanutils-1.9.4.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/commons-logging/commons-logging/1.2/commons-logging-1.2.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/commons-collections/commons-collections/3.2.2/commons-collections-3.2.2.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="VARJAR" id="M2_REPO/javax/mail/mail/1.4.7/mail-1.4.7.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/com/sun/mail/javax.mail/1.6.2/javax.mail-1.6.2.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/javax/activation/activation/1.1/activation-1.1.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/edu/asu/diging/publication-metadata-util/0.7/publication-metadata-util-0.7.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/spring-context/5.2.5.RELEASE/spring-context-5.2.5.RELEASE.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/spring-beans/5.2.5.RELEASE/spring-beans-5.2.5.RELEASE.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/spring-core/5.2.5.RELEASE/spring-core-5.2.5.RELEASE.jar" enabled="true" runInBatchMode="false"/>
@@ -18,12 +20,12 @@
     <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/spring-webmvc/5.2.5.RELEASE/spring-webmvc-5.2.5.RELEASE.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/spring-web/5.2.5.RELEASE/spring-web-5.2.5.RELEASE.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/security/spring-security-core/5.3.1.RELEASE/spring-security-core-5.3.1.RELEASE.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/security/spring-security-config/5.3.1.RELEASE/spring-security-config-5.3.1.RELEASE.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/security/spring-security-taglibs/5.3.1.RELEASE/spring-security-taglibs-5.3.1.RELEASE.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/security/spring-security-acl/5.3.1.RELEASE/spring-security-acl-5.3.1.RELEASE.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/security/spring-security-core/5.3.3.RELEASE/spring-security-core-5.3.3.RELEASE.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/security/spring-security-config/5.3.3.RELEASE/spring-security-config-5.3.3.RELEASE.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/security/spring-security-taglibs/5.3.3.RELEASE/spring-security-taglibs-5.3.3.RELEASE.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/security/spring-security-acl/5.3.3.RELEASE/spring-security-acl-5.3.3.RELEASE.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/spring-jdbc/5.2.5.RELEASE/spring-jdbc-5.2.5.RELEASE.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/security/spring-security-web/5.3.1.RELEASE/spring-security-web-5.3.1.RELEASE.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/security/spring-security-web/5.3.3.RELEASE/spring-security-web-5.3.3.RELEASE.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/data/spring-data-jpa/2.2.6.RELEASE/spring-data-jpa-2.2.6.RELEASE.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/data/spring-data-commons/2.2.6.RELEASE/spring-data-commons-2.2.6.RELEASE.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/springframework/spring-orm/5.2.5.RELEASE/spring-orm-5.2.5.RELEASE.jar" enabled="true" runInBatchMode="false"/>
@@ -132,31 +134,10 @@
     <factorypathentry kind="VARJAR" id="M2_REPO/org/apache/httpcomponents/httpcore-nio/4.4.5/httpcore-nio-4.4.5.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/commons-codec/commons-codec/1.10/commons-codec-1.10.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/elasticsearch/plugin/aggs-matrix-stats-client/6.8.7/aggs-matrix-stats-client-6.8.7.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="/Users/taylorquinn/Desktop/apache-tomcat-8.5.41/lib/el-api.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="/Users/taylorquinn/Desktop/apache-tomcat-8.5.41/lib/tomcat-i18n-es.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="/Users/taylorquinn/Desktop/apache-tomcat-8.5.41/lib/tomcat-websocket.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="/Users/taylorquinn/Desktop/apache-tomcat-8.5.41/lib/jasper.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="/Users/taylorquinn/Desktop/apache-tomcat-8.5.41/lib/jasper-el.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="/Users/taylorquinn/Desktop/apache-tomcat-8.5.41/lib/tomcat-util.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="/Users/taylorquinn/Desktop/apache-tomcat-8.5.41/lib/catalina-storeconfig.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="/Users/taylorquinn/Desktop/apache-tomcat-8.5.41/lib/jsp-api.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="/Users/taylorquinn/Desktop/apache-tomcat-8.5.41/lib/catalina-tribes.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="/Users/taylorquinn/Desktop/apache-tomcat-8.5.41/lib/catalina.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="/Users/taylorquinn/Desktop/apache-tomcat-8.5.41/lib/tomcat-jni.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="/Users/taylorquinn/Desktop/apache-tomcat-8.5.41/lib/websocket-api.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="/Users/taylorquinn/Desktop/apache-tomcat-8.5.41/lib/tomcat-coyote.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="/Users/taylorquinn/Desktop/apache-tomcat-8.5.41/lib/catalina-ha.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="/Users/taylorquinn/Desktop/apache-tomcat-8.5.41/lib/tomcat-api.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="/Users/taylorquinn/Desktop/apache-tomcat-8.5.41/lib/annotations-api.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="/Users/taylorquinn/Desktop/apache-tomcat-8.5.41/lib/jaspic-api.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="/Users/taylorquinn/Desktop/apache-tomcat-8.5.41/lib/catalina-ant.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="/Users/taylorquinn/Desktop/apache-tomcat-8.5.41/lib/ecj-4.6.3.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="/Users/taylorquinn/Desktop/apache-tomcat-8.5.41/lib/servlet-api.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="/Users/taylorquinn/Desktop/apache-tomcat-8.5.41/lib/tomcat-util-scan.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="/Users/taylorquinn/Desktop/apache-tomcat-8.5.41/lib/tomcat-i18n-ja.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="/Users/taylorquinn/Desktop/apache-tomcat-8.5.41/lib/tomcat-i18n-ru.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="/Users/taylorquinn/Desktop/apache-tomcat-8.5.41/lib/tomcat-jdbc.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="/Users/taylorquinn/Desktop/apache-tomcat-8.5.41/lib/tomcat-i18n-fr.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="EXTJAR" id="/Users/taylorquinn/Desktop/apache-tomcat-8.5.41/lib/tomcat-dbcp.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/com/rometools/rome/1.13.0/rome-1.13.0.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/com/rometools/rome-utils/1.13.0/rome-utils-1.13.0.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/org/jdom/jdom2/2.0.6/jdom2-2.0.6.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/commons-io/commons-io/2.7/commons-io-2.7.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/org/apache/commons/commons-csv/1.8/commons-csv-1.8.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="PLUGIN" id="org.eclipse.jst.ws.annotations.core" enabled="true" runInBatchMode="false"/>
 </factorypath>

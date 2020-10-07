@@ -1,0 +1,78 @@
+<html layout:decorate="~{layouts/main}">
+<html>
+<head>
+ <title>CORD-19 Geo Explorer</title>
+</head>
+<body>
+	<div th:replace="layouts/navbar :: navbar"></div>
+	<div layout:fragment="content" class="content">
+		<h2>Affiliations</h2>
+		
+		<h5>
+   		Total: [[${total}]] affiliations
+   		</h5>
+   		<nav>
+		  <ul class="pagination">
+		  	<li th:if="${page != 0}"><a href="#" th:href="@{'/affiliations?page=0'}" aria-label="First"><span aria-hidden="true">&laquo;&laquo;</span></a></li>
+		  	<li th:if="${page == 0}" class="disabled"><a href="#" aria-label="First"><span aria-hidden="true">&laquo;&laquo;</span></a></li>
+		  	
+		    <li th:if="${page - 1 >= 0}"><a href="#" th:href="@{'/affiliations?page=' + ${page-1}}" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+		    <li th:if="${page - 1 < 0}" class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+		    
+		    <li th:if="${page - 4 >= 0}"><a href="#" th:href="@{'/affiliations?page=' + ${page-5}}">[[${page-3}]]</a></li>
+		    <li th:if="${page - 3 >= 0}"><a href="#" th:href="@{'/affiliations?page=' + ${page-3}}">[[${page-2}]]</a></li>
+		    <li th:if="${page - 2 >= 0}"><a href="#" th:href="@{'/affiliations?page=' + ${page-2}}">[[${page-1}]]</a></li>
+		    <li th:if="${page - 1 >= 0}"><a href="#" th:href="@{'/affiliations?page=' + ${page-1}}">[[${page}]]</a></li>
+		    
+		    <li class="active"><a href="#">[[${page+1}]]</a></li>
+		    
+		    <li th:if="${page + 1 < pageCount}"><a href="#" th:href="@{'/affiliations?page=' + ${page+1}}">[[${page+2}]]</a></li>
+		    <li th:if="${page + 2 < pageCount}"><a href="#" th:href="@{'/affiliations?page=' + ${page+2}}">[[${page+3}]]</a></li>
+		    <li th:if="${page + 3 < pageCount}"><a href="#" th:href="@{'/affiliations?page=' + ${page+3}}">[[${page+4}]]</a></li>
+		    <li th:if="${page + 4 < pageCount}"><a href="#" th:href="@{'/affiliations?page=' + ${page+4}}">[[${page+5}]]</a></li>
+		    
+		    <li th:if="${page + 1 < pageCount}"><a href="#" th:href="@{'/affiliations?page=' + ${page+1}}" aria-label="Previous"><span aria-hidden="true">&raquo;</span></a></li>
+		    <li th:if="${page + 1 >= pageCount}" class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&raquo;</span></a></li>
+		    
+		    <li th:if="${page != pageCount-1}"><a href="#" th:href="@{'/affiliations?page=' + ${pageCount-1}}" aria-label="Last"><span aria-hidden="true">&raquo;&raquo;</span></a></li>
+		  	<li th:if="${page == pageCount-1}" class="disabled"><a href="#" aria-label="Last"><span aria-hidden="true">&raquo;&raquo;</span></a></li>
+		  	
+		  </ul>
+		</nav>
+		
+	<table class="table table-striped">
+      <thead class="table-header">
+      <tr>
+      	<th>Institution</th>
+      	<th>Location</th>
+      	<th>Linked Publications</th>
+      	<th>Linked authors</th>
+      </tr>
+      </thead>
+      <tbody class="table-body">
+       <tr th:each="aff, iter : ${affs}" th:classappend="(${aff.status} == 'INCORRECT' ? 'danger' : '') + (${aff.status} == 'CORRECT_REGION' ? 'warning' : '') + (${aff.status} == 'CORRECT' ? 'success' : '')" >
+      	<td>
+      		 <a th:href="@{/publications(name=${aff.id})}"><span th:text="${aff.id}"></span></a>
+      		 <br>[[${aff.settlement}]], [[${aff.country}]]
+      	</td>
+      	<td th:attr="id=${'name-' + iter.index}">
+	      	<i th:if="${aff.locType == 'CURATED'}" class="fas fa-user-check" title ="Checked"></i>
+	      	<i th:if="${aff.locType == 'CITY'}" class="fas fa-city" title ="City"></i>
+	      	<i th:if="${aff.locType == 'COUNTRY'}" class="far fa-flag" title ="Country"></i>
+	      	<a th:if="${aff.wiki}" target="_blank" th:href="'https://en.wikipedia.org/wiki/' + ${aff.wiki}">
+	      		[[${aff.wiki}]]
+	      	</a>
+      	</td>
+      	<td>
+      		<span th:if="${aff.paperId != null}">[[${#lists.size(aff.paperId)}]]</span>
+      	
+      	</td>
+      	<td>
+      		<span th:if="${aff.authors != null}">[[${#lists.size(aff.authors)}]]</span>
+      	
+      	</td>
+      	</tr>
+      	</tbody>
+      	</table>
+</body>
+</html>

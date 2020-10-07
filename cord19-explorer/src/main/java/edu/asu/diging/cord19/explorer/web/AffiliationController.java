@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import edu.asu.diging.cord19.explorer.core.model.Publication;
 import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
 import edu.asu.diging.cord19.explorer.core.mongo.PublicationRepository;
 
@@ -22,7 +23,7 @@ public class AffiliationController {
     public String findPublications(@RequestParam("name") String affiliation, Model model) {
         List<PublicationImpl> pubs = pubRepo.findByMetadataAuthorsAffiliationInstitution(affiliation);
         
-        for (PublicationImpl pub : pubs) {
+        for (Publication pub : pubs) {
             if (pub.getMetadata() != null && pub.getMetadata().getAuthors() != null) {
                    pub.getMetadata().setAuthors(pub.getMetadata().getAuthors().stream().filter(a -> {
                        if (a.getAffiliation() != null && a.getAffiliation().getWikiarticles() != null) {
@@ -34,7 +35,6 @@ public class AffiliationController {
             }
         }
         
-       
         model.addAttribute("publications", pubs);
         model.addAttribute("institution", affiliation);
         return "affiliation";

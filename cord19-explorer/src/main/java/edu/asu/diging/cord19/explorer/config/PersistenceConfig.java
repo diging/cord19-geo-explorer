@@ -76,6 +76,7 @@ public class PersistenceConfig {
         properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQLInnoDBDialect");
         properties.setProperty("hibernate.show_sql", "true");
         properties.setProperty("hibernate.id.new_generator_mappings", "true");
+        properties.setProperty("hibernate.naming_strategy", "org.hibernate.cfg.ImprovedNamingStrategy");
 
         return properties;
     }

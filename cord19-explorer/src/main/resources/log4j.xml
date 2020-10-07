@@ -12,7 +12,7 @@
     
     <!-- Application Loggers -->
     <logger name="edu.asu.diging">
-        <level value="debug" />
+        <level value="${log.level.diging}" />
     </logger>
     
     <logger name="org.springframework.scheduling">

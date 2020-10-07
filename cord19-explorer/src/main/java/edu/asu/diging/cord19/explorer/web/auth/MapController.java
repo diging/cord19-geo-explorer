@@ -71,7 +71,7 @@ public class MapController {
         model.addAttribute("countries", countriesMap);
         model.addAttribute("low", lowCount);
         model.addAttribute("high", highCount);
-        
+        System.out.println("Hits");
         return "auth/map";
     }
     

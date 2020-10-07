@@ -1,0 +1,203 @@
+<html layout:decorate="~{layouts/main}">
+  <head>
+    <title>CORD-19 Geo Explorer</title>
+  </head>
+  <body>
+   <div th:replace="layouts/navbar :: navbar"></div>
+   <div layout:fragment="content" class="content">
+      <h2>Affiliations</h2>
+      
+      	<h5 style="color: var(--content-6)">
+      		Total: [[${total}]] affiliations
+      	</h5>
+   			
+	   	<nav>
+		  <ul class="pagination">
+		  	<li th:if="${page != 0}"><a href="#" th:href="@{'/auth/affiliations?page=0'}" aria-label="First"><span aria-hidden="true">&laquo;&laquo;</span></a></li>
+		  	<li th:if="${page == 0}" class="disabled"><a href="#" aria-label="First"><span aria-hidden="true">&laquo;&laquo;</span></a></li>
+		  	
+		    <li th:if="${page - 1 >= 0}"><a href="#" th:href="@{'/auth/affiliations?page=' + ${page-1}}" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+		    <li th:if="${page - 1 < 0}" class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+		    
+		    <li th:if="${page - 4 >= 0}"><a href="#" th:href="@{'/auth/affiliations?page=' + ${page-5}}">[[${page-3}]]</a></li>
+		    <li th:if="${page - 3 >= 0}"><a href="#" th:href="@{'/auth/affiliations?page=' + ${page-3}}">[[${page-2}]]</a></li>
+		    <li th:if="${page - 2 >= 0}"><a href="#" th:href="@{'/auth/affiliations?page=' + ${page-2}}">[[${page-1}]]</a></li>
+		    <li th:if="${page - 1 >= 0}"><a href="#" th:href="@{'/auth/affiliations?page=' + ${page-1}}">[[${page}]]</a></li>
+		    
+		    <li class="active"><a href="#">[[${page+1}]]</a></li>
+		    
+		    <li th:if="${page + 1 < pageCount}"><a href="#" th:href="@{'/auth/affiliations?page=' + ${page+1}}">[[${page+2}]]</a></li>
+		    <li th:if="${page + 2 < pageCount}"><a href="#" th:href="@{'/auth/affiliations?page=' + ${page+2}}">[[${page+3}]]</a></li>
+		    <li th:if="${page + 3 < pageCount}"><a href="#" th:href="@{'/auth/affiliations?page=' + ${page+3}}">[[${page+4}]]</a></li>
+		    <li th:if="${page + 4 < pageCount}"><a href="#" th:href="@{'/auth/affiliations?page=' + ${page+4}}">[[${page+5}]]</a></li>
+		    
+		    <li th:if="${page + 1 < pageCount}"><a href="#" th:href="@{'/auth/affiliations?page=' + ${page+1}}" aria-label="Previous"><span aria-hidden="true">&raquo;</span></a></li>
+		    <li th:if="${page + 1 >= pageCount}" class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&raquo;</span></a></li>
+		    
+		    <li th:if="${page != pageCount-1}"><a href="#" th:href="@{'/auth/affiliations?page=' + ${pageCount-1}}" aria-label="Last"><span aria-hidden="true">&raquo;&raquo;</span></a></li>
+		  	<li th:if="${page == pageCount-1}" class="disabled"><a href="#" aria-label="Last"><span aria-hidden="true">&raquo;&raquo;</span></a></li>
+		  	
+		  </ul>
+		</nav>
+      
+      <table class="table table-striped">
+	      <thead class="table-header">
+	      <tr>
+	      	<th>Institution</th>
+	      	<th>Selected Wiki article</th>
+	      	<th>Coordinates</th>
+	      	<th></th>
+	      	<th>Status</th>
+	      </tr>
+	      </thead>
+	      <tbody class="table-body">
+	      	<tr th:each="aff, iter : ${affs}" th:classappend="(${aff.status} == 'INCORRECT' ? 'danger' : '') + (${aff.status} == 'CORRECT_REGION' ? 'warning' : '') + (${aff.status} == 'CORRECT' ? 'success' : '')" >
+	      	<td>
+	      		 <a th:href="@{/affiliation(name=${aff.id})}"><span th:text="${aff.id}"></span></a>
+	      		 <br>[[${aff.settlement}]], [[${aff.country}]]
+	      	</td>
+	      	<td th:attr="id=${'name-' + iter.index}">
+	      		<a th:if="${aff.wiki}" target="_blank" th:href="'https://en.wikipedia.org/wiki/' + ${aff.wiki}">
+	      		[[${aff.wiki}]]
+	      		</a><br>
+	      		<i th:if="${aff.locType == 'CURATED'}" class="fas fa-user-check"></i>
+	      		<i th:if="${aff.locType == 'CITY'}" class="fas fa-city"></i>
+	      		<i th:if="${aff.locType == 'COUNTRY'}" class="far fa-flag"></i>
+	      	</td>
+	      	<td>
+	      		<span th:text="${aff.coord}"></span>
+	      	</td>
+	      	<td>
+	      		<a href="#"><i class="fas fa-tools aff-fix" th:attr="data-index=${iter.index}, data-title=${aff.id}, data-city=${aff.settlement}, data-country=${aff.country}"></i></a>
+	      	</td>
+	      	<td>
+	      		<form th:action="@{'/auth/affiliation/status'}" method="POST">
+	      		<input type="hidden" name="affiliation" th:value="${aff.id}">
+	      		<input type="hidden" name="status" value="INCORRECT">
+	      		<input type="hidden" name="page" th:value="${page}">
+	      		<button type="submit" class="btn btn-xs btn-danger">Incorrect</button>
+	      		</form>
+	      		<form th:action="@{'/auth/affiliation/status'}" method="POST">
+	      		<input type="hidden" name="affiliation" th:value="${aff.id}">
+	      		<input type="hidden" name="status" value="CORRECT_REGION">
+	      		<input type="hidden" name="page" th:value="${page}">
+	      		<button type="submit" class="btn btn-xs btn-warning">Correct region</button>
+	      		</form>
+	      		<form th:action="@{'/auth/affiliation/status'}" method="POST">
+	      		<input type="hidden" name="affiliation" th:value="${aff.id}">
+	      		<input type="hidden" name="status" value="CORRECT">
+	      		<input type="hidden" name="page" th:value="${page}">
+	      		<button type="submit" class="btn btn-xs btn-success">Correct</button>
+	      		</form>
+	      	</td>
+	      	</tr>
+	      </tbody>
+	  
+      </table>
+      
+      <script>
+      //# sourceURL=correct.js
+      $(function() {
+    	  $(".aff-fix").click(function(e) {
+    		  e.preventDefault();
+    		  var title = $(e.target).attr("data-title");
+    		  var city = $(e.target).attr("data-city");
+    		  var country = $(e.target).attr("data-country");
+    		  if (title != undefined) {
+    			  $("#searchTerm").val(title);
+    		  } else if (city != undefined) {
+    			  $("#searchTerm").val(city);
+    		  } else {
+    			  $("#searchTerm").val(country);
+    		  }
+    		  $("#affiliationName").val(title);
+    		  $("#rowIdx").val($(e.target).attr("data-index"));
+    		  $("#searchModal").modal('show');
+    	  });
+    	  
+    	  $("#closeBtn").click(function() {
+    		  $("#searchResults").empty();
+    	  })
+    	  
+    	  $("#searchBtn").click(function() {
+    		  $("#searchResults").empty();
+    		  var searchTerm = $("#searchTerm").val();
+    		  var affiliation = $("#affiliationName").val();
+    		  var rowIdx = $("#rowIdx").val();
+    		  if (searchTerm != undefined) {
+    			  $.get("[(@{/auth/affiliation/wiki/find})]?title=" + searchTerm, function( data ) {
+    				var ul = $('<div class="list-group">');
+    				data.forEach(function(elem, idx) {
+    					var li = $('<a href="https://en.wikipedia.org/wiki/' + elem.title + '" target="_blank" class="list-group-item">');
+    					li.append("<b>" + elem.title + "</b>");
+    					li.append("<br>");
+    					li.append(elem.shortDescription);
+    					if (elem.redirectsTo != undefined) {
+    						li.append("Redirects to: <i>" + elem.redirectsTo + "</i>");
+    					}
+    					if (elem.coordinates != undefined) {
+    						var span = $('<span class="pull-right"></span>');
+    						span.append('<i class="fas fa-map-marked-alt"></i>');
+    						span.click(function(e) {
+								selectLocation(elem.id, affiliation, rowIdx);
+								e.preventDefault();
+								$("#searchModal").modal('hide');
+							});		
+    						li.append(span);
+    						li.append('<span class="clearfix"></span>');
+    					} else {
+    						li.addClass("disabled");
+    					}
+    					ul.append(li);
+    				});
+    				$("#searchResults").append(ul);
+    			  })
+    		  }
+    	  });
+      })
+      
+      function selectLocation(id, affiliation, idx) {
+    	  $.ajax({
+    		  type: "POST",
+    		  url: "[[(@{/auth/affiliation/wiki/select})]]?id=" + id + "&affiliation=" + affiliation + "&[[${_csrf.parameterName}]]=[[${_csrf.token}]]",
+    		  success: function(data) {
+    			  data = JSON.parse(data);
+    			  var td = $("#name-" + idx);
+    			  td.empty();
+    			  var a = $('<a href="https://en.wikipedia.org/wiki/' + data.title + '" targe="_blank">' + data.title + "</a>");
+    			  td.append(a);
+    			  td.append("<br>");
+    			  td.append("(" + data.count + ") ")
+    			  td.append('<i class="fas fa-user-check"></i>');
+    		  },
+    		});
+      }
+      
+      </script>
+      
+      <div id="searchModal" class="modal fade content"  tabindex="-1" role="dialog">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content" style="padding: 25px;">
+	      <div class="modal-header">
+	        <h4 class="modal-title">Search</h4>
+	      </div>
+	      <div class="modal-body">
+	     	<p>
+	        <input class="form-control searchbox" type="text" id="searchTerm">
+	        <input type="hidden" id="affiliationName">
+	        <input type="hidden" id="rowIdx">
+	        </p>
+	        <p id="searchResults">
+	        </p>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" id="closeBtn" data-dismiss="modal">Close</button>
+	        <button id="searchBtn" type="button" class="btn primary-btn">Search</button>
+	      </div>
+	    </div><!-- /.modal-content -->
+	  </div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+	
+   </div>
+  </body>
+</html>

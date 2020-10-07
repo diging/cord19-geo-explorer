@@ -20,6 +20,9 @@ public class AffiliationImpl implements Affiliation {
     
     private List<WikipediaArticleImpl> wikiarticles;
     private WikipediaArticleImpl selectedWikiarticle;
+    
+    private WikipediaSelectionStatus selectionStatus;
+    private String selectionCheckedOn;
 
     @JsonProperty("location")
     private void unpackLocation(Map<String, Object> location) {
@@ -193,6 +196,26 @@ public class AffiliationImpl implements Affiliation {
     @Override
     public void setSelectedWikiarticle(WikipediaArticleImpl selectedWikiarticle) {
         this.selectedWikiarticle = selectedWikiarticle;
+    }
+
+    @Override
+    public WikipediaSelectionStatus getSelectionStatus() {
+        return selectionStatus;
+    }
+
+    @Override
+    public void setSelectionStatus(WikipediaSelectionStatus selectionStatus) {
+        this.selectionStatus = selectionStatus;
+    }
+
+    @Override
+    public String getSelectionCheckedOn() {
+        return selectionCheckedOn;
+    }
+
+    @Override
+    public void setSelectionCheckedOn(String selectionCheckedOn) {
+        this.selectionCheckedOn = selectionCheckedOn;
     }
 
 }

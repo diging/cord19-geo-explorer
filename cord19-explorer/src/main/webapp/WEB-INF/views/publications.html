@@ -6,7 +6,18 @@ $(function() {
     $('#sortByDropdown').change(function() {
         this.form.submit();
     });
+    
+    $('#orderByDropdown').change(function() {
+    	var sort = document.getElementById("sortByDropdown");
+    	var value = sort.options[sort.selectedIndex].value;
+    	var order = document.getElementById("orderByDropdown");
+    	var newVal = order.options[order.selectedIndex].value;
+    	var res = value.split(",")
+    	sort.options[sort.selectedIndex].value = res[0]+","+newVal
+        this.form.submit();
+    });
 });
+
 
 </script>
 </head>
@@ -17,17 +28,21 @@ $(function() {
 		<div class="nav-content" style="width: 100%">
 		<h3>[[${total}]] publications found</h3>
 		 <form th:action="@{'/pubs'}" id="sortByForm" method="GET" class="form" style="display: flex;">	
-				<div style="display: flex;">
-				<h5>Sort by:</h5>
-				</div>
-				
-				<div>
+				<div style="display:flex">
+				<label for="sortByDropdown">Sort by: </label>
 					<select aria-describedby="sortByDropdown" class="form-control searchbox" data-nav-selected="47"
 						id="sortByDropdown" style="display: block"
 						tabindex="18" title="Sort by:" th:name="sort">
-						<option value="journal,desc" th:selected="${sort eq 'journal,DESC'}">Journal</option>
- 						<option value="publishYear,desc" th:selected="${sort eq 'publishYear,DESC'}">Year</option>
- 						<option value="metadata.title,desc" th:selected="${sort eq 'metadata.title,DESC'}">Title</option>
+						<option value="journal,desc" th:selected="${sort eq 'journal,DESC' or sort eq 'journal,ASC' }">Journal</option>
+ 						<option value="publishYear,desc" th:selected="${sort eq 'publishYear,DESC' or sort eq 'publishYear,ASC'}">Year</option>
+ 						<option value="metadata.title,asc" th:selected="${sort eq 'metadata.title,DESC' or sort eq 'metadata.title,ASC'}">Title</option>
+					</select>
+					<label for="orderByDropdown">Order by: </label>
+					<select aria-describedby="orderByDropdown" class="form-control searchbox" data-nav-selected="47"
+						id="orderByDropdown" style="display: block"
+						tabindex="18" title="Order by:">
+						<option value="asc" th:selected="${order eq 'ASC'}">Ascending</option>
+ 						<option value="desc" th:selected="${order eq 'DESC'}">Descending</option>
 					</select>
 				</div>
 				
@@ -39,6 +54,8 @@ $(function() {
 				<div th:each="pub, iStat : ${pubs}">
 					<tr>
 						<th scope="row" style="border: none;"><b><a th:href="@{'/paper/' + ${pub.paperId}}">[[${#strings.defaultString(pub.metadata.title, 'No title available')}]]</a></b> <br>
+							<b th:if="${pub.publishYear != '' && pub.publishYear > 0}">Publish Year: [[${pub.publishYear}]]</b> 
+							<b th:if="${pub.journal != null}">, Journal: [[${pub.journal}]]</b><br th:if="${pub.journal != null or pub.publishYear != null}">
 							<div th:each="author, iterstat : ${pub.metadata.authors}" class="authors-list">
 								<b th:if="${author.name == null}">[[${author.first}]] [[${#strings.listJoin(author.middle,',')}]] [[${author.last}]]</b>
 								<b th:if="${author.name != null}">[[${author.name}]]</b><span th:text="!${iterstat.last} ? ',': ''"></span>

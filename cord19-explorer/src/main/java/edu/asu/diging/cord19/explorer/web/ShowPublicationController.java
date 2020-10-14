@@ -25,6 +25,7 @@ public class ShowPublicationController {
         model.addAttribute("page", pageable.getPageNumber());
         model.addAttribute("pageCount", page.getTotalPages());
         model.addAttribute("sort", pageable.getSort().toString().replace(": ", ","));
+        model.addAttribute("order", pageable.getSort().toString().split(": ")[1]);
         return "publications";
     }
 

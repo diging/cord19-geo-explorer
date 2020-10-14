@@ -25,6 +25,10 @@ textarea, input {
     text-decoration: inherit;
 }
 
+b {
+	color: var(--content-6);
+}
+
 a{
 	color: var(--primary) !important;
 	font-weight: 600 !important;	
@@ -359,4 +363,9 @@ td, th {
 	background-color: var(--raised-8) !important;
 	border-color: white !important;
 	color: white;
+}
+
+.one-line-right {
+	white-space: nowrap;
+	margin-right: 10px;
 }

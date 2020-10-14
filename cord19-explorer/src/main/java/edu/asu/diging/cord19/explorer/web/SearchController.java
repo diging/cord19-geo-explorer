@@ -1,7 +1,5 @@
 package edu.asu.diging.cord19.explorer.web;
 
-import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -12,46 +10,38 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
-import edu.asu.diging.cord19.explorer.core.mongo.impl.AffiliationPaperAggregationOutput;
 import edu.asu.diging.cord19.explorer.core.mongo.impl.SearchProvider;
+import edu.asu.diging.cord19.explorer.core.mongo.impl.SearchProviderRegistry;
 import edu.asu.diging.cord19.explorer.web.model.SearchType;
 
 @Controller
 public class SearchController {
 
     @Autowired
-    private Map<SearchType, SearchProvider> searchProviderRegistry;
+    private SearchProviderRegistry searchProviderRegistry;
 
     @RequestMapping(value = "/{searchType}/search")
-    public String search(@PathVariable("searchType") SearchType searchType, @RequestParam("search") String query,
+    public String search(@PathVariable("searchType") String searchType, @RequestParam("search") String query,
             Model model, @PageableDefault(size = 20) Pageable pageable) {
 
-        if (searchType.equals(SearchType.AFFILIATIONS)) {
-            @SuppressWarnings("unchecked")
-            List<AffiliationPaperAggregationOutput> matchedAffiliationsList = (List<AffiliationPaperAggregationOutput>) searchProviderRegistry
-                    .get(SearchType.AFFILIATIONS)
-                    .search(query, (long) pageable.getPageNumber(), pageable.getPageSize());
-            long affCount = searchProviderRegistry.get(SearchType.AFFILIATIONS).getTotalResults(query);
-            model.addAttribute("matchedAffiliationsPage", matchedAffiliationsList);
-            addAttributes(model, pageable, query, affCount);
+        if (searchType.equalsIgnoreCase(SearchType.AFFILIATIONS.toString())) {
+            addAttributes(model, pageable, query, searchProviderRegistry.getProvider(SearchType.AFFILIATIONS),
+                    "matchedAffiliationsPage");
             return "affResults";
 
         } else {
-            @SuppressWarnings("unchecked")
-            List<PublicationImpl> matchedPublicationsList = (List<PublicationImpl>)searchProviderRegistry.get(SearchType.PUBLICATIONS).search(query,
-                    (long) pageable.getPageNumber(), pageable.getPageSize());
-            
-            
-            long pubCount = searchProviderRegistry.get(SearchType.PUBLICATIONS).getTotalResults(query);
-            addAttributes(model, pageable, query, pubCount);
-            model.addAttribute("matchedPublicationsPage", matchedPublicationsList);
+            addAttributes(model, pageable, query, searchProviderRegistry.getProvider(SearchType.PUBLICATIONS),
+                    "matchedPublicationsPage");
             return "results";
 
         }
     }
 
-    private void addAttributes(Model model, Pageable pageable, String query, long count) {
+    private void addAttributes(Model model, Pageable pageable, String query, SearchProvider searchProvider,
+            String listType) {
+        long count = searchProvider.getTotalResults(query);
+        model.addAttribute(listType,
+                searchProvider.search(query, (long) pageable.getPageNumber(), pageable.getPageSize()));
         model.addAttribute("total", count);
         model.addAttribute("query", query);
         model.addAttribute("page", pageable.getPageNumber());

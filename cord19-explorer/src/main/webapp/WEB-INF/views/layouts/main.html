@@ -30,10 +30,10 @@
 	$( document ).ready(function() {
 	    $("#searchDropdownBox").change(function() {
 	        if($(this).val() == "AFFILIATIONS"){
-	            $("#searchForm").attr("action", '[[@{/AFFILIATIONS/search}]]');
+	            $("#searchForm").attr("action", '[[@{/affiliations/search}]]');
 	        }
 	        else{
-	        	$("#searchForm").attr("action", '[[@{/PUBLICATIONS/search}]]');
+	        	$("#searchForm").attr("action", '[[@{/publications/search}]]');
 	        }
 	    });
 	});			

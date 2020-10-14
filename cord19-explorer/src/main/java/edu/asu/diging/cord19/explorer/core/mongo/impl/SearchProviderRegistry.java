@@ -5,26 +5,25 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Service;
 
 import edu.asu.diging.cord19.explorer.web.model.SearchType;
 
-@Configuration
+@Service
 public class SearchProviderRegistry {
 
     @Autowired
     private List<SearchProvider> searchProviders;
-    
-    
-    @Bean
-    public Map<SearchType, SearchProvider> initialize(){
-        Map<SearchType, SearchProvider> map = new HashMap<>();
-        for (SearchProvider search : searchProviders) {
-            map.put(search.getSearchType(), search);
+
+    Map<SearchType, SearchProvider> map = new HashMap<>();
+
+    public SearchProvider getProvider(SearchType searchType) {
+        if (map.size() == 0) {
+            for (SearchProvider search : searchProviders) {
+                map.put(search.getSearchType(), search);
+            }
         }
-        return map;
+        return map.get(searchType);
     }
-    
 
 }

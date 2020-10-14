@@ -10,7 +10,7 @@
 				<h5>
 					Version: <span
 						th:text="${#strings.defaultString(@environment.getProperty('buildNumber'),'')}"></span>
-					<span th:if="${@environment.getProperty('pullReq') != null}">,
+					<span th:if="${@environment.getProperty('pullrequest') != null}">,
 						Pull Request: <span
 						th:text="${#strings.defaultString(@environment.getProperty('pullrequest'),'')}"></span>
 					</span>

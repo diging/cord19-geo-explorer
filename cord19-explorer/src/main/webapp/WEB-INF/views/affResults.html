@@ -15,7 +15,7 @@
 			</thead>
 			<tbody>
 
-				<div th:each="aff, iStat : ${matchedAffiliationsPage}">
+				<div th:each="aff, iStat : ${matchedResultsPage}">
 					<tr>
 						<th scope="row">
 						<b><a th:href="@{'/affiliation?name=' + ${aff.id}}">[[${#strings.defaultString(aff.wiki,
@@ -27,7 +27,7 @@
 		</table>
 
 		<div th:if="${totalPages > 0}" class="pagination" th:each="pageNumber : ${pageNumbers}">
-			<a th:href="@{/affiliations/search(size=${#lists.size(matchedAffiliationsPage)}, page=${pageNumber}, search=${query}, totalPages=${totalPages})}" th:text=${pageNumber}></a>
+			<a th:href="@{/affiliations/search(size=${#lists.size(matchedResultsPage)}, page=${pageNumber}, search=${query}, totalPages=${totalPages})}" th:text=${pageNumber}></a>
 		</div>
 		<nav>
 			<ul class="pagination">

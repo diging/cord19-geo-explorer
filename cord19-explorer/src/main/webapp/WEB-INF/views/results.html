@@ -9,7 +9,7 @@
 		<h3>[[${total}]] results for <span style="color: var(--primary)">"[[${query}]]"</span></h3>
 		<table class="table table-striped">
 			<tbody>
-				<div th:each="pub, iStat : ${matchedPublicationsPage}">
+				<div th:each="pub, iStat : ${matchedResultsPage}">
 					<tr>
 						<th scope="row" style="border: none;"><b><a th:href="@{'/paper/' + ${pub.paperId}}">[[${#strings.defaultString(pub.metadata.title, 'No title available')}]]</a></b> <br>
 							<div th:each="author, iterstat : ${pub.metadata.authors}" class="authors-list">
@@ -25,7 +25,7 @@
 		<div th:if="${totalPages > 0}"
 			class="pagination" th:each="pageNumber : ${pageNumbers}">
 			<a
-				th:href="@{/publications/search(size=${#lists.size(matchedpublicationsPage)}, page=${pageNumber}, search=${query}, totalPages=${totalPages})}"
+				th:href="@{/publications/search(size=${#lists.size(matchedResultsPage)}, page=${pageNumber}, search=${query}, totalPages=${totalPages})}"
 				th:text=${pageNumber}></a>
 		</div>
 		

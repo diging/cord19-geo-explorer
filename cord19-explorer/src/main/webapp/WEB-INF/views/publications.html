@@ -2,23 +2,20 @@
 <head>
 <title>Authority Matcher</title>
 <script>
-$(function() {
-    $('#sortByDropdown').change(function() {
-        this.form.submit();
-    });
-    
-    $('#orderByDropdown').change(function() {
-    	var sort = document.getElementById("sortByDropdown");
-    	var value = sort.options[sort.selectedIndex].value;
-    	var order = document.getElementById("orderByDropdown");
-    	var newVal = order.options[order.selectedIndex].value;
-    	var res = value.split(",")
-    	sort.options[sort.selectedIndex].value = res[0]+","+newVal
-        this.form.submit();
-    });
-});
+	$(function() {
+		$('#sortByDropdown').change(function() {
+			this.form.submit();
+		});
 
+		$('#orderByDropdown').change(
+				function() {
 
+					$('#sortByDropdown').find(":selected").val(
+							$('#sortByDropdown').find(":selected").val().split(",")[0] +","
+							+ $('#orderByDropdown').find(":selected").val());
+					this.form.submit();
+				});
+	});
 </script>
 </head>
 <body>

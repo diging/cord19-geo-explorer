@@ -20,8 +20,7 @@ public class ShowPublicationController {
     public String get(Model model, Pageable pageable) {
         Page<PublicationImpl> page = pubDao.getPublications(pageable);
         model.addAttribute("pubs", page);
-        long pubCount = page.getTotalElements();
-        model.addAttribute("total", pubCount);
+        model.addAttribute("total", page.getTotalElements());
         model.addAttribute("page", pageable.getPageNumber());
         model.addAttribute("pageCount", page.getTotalPages());
         model.addAttribute("sort", pageable.getSort().toString().replace(": ", ","));

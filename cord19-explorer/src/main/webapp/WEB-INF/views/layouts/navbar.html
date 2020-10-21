@@ -7,7 +7,7 @@
 		   
       <div style="display: flex">
          
-          <form th:action="@{/login}">
+         <form th:action="@{/login}">
             <button sec:authorize="!isAuthenticated()" class="btn primary-btn" type="submit" style="margin-right: 40px;">Login</button>
          </form>
          <form th:action="@{'/affiliations/search'}" id="searchForm" method="GET" class="form" style="position: relative; display: flex; align-items: center">	

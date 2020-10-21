@@ -46,7 +46,7 @@ public class SearchController {
                     count / pageable.getPageSize() + (count % pageable.getPageSize() > 0 ? 1 : 0));
             return views.get(SearchType.valueOf(searchType));
         } catch (IllegalArgumentException e) {
-            logger.error("Could not store Group", e);
+            logger.error("searchType doesn't exist", e);
             redirectAttrs.addFlashAttribute("show_alert", true);
             redirectAttrs.addFlashAttribute("alert_type", "danger");
             redirectAttrs.addFlashAttribute("alert_msg", "Search Failed. Invalid search Type");

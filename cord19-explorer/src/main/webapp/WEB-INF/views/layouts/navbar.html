@@ -11,7 +11,7 @@
             <button sec:authorize="!isAuthenticated()" class="btn primary-btn" type="submit" style="margin-right: 40px;">Login</button>
          </form>
          <form th:action="@{'/affiliations/search'}" id="searchForm" method="GET" class="form" style="position: relative; display: flex; align-items: center">	
-				<input class="form-control searchbox form_input" type="search" placeholder="Search" id="search" th:name="search">
+		     <input class="form-control searchbox form_input" type="search" placeholder="Search" id="search" th:name="search">
 				<div class="form_icon">
 					<select aria-describedby="searchDropdownDescription" class="form-control searchbox" data-nav-selected="47"
 						id="searchDropdownBox" style="display: block; width: unset"

@@ -17,7 +17,6 @@ public class SearchProviderRegistry {
     @Autowired
     private List<SearchProvider> searchProviders;
 
-    private Map<SearchType, String> views = new HashMap<>();
 
     private Map<SearchType, SearchProvider> map = new HashMap<>();
 
@@ -26,16 +25,10 @@ public class SearchProviderRegistry {
         for (SearchProvider search : searchProviders) {
             map.put(search.getSearchType(), search);
         }
-        views.put(SearchType.AFFILIATIONS, "affResults");
-        views.put(SearchType.PUBLICATIONS, "results");
     }
 
     public SearchProvider getProvider(SearchType searchType) {
         return map.get(searchType);
-    }
-
-    public String getView(SearchType searchType) {
-        return views.get(searchType);
     }
 
 }

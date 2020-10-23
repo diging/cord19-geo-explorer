@@ -22,29 +22,27 @@ import edu.asu.diging.cord19.explorer.web.model.SearchType;
 
 @Controller
 public class SearchController {
-    
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private SearchProviderRegistry searchProviderRegistry;
-    
+
     private Map<SearchType, String> views = new HashMap<>();
+
+    @PostConstruct
+    public void init() {
+        views.put(SearchType.AFFILIATIONS, "affResults");
+        views.put(SearchType.PUBLICATIONS, "results");
+    }
 
     @RequestMapping(value = "/{searchType}/search")
     public String search(@PathVariable("searchType") String searchType, @RequestParam("search") String query,
             Model model, @PageableDefault(size = 20) Pageable pageable, RedirectAttributes redirectAttrs) {
-
+        SearchType search;
         try {
             searchType = searchType.toUpperCase();
-            long count = searchProviderRegistry.getProvider(SearchType.valueOf(searchType)).getTotalResults(query);
-            model.addAttribute("matchedResultsPage", searchProviderRegistry.getProvider(SearchType.valueOf(searchType))
-                    .search(query, (long) pageable.getPageNumber(), pageable.getPageSize()));
-            model.addAttribute("total", count);
-            model.addAttribute("query", query);
-            model.addAttribute("page", pageable.getPageNumber());
-            model.addAttribute("pageCount",
-                    count / pageable.getPageSize() + (count % pageable.getPageSize() > 0 ? 1 : 0));
-            return views.get(SearchType.valueOf(searchType));
+            search = SearchType.valueOf(searchType);
         } catch (IllegalArgumentException e) {
             logger.error("searchType doesn't exist", e);
             redirectAttrs.addFlashAttribute("show_alert", true);
@@ -53,11 +51,15 @@ public class SearchController {
             return "redirect:/";
         }
 
+        long count = searchProviderRegistry.getProvider(search).getTotalResults(query);
+        model.addAttribute("matchedResultsPage", searchProviderRegistry.getProvider(search).search(query,
+                (long) pageable.getPageNumber(), pageable.getPageSize()));
+        model.addAttribute("total", count);
+        model.addAttribute("query", query);
+        model.addAttribute("page", pageable.getPageNumber());
+        model.addAttribute("pageCount", count / pageable.getPageSize() + (count % pageable.getPageSize() > 0 ? 1 : 0));
+        return views.get(search);
+
     }
-    
-    @PostConstruct
-    public void init() {
-        views.put(SearchType.AFFILIATIONS, "affResults");
-        views.put(SearchType.PUBLICATIONS, "results");
-    }
+
 }

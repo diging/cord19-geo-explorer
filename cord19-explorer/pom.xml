@@ -308,6 +308,10 @@
 
 
 	</dependencies>
+	<scm>
+		<connection>scm:svn:http://none</connection>
+		<url>scm:svn:https://none</url>
+	</scm>
 
 	<build>
 		<finalName>cord19-geo-explorer</finalName>

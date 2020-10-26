@@ -2,12 +2,15 @@ package edu.asu.diging.cord19.explorer.core.mongo.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -20,7 +23,7 @@ import org.springframework.data.mongodb.core.aggregation.SortOperation;
 import org.springframework.data.mongodb.core.aggregation.UnwindOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.repository.support.PageableExecutionUtils;
+import org.springframework.data.util.StreamUtils;
 import org.springframework.stereotype.Service;
 
 import com.mongodb.BasicDBObject;
@@ -73,12 +76,16 @@ public class PublicationDaoImpl implements PublicationDao {
     @Override
     public Page<PublicationImpl> getPublications(Pageable pageable) {
 
-        Query query = new Query().with(pageable);
+        String[] sort = pageable.getSort().toString().split(": ");
 
-        List<PublicationImpl> list = mongoTemplate.find(query, PublicationImpl.class);
-        return PageableExecutionUtils.getPage(list, pageable,
-                () -> mongoTemplate.count(query.limit(-1).skip(-1), PublicationImpl.class));
+        long startItem = pageable.getPageNumber() * pageable.getPageSize();
+        int limit = pageable.getPageSize();
+        List<PublicationImpl> list = StreamUtils.createStreamFromIterator(mongoTemplate.stream(
+                new Query().with(Sort.by(new Order(sort[1].equals("ASC") ? Direction.ASC : Direction.DESC, sort[0]))),
+                PublicationImpl.class)).skip(startItem).limit(limit).collect(Collectors.toList());
 
+        Page<PublicationImpl> page = new PageImpl<PublicationImpl>(list, pageable, list.size());
+        return page;
     }
 
     @Override
@@ -91,11 +98,10 @@ public class PublicationDaoImpl implements PublicationDao {
                 .first("metadata.authors.affiliation.locationSettlement").as("settlement")
                 .first("metadata.authors.affiliation.locationCountry").as("country")
                 .first("metadata.authors.affiliation.selectedWikiarticle.coordinates").as("coord")
-                .first("metadata.authors.affiliation.selectedWikiarticle.locationType").as("locType")
-                .push("paperId").as("paperId").push(new BasicDBObject
-                        ("firstName", "$metadata.authors.first").append
-                        ("lastName", "$metadata.authors.last")).as("authors");
-
+                .first("metadata.authors.affiliation.selectedWikiarticle.locationType").as("locType").push("paperId")
+                .as("paperId").push(new BasicDBObject("firstName", "$metadata.authors.first").append("lastName",
+                        "$metadata.authors.last"))
+                .as("authors");
 
         SortOperation sort = Aggregation.sort(Sort.by(Order.asc("_id")));
 

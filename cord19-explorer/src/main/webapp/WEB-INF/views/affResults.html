@@ -6,15 +6,9 @@
 	<div th:replace="layouts/navbar :: navbar"></div>
 	
 	<div layout:fragment="content" class="content">
-		<h3>[[${total}]] results for <span style="color: var(--primary)">"[[${query}]]"</span></h3>
+		<h3>[[${total}]] results in Affiliations for <span style="color: var(--primary)">"[[${query}]]"</span></h3>
 		<table class="table table-striped">
-			<thead>
-				<tr>
-					<th scope="col">Matched affiliations</th>
-				</tr>
-			</thead>
 			<tbody>
-
 				<div th:each="aff, iStat : ${matchedResultsPage}">
 					<tr>
 						<th scope="row">

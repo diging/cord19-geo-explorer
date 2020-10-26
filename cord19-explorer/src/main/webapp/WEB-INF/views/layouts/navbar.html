@@ -18,7 +18,7 @@
 						tabindex="18" title="Search in">
 	
 						<option th:each="search : ${T(edu.asu.diging.cord19.explorer.web.model.SearchType).values()}"
-                                        th:value="${search}" th:text="${search}"></option>
+                                        th:value="${search}" th:text="${#strings.capitalize(#strings.toLowerCase(search))}"></option>
 					</select>
 
 				</div>

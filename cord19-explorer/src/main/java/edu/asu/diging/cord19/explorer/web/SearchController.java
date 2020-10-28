@@ -50,7 +50,9 @@ public class SearchController {
             redirectAttrs.addFlashAttribute("alert_msg", "Search Failed. Invalid search Type");
             return "redirect:/";
         }
-
+        if (query.isEmpty()) {
+            return "redirect:/";
+        }
         long count = searchProviderRegistry.getProvider(search).getTotalResults(query);
         model.addAttribute("matchedResultsPage", searchProviderRegistry.getProvider(search).search(query,
                 (long) pageable.getPageNumber(), pageable.getPageSize()));

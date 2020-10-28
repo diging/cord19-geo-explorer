@@ -11,7 +11,7 @@
 			<tbody>
 				<div th:each="pub, iStat : ${matchedResultsPage}">
 					<tr>
-						<th scope="row" style="border: none;"><b><a th:href="@{'/paper/' + ${pub.paperId}}">[[${#strings.defaultString(pub.metadata.title, 'No title available')}]]</a></b> <br>
+						<th scope="row" style="border: none;"><b><a th:href="@{'/paper/?paperId=' + ${#uris.escapeQueryParam(pub.paperId)}}">[[${#strings.defaultString(pub.metadata.title, 'No title available')}]]</a></b> <br>
 							<div th:each="author, iterstat : ${pub.metadata.authors}" class="authors-list">
 								<b th:if="${author.name == null}">[[${author.first}]] [[${#strings.listJoin(author.middle,',')}]] [[${author.last}]]</b>
 								<b th:if="${author.name != null}">[[${author.name}]]</b><span th:text="!${iterstat.last} ? ',': ''"></span>

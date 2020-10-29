@@ -1,0 +1,122 @@
+<div class="map" th:fragment="map">
+	<div id="mapid" style=" height: 400px;"></div>
+	<span hidden id="countries" th:text="${countries}"></span>
+	   <span hidden id="low" th:text="${low}"></span>
+	   <span hidden id="high" th:text="${high}"></span>
+	   <script th:inline="javascript">
+	   $(document).ready(function(){
+		   loadMap();
+		   
+		});
+	   function loadMap() {
+		   var map = L.map('mapid').setView([47, 2], 5);
+			L.tileLayer(
+				    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+				    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>',
+				    maxZoom: 6,
+				    }).addTo(map);
+		   function getCountries(handleData) {
+			   $.ajax([[@{'/'}]],   // request url
+				    {
+				        success: function (data, status, xhr) {// success callback function
+				           handleData(data)
+				      
+				    }
+				});
+		   }
+		   
+		   function getColor(d) {
+			    return d > 1000 ? '#800026' :
+			           d > 500  ? '#BD0026' :
+			           d > 200  ? '#E31A1C' :
+			           d > 100  ? '#FC4E2A' :
+			           d > 50   ? '#FD8D3C' :
+			           d > 20   ? '#FEB24C' :
+			           d > 10   ? '#FED976' :
+			                      '#FFEDA0';
+			}
+	
+		   
+		   function style(feature) {
+			    return {
+			        fillColor: getColor(feature.properties.selectedWikipediaCount),
+			        weight: 2,
+			        opacity: 1,
+			        color: 'white',
+			        dashArray: '3',
+			        fillOpacity: 0.7
+			    };
+			}
+		   var countries = [[${countries}]];
+		   Object.entries(countries).forEach(
+				   ([key, value]) => {
+					   obj = JSON.parse(value);
+					   delete obj["@type"]
+					   L.geoJson(obj, {style: style}).addTo(map);
+				   }
+				);
+	   		
+			// mapid is the id of the div where the map will appear
+			// center position + zoom
+			// Add a tile to the map = a background. Comes from OpenStreetmap
+	
+			
+		var info = L.control();
+		var geojson;
+		
+		info.onAdd = function (map) {
+		    this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+		    this.update();
+		    return this._div;
+		};
+		
+		// method that we will use to update the control based on feature properties passed
+		info.update = function (props) {
+		    this._div.innerHTML = '<h4>US Population Density</h4>' +  (props ?
+		        '<b>' + props.name + '</b><br />' + props.density + ' people / mi<sup>2</sup>'
+		        : 'Hover over a state');
+		};
+		
+		function highlightFeature(e) {
+		    var layer = e.target;
+	
+		    layer.setStyle({
+		        weight: 5,
+		        color: '#666',
+		        dashArray: '',
+		        fillOpacity: 0.7
+		    });
+	
+		    if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+		        layer.bringToFront();
+		    }
+		}
+		function zoomToFeature(e) {
+		    map.fitBounds(e.target.getBounds());
+		}
+		function resetHighlight(e) {
+		    geojson.resetStyle(e.target);
+		}
+		
+		function onEachFeature(feature, layer) {
+		    layer.on({
+		        mouseover: highlightFeature,
+		        mouseout: resetHighlight,
+		        click: zoomToFeature
+		    });
+		}
+	
+		geojson = L.geoJson(countries, {
+		    style: style,
+		    onEachFeature: onEachFeature
+		}).addTo(map);
+			
+			
+			// If the user change the map (zoom or drag), I update circle position:
+			//map.on("moveend", update)
+	   }
+	
+	</script>
+	
+	      <!-- Create an element where the map will take place -->
+	</div>

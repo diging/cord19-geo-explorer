@@ -31,7 +31,7 @@ public class GetCoordinatesController {
     
     @RequestMapping(value = "/auth/locate", method=RequestMethod.POST)
     public String getCoordinates(Model model) {
-        model.addAttribute("countries", pubDao.getCollection());
+        //model.addAttribute("countries", pubDao.getCollection());
         System.out.print(pubRepo.findAll());
         return "coordinates";
         

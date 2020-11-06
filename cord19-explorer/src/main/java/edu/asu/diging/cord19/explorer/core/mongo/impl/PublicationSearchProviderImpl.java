@@ -1,12 +1,14 @@
 package edu.asu.diging.cord19.explorer.core.mongo.impl;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.data.mongodb.core.query.TextQuery;
+import org.springframework.data.util.StreamUtils;
 import org.springframework.stereotype.Service;
 
 import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
@@ -42,9 +44,10 @@ public class PublicationSearchProviderImpl implements SearchProvider {
     public List<PublicationImpl> search(String title, Long currentPage, Integer size) {
         long startItem = currentPage * size;
 
-        Query query = buildQuery(title).sortByScore().skip(startItem).limit(size);
+        Query query = buildQuery(title);
 
-        return mongoTemplate.find(query, PublicationImpl.class);
+        return StreamUtils.createStreamFromIterator(mongoTemplate.stream(query, PublicationImpl.class)).skip(startItem)
+                .limit(size).collect(Collectors.toList());
     }
 
     @Override

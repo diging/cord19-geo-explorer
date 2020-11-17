@@ -1,5 +1,11 @@
 package edu.asu.diging.cord19.explorer.core.service.worker.impl;
 
+import java.util.List;
+import java.util.Map;
+
+import edu.asu.diging.cord19.explorer.core.model.PublicationType;
+import edu.asu.diging.cord19.explorer.core.model.impl.CategoryImpl;
+
 public class ExportedMetadataEntry {
 
     private String cordId;
@@ -29,6 +35,18 @@ public class ExportedMetadataEntry {
     private String primaryCategory;
     private String comment;
     private String abstractText;
+    
+    private String publicationType;
+    private String funder;
+    private String volume;
+    private String issue;
+    private String pages;
+    
+    private String meshTerms;
+    private int timesCited;
+    private int recentCitations;
+    
+    private String extraData;
     
     public String getCordId() {
         return cordId;
@@ -179,6 +197,60 @@ public class ExportedMetadataEntry {
     }
     public void setAbstractText(String abstractText) {
         this.abstractText = abstractText;
+    }
+    public String getPublicationType() {
+        return publicationType;
+    }
+    public void setPublicationType(String publicationType) {
+        this.publicationType = publicationType;
+    }
+    public String getFunder() {
+        return funder;
+    }
+    public void setFunder(String funder) {
+        this.funder = funder;
+    }
+    public String getVolume() {
+        return volume;
+    }
+    public void setVolume(String volume) {
+        this.volume = volume;
+    }
+    public String getIssue() {
+        return issue;
+    }
+    public void setIssue(String issue) {
+        this.issue = issue;
+    }
+    public String getPages() {
+        return pages;
+    }
+    public void setPages(String pages) {
+        this.pages = pages;
+    }
+    public String getMeshTerms() {
+        return meshTerms;
+    }
+    public void setMeshTerms(String meshTerms) {
+        this.meshTerms = meshTerms;
+    }
+    public int getTimesCited() {
+        return timesCited;
+    }
+    public void setTimesCited(int timesCited) {
+        this.timesCited = timesCited;
+    }
+    public int getRecentCitations() {
+        return recentCitations;
+    }
+    public void setRecentCitations(int recentCitations) {
+        this.recentCitations = recentCitations;
+    }
+    public String getExtraData() {
+        return extraData;
+    }
+    public void setExtraData(String extraData) {
+        this.extraData = extraData;
     }
     
     

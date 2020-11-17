@@ -20,6 +20,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.client.DistinctIterable;
 import com.mongodb.client.MongoCursor;
 
@@ -75,12 +76,17 @@ public class PublicationDaoImpl implements PublicationDao {
                 .first("metadata.authors.affiliation.locationSettlement").as("settlement")
                 .first("metadata.authors.affiliation.locationCountry").as("country")
                 .first("metadata.authors.affiliation.selectedWikiarticle.coordinates").as("coord")
-                .first("metadata.authors.affiliation.selectedWikiarticle.locationType").as("locType");
+                .first("metadata.authors.affiliation.selectedWikiarticle.locationType").as("locType")
+                .push("paperId").as("paperId").push(new BasicDBObject
+                        ("firstName", "$metadata.authors.first").append
+                        ("lastName", "$metadata.authors.last")).as("authors");
+
 
         SortOperation sort = Aggregation.sort(Sort.by(Order.asc("_id")));
 
         SkipOperation skip = Aggregation.skip(start);
         LimitOperation limit = Aggregation.limit(pageSize);
+        
 
         Aggregation aggregation = Aggregation.newAggregation(unwind, group, sort, skip, limit);
 

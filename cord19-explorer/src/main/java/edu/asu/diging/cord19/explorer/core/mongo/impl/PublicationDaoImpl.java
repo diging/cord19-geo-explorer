@@ -23,6 +23,7 @@ import org.springframework.data.mongodb.core.aggregation.SortOperation;
 import org.springframework.data.mongodb.core.aggregation.UnwindOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.repository.support.PageableExecutionUtils;
 import org.springframework.data.util.StreamUtils;
 import org.springframework.stereotype.Service;
 
@@ -74,18 +75,19 @@ public class PublicationDaoImpl implements PublicationDao {
     }
 
     @Override
-    public Page<PublicationImpl> getPublications(Pageable pageable) {
+    public List<PublicationImpl> getPublications(Pageable pageable, String lastTitle, String lastId) {
 
-        String[] sort = pageable.getSort().toString().split(": ");
-
+        String[] title = pageable.getSort().toString().split(": ");
         long startItem = pageable.getPageNumber() * pageable.getPageSize();
         int limit = pageable.getPageSize();
-        List<PublicationImpl> list = StreamUtils.createStreamFromIterator(mongoTemplate.stream(
-                new Query().with(Sort.by(new Order(sort[1].equals("ASC") ? Direction.ASC : Direction.DESC, sort[0]))),
-                PublicationImpl.class)).skip(startItem).limit(limit).collect(Collectors.toList());
+        Criteria criteria = new Criteria();
+        criteria = criteria.orOperator(Criteria.where(title[0]).gte(lastTitle));//
+        Criteria criteria2 = new Criteria();
+        criteria2 = criteria2.andOperator(Criteria.where("_id").gt(lastId));
+        Query query = new Query(criteria).with(pageable).limit(limit).skip(startItem);
 
-        Page<PublicationImpl> page = new PageImpl<PublicationImpl>(list, pageable, list.size());
-        return page;
+        List<PublicationImpl> list = mongoTemplate.find(query, PublicationImpl.class);
+        return list;
     }
 
     @Override

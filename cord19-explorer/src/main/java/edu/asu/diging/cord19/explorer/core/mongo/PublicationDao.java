@@ -44,6 +44,6 @@ public interface PublicationDao {
 
     long getTotalAffiliation();
 
-    Page<PublicationImpl> getPublications(Pageable pageable);
+    List<PublicationImpl> getPublications(Pageable pageable, String lastTitle, String lastId);
 
 }

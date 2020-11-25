@@ -70,28 +70,28 @@
 		
 		<nav>
 			<ul class="pagination">
-		  	<li th:if="${page != 0}"><a href="#" th:href="@{/pubs(page=0, sort=${sort})}" aria-label="First"><span aria-hidden="true">&laquo;&laquo;</span></a></li>
+		  	<li th:if="${page != 0}"><a href="#" th:href="@{/pubs(page=0, sort=${sort},last=${pubs[#lists.size(pubs)-1].metadata.title},lastId=${pubs[#lists.size(pubs)-1].id})}" aria-label="First"><span aria-hidden="true">&laquo;&laquo;</span></a></li>
 		  	<li th:if="${page == 0}" class="disabled"><a href="#" aria-label="First"><span aria-hidden="true">&laquo;&laquo;</span></a></li>
 		  	
-		    <li th:if="${page - 1 >= 0}"><a href="#" th:href="@{/pubs(page=${page-1}, sort=${sort})}" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+		    <li th:if="${page - 1 >= 0}"><a href="#" th:href="@{/pubs(page=${page-1}, sort=${sort},last=${pubs[#lists.size(pubs)-1].metadata.title},lastId=${pubs[#lists.size(pubs)-1].id})}" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
 		    <li th:if="${page - 1 < 0}" class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
 		    
-		    <li th:if="${page - 4 >= 0}"><a href="#" th:href="@{/pubs(page=${page-5},sort=${sort})}">[[${page-3}]]</a></li>
-		    <li th:if="${page - 3 >= 0}"><a href="#" th:href="@{/pubs(page=${page-3},sort=${sort})}">[[${page-2}]]</a></li>
-		    <li th:if="${page - 2 >= 0}"><a href="#" th:href="@{/pubs(page=${page-2},sort=${sort})}">[[${page-1}]]</a></li>
-		    <li th:if="${page - 1 >= 0}"><a href="#" th:href="@{/pubs(page=${page-1},sort=${sort})}">[[${page}]]</a></li>
+		    <li th:if="${page - 4 >= 0}"><a href="#" th:href="@{/pubs(page=${page-5},sort=${sort},last=${pubs[#lists.size(pubs)-1].metadata.title},lastId=${pubs[#lists.size(pubs)-1].id})}">[[${page-3}]]</a></li>
+		    <li th:if="${page - 3 >= 0}"><a href="#" th:href="@{/pubs(page=${page-3},sort=${sort},last=${pubs[#lists.size(pubs)-1].metadata.title},lastId=${pubs[#lists.size(pubs)-1].id})}">[[${page-2}]]</a></li>
+		    <li th:if="${page - 2 >= 0}"><a href="#" th:href="@{/pubs(page=${page-2},sort=${sort},last=${pubs[#lists.size(pubs)-1].metadata.title},lastId=${pubs[#lists.size(pubs)-1].id})}">[[${page-1}]]</a></li>
+		    <li th:if="${page - 1 >= 0}"><a href="#" th:href="@{/pubs(page=${page-1},sort=${sort},last=${pubs[#lists.size(pubs)-1].metadata.title},lastId=${pubs[#lists.size(pubs)-1].id})}">[[${page}]]</a></li>
 		    
 		    <li class="active"><a href="#">[[${page+1}]]</a></li>
 		    
-		    <li th:if="${page + 1 < pageCount}"><a href="#" th:href="@{/pubs(page=${page+1}, sort=${sort})}">[[${page+2}]]</a></li>
-		    <li th:if="${page + 2 < pageCount}"><a href="#" th:href="@{/pubs(page=${page+2}, sort=${sort})}">[[${page+3}]]</a></li>
-		    <li th:if="${page + 3 < pageCount}"><a href="#" th:href="@{/pubs(page=${page+3}, sort=${sort})}">[[${page+4}]]</a></li>
-		    <li th:if="${page + 4 < pageCount}"><a href="#" th:href="@{/pubs(page=${page+4}, sort=${sort})}">[[${page+5}]]</a></li>
+		    <li th:if="${page + 1 < pageCount}"><a href="#" th:href="@{/pubs(page=${page+1}, sort=${sort},last=${pubs[#lists.size(pubs)-1].metadata.title},lastId=${pubs[#lists.size(pubs)-1].id})}">[[${page+2}]]</a></li>
+		    <li th:if="${page + 2 < pageCount}"><a href="#" th:href="@{/pubs(page=${page+2}, sort=${sort},last=${pubs[#lists.size(pubs)-1].metadata.title},lastId=${pubs[#lists.size(pubs)-1].id})}">[[${page+3}]]</a></li>
+		    <li th:if="${page + 3 < pageCount}"><a href="#" th:href="@{/pubs(page=${page+3}, sort=${sort},last=${pubs[#lists.size(pubs)-1].metadata.title},lastId=${pubs[#lists.size(pubs)-1].id})}">[[${page+4}]]</a></li>
+		    <li th:if="${page + 4 < pageCount}"><a href="#" th:href="@{/pubs(page=${page+4}, sort=${sort},last=${pubs[#lists.size(pubs)-1].metadata.title},lastId=${pubs[#lists.size(pubs)-1].id})}">[[${page+5}]]</a></li>
 		    
-		    <li th:if="${page + 1 < pageCount}"><a href="#" th:href="@{/pubs(page=${page+1}, sort=${sort})}" aria-label="Previous"><span aria-hidden="true">&raquo;</span></a></li>
+		    <li th:if="${page + 1 < pageCount}"><a href="#" th:href="@{/pubs(page=${page+1}, sort=${sort},last=${pubs[#lists.size(pubs)-1].metadata.title},lastId=${pubs[#lists.size(pubs)-1].id})}" aria-label="Previous"><span aria-hidden="true">&raquo;</span></a></li>
 		    <li th:if="${page + 1 >= pageCount}" class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&raquo;</span></a></li>
 		    
-		    <li th:if="${page != pageCount-1}"><a href="#" th:href="@{/pubs(page=${pageCount-1}, sort=${sort})}" aria-label="Last"><span aria-hidden="true">&raquo;&raquo;</span></a></li>
+		    <li th:if="${page != pageCount-1}"><a href="#" th:href="@{/pubs(page=${pageCount-1}, sort=${sort},last=${pubs[#lists.size(pubs)-1].metadata.title},lastId=${pubs[#lists.size(pubs)-1].id})}" aria-label="Last"><span aria-hidden="true">&raquo;&raquo;</span></a></li>
 		  	<li th:if="${page == pageCount-1}" class="disabled"><a href="#" aria-label="Last"><span aria-hidden="true">&raquo;&raquo;</span></a></li>
 		  	
 		  </ul>

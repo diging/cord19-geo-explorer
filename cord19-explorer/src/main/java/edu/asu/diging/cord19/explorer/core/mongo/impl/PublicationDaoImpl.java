@@ -2,12 +2,10 @@ package edu.asu.diging.cord19.explorer.core.mongo.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -23,8 +21,6 @@ import org.springframework.data.mongodb.core.aggregation.SortOperation;
 import org.springframework.data.mongodb.core.aggregation.UnwindOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.repository.support.PageableExecutionUtils;
-import org.springframework.data.util.StreamUtils;
 import org.springframework.stereotype.Service;
 
 import com.mongodb.BasicDBObject;
@@ -78,16 +74,18 @@ public class PublicationDaoImpl implements PublicationDao {
     public List<PublicationImpl> getPublications(Pageable pageable, String lastTitle, String lastId) {
 
         String[] title = pageable.getSort().toString().split(": ");
-        long startItem = pageable.getPageNumber() * pageable.getPageSize();
         int limit = pageable.getPageSize();
-        Criteria criteria = new Criteria();
-        criteria = criteria.orOperator(Criteria.where(title[0]).gte(lastTitle));//
-        Criteria criteria2 = new Criteria();
-        criteria2 = criteria2.andOperator(Criteria.where("_id").gt(lastId));
-        Query query = new Query(criteria).with(pageable).limit(limit).skip(startItem);
+        Criteria criteria1 = Criteria.where(title[0]).gt(lastTitle);
 
-        List<PublicationImpl> list = mongoTemplate.find(query, PublicationImpl.class);
-        return list;
+        Criteria criteria2 = Criteria.where(title[0]).is(lastTitle);
+        if (lastId.length()!=0) {
+          criteria2 = criteria2.andOperator(Criteria.where("id").gt(new ObjectId(lastId)));
+        }
+        Query query2 = new Query(new Criteria().orOperator(criteria1, criteria2))
+                .with(Sort.by(new Order(title[1].equals("ASC") ? Direction.ASC : Direction.DESC, title[0]))).limit(limit);
+               
+
+        return mongoTemplate.find(query2, PublicationImpl.class);
     }
 
     @Override

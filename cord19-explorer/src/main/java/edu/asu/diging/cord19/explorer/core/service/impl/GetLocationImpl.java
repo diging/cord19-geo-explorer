@@ -18,7 +18,6 @@ private PublicationRepository pubRepo;
 
     public void run() {
        List<PublicationImpl> publications = pubRepo.findAll();
-       System.out.print(publications);
     }
 
 }

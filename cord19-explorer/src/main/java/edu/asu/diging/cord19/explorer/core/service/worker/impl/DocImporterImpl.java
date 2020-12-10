@@ -52,6 +52,7 @@ import edu.asu.diging.cord19.explorer.core.model.task.TaskStatus;
 import edu.asu.diging.cord19.explorer.core.model.task.impl.TaskImpl;
 import edu.asu.diging.cord19.explorer.core.mongo.PublicationRepository;
 import edu.asu.diging.cord19.explorer.core.service.worker.AffiliationCleaner;
+import edu.asu.diging.cord19.explorer.core.service.worker.CoordinateCleaner;
 import edu.asu.diging.cord19.explorer.core.service.worker.DimensionsMapper;
 import edu.asu.diging.cord19.explorer.core.service.worker.DocImporter;
 import edu.asu.diging.cord19.explorer.core.service.worker.TextLocationMatcher;
@@ -92,6 +93,9 @@ public class DocImporterImpl implements DocImporter {
     
     @Autowired
     private DimensionsMapper dimensionsMapper;
+    
+    @Autowired
+    private CoordinateCleaner coordinateCleaner;
     
     private ObjectMapper mapper;
     private AuthorsParser authorParser;
@@ -159,7 +163,6 @@ public class DocImporterImpl implements DocImporter {
         writer.close();
 
         parseMetadataCsv(rootFolder + File.separator + metadataFilename);
-
         task.setStatus(TaskStatus.DONE);
         task.setDateEnded(OffsetDateTime.now());
         taskRepo.save((TaskImpl) task);
@@ -197,6 +200,7 @@ public class DocImporterImpl implements DocImporter {
 
             fillPublication(entry, pub);
             extractYear(pub);
+            coordinateCleaner.cleanCoordinatesImport(pub);
             pubRepo.save((PublicationImpl)pub);
             
         }

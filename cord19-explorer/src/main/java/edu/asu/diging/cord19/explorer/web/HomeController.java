@@ -62,9 +62,7 @@ public class HomeController {
         try (CloseableIterator<CountriesImpl> countries = mongoTemplate.stream(new Query().noCursorTimeout(), CountriesImpl.class)) {
             while(countries.hasNext()) {
                 CountriesImpl country = countries.next();
-                System.out.println(country.toString());
                 if(country.getProperties().getSelectedWikipediaCount() > 0) {
-                    System.out.println("Inside");
                     ArrayList<String> properties = new ArrayList<String>();
                     properties.add(Integer.toString(country.getProperties().getSelectedWikipediaCount()));
                     properties.add(country.getProperties().getCenter());     
@@ -81,7 +79,6 @@ public class HomeController {
 					      FilterProvider filters = new SimpleFilterProvider()
 					          .addFilter("myFilter", theFilter);
 					String str = objectMapper.writer(filters).writeValueAsString(country);
-					System.out.println(str);
 					countriesList.add(str);
                     //countriesMap.put();
                 }
@@ -90,9 +87,6 @@ public class HomeController {
         model.addAttribute("countries", countriesList);
         model.addAttribute("low", lowCount);
         model.addAttribute("high", highCount);
-        //System.out.println(countriesMap);
-        
-        
         return "home";
     }
     

@@ -71,7 +71,6 @@ public class MapController {
         model.addAttribute("countries", countriesMap);
         model.addAttribute("low", lowCount);
         model.addAttribute("high", highCount);
-        System.out.println("Hits");
         return "auth/map";
     }
     
@@ -85,7 +84,6 @@ public class MapController {
                 if(country.getGeometry().getType().equalsIgnoreCase("multipolygon")) {
                     ArrayList<ArrayList<ArrayList<?>>> countryCoords = country.getGeometry().getCoordinates();
                     country.getProperties().setSelectedWikipediaCount(0);  
-                    System.out.println(country.getProperties().getSelectedWikipediaCount());
                     Iterator<ArrayList<ArrayList<?>>> countryCoordsIter = countryCoords.iterator();
                     while(countryCoordsIter.hasNext()) {
                         ArrayList<ArrayList<?>> coordList = countryCoordsIter.next();
@@ -111,12 +109,8 @@ public class MapController {
 										}
 										//TODO: not sure what to do with malformed data yet
 										if(x == 0.0) {
-											System.out.println('x');
-											System.out.println(coordList);
 										}
 										if(y == 0.0) {
-											System.out.println('y');
-											System.out.println(coordList);
 										}
 				
                                         points.add(new Coordinate(x, y));
@@ -139,10 +133,8 @@ public class MapController {
                                                     Point point = gf.createPoint(coordToFind);
                                                  	if(point.within(polygon)) {
                                                         country.getProperties().incrementSelectedWikipediaCount();
-                                                        System.out.println(country.getProperties().getName());
                                                     }
                                                 } catch(Exception e) {
-                                                   //System.out.println("no coords");
                                                 }
 											}
 										}

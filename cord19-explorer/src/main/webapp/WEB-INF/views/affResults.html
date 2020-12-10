@@ -1,0 +1,63 @@
+<html layout:decorate="~{layouts/main}">
+<head>
+	<title>CORD-19 Geo Explorer</title>
+</head>
+<body>
+	<div th:replace="layouts/navbar :: navbar"></div>
+	
+	<div layout:fragment="content" class="content">
+		<h3>[[${total}]] results in Affiliations for <span style="color: var(--primary)">"[[${query}]]"</span></h3>
+		<table class="table table-striped">
+			<tbody>
+				<div th:each="aff, iStat : ${matchedResultsPage}">
+					<tr>
+						<th scope="row">
+						<b><a th:href="@{'/affiliation?name=' + ${aff.id}}">[[${#strings.defaultString(aff.wiki,
+									'No title available')}]]</a></b> <br>
+						</th>
+					</tr>
+				</div>
+			</tbody>
+		</table>
+
+		<div th:if="${totalPages > 0}" class="pagination" th:each="pageNumber : ${pageNumbers}">
+			<a th:href="@{/affiliations/search(size=${#lists.size(matchedResultsPage)}, page=${pageNumber}, search=${query}, totalPages=${totalPages})}" th:text=${pageNumber}></a>
+		</div>
+		<nav>
+			<ul class="pagination">
+				<li th:if="${page != 0}">
+			  		<a href="#" th:href="@{/affiliations/search(page=0, search=${query})}" aria-label="First">
+			  			<span aria-hidden="true">&laquo;&laquo;</span>
+			  		</a>
+			  	</li>
+			  	<li th:if="${page == 0}" class="disabled"><a href="#" aria-label="First"><span aria-hidden="true">&laquo;&laquo;</span></a></li>
+			  	
+			    <li th:if="${page - 1 >= 0}">
+			    	<a href="#" th:href="@{/affiliations/search(page=${page-1}, search=${query})}" aria-label="Previous">
+			    		<span aria-hidden="true">&laquo;</span>
+			    	</a>
+			    </li>
+			    <li th:if="${page - 1 < 0}" class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+			    <li th:if="${page - 4 >= 0}"><a href="#" th:href="@{/affiliations/search(page=${page-5}, search=${query})}">[[${page-3}]]</a></li>
+			    <li th:if="${page - 3 >= 0}"><a href="#" th:href="@{/affiliations/search(page=${page-3}, search=${query})}">[[${page-2}]]</a></li>
+			    <li th:if="${page - 2 >= 0}"><a href="#" th:href="@{/affiliations/search(page=${page-2}, search=${query})}">[[${page-1}]]</a></li>
+			    <li th:if="${page - 1 >= 0}"><a href="#" th:href="@{/affiliations/search(page=${page-1}, search=${query})}">[[${page}]]</a></li>
+			    
+			    <li class="active"><a href="#">[[${page+1}]]</a></li>
+			    
+			    <li th:if="${page + 1 < pageCount}"><a href="#" th:href="@{/affiliations/search(page=${page+1}, search=${query})}">[[${page+2}]]</a></li>
+			    <li th:if="${page + 2 < pageCount}"><a href="#" th:href="@{/affiliations/search(page=${page+2}, search=${query})}">[[${page+3}]]</a></li>
+			    <li th:if="${page + 3 < pageCount}"><a href="#" th:href="@{/affiliations/search(page=${page+3}, search=${query})}">[[${page+4}]]</a></li>
+			    <li th:if="${page + 4 < pageCount}"><a href="#" th:href="@{/affiliations/search(page=${page+4}, search=${query})}">[[${page+5}]]</a></li>
+			    
+			    <li th:if="${page + 1 < pageCount}"><a href="#" th:href="@{/affiliations/search(page=${page+1}, search=${query})}" aria-label="Previous"><span aria-hidden="true">&raquo;</span></a></li>
+			    <li th:if="${page + 1 >= pageCount}" class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&raquo;</span></a></li>
+			    
+			    <li th:if="${page != pageCount-1}"><a href="#" th:href="@{/affiliations/search(page=${pageCount-1}, search=${query})}" aria-label="Last"><span aria-hidden="true">&raquo;&raquo;</span></a></li>
+			  	<li th:if="${page == pageCount-1}" class="disabled"><a href="#" aria-label="Last"><span aria-hidden="true">&raquo;&raquo;</span></a></li>
+			  	
+			</ul>
+		</nav>
+	</div>	
+</body>
+</html>

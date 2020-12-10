@@ -17,13 +17,9 @@ import edu.asu.diging.cord19.explorer.core.model.task.TaskStatus;
 import edu.asu.diging.cord19.explorer.core.model.task.impl.TaskImpl;
 import edu.asu.diging.cord19.explorer.core.mongo.PublicationRepository;
 import edu.asu.diging.cord19.explorer.core.service.worker.CoordinateCleaner;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.util.CloseableIterator;
 
@@ -79,8 +75,8 @@ public class CoordinateCleanerImpl implements CoordinateCleaner {
                 PublicationImpl pub = docs.next();
                 List<PersonImpl> authors = pub.getMetadata().getAuthors();
                 for(PersonImpl author : authors) {
-                    List<String> coords = new ArrayList();
-                    List<Double> formattedCoords = new ArrayList();
+                    List<String> coords = new ArrayList<String>();
+                    List<Double> formattedCoords = new ArrayList<Double>();
                     if(author.getAffiliation().getSelectedWikiarticle() != null) {
                        WikipediaArticleImpl article = author.getAffiliation().getSelectedWikiarticle();
                        String [] splitted =  article.getCoordinates().split("\\|");
@@ -165,8 +161,8 @@ public class CoordinateCleanerImpl implements CoordinateCleaner {
     public Publication cleanCoordinatesImport(Publication pub) {
         List<PersonImpl> authors = pub.getMetadata().getAuthors();
         for(PersonImpl author : authors) {
-            List<String> coords = new ArrayList();
-            List<Double> formattedCoords = new ArrayList();
+            List<String> coords = new ArrayList<String>();
+            List<Double> formattedCoords = new ArrayList<Double>();
             if(author.getAffiliation().getSelectedWikiarticle() != null) {
                WikipediaArticleImpl article = author.getAffiliation().getSelectedWikiarticle();
                String [] splitted =  article.getCoordinates().split("\\|");

@@ -29,6 +29,7 @@ import com.mongodb.client.MongoCursor;
 
 import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
 import edu.asu.diging.cord19.explorer.core.mongo.PublicationDao;
+import edu.asu.diging.cord19.explorer.web.model.SortType;
 
 @Service
 public class PublicationDaoImpl implements PublicationDao {
@@ -71,21 +72,41 @@ public class PublicationDaoImpl implements PublicationDao {
     }
 
     @Override
-    public List<PublicationImpl> getPublications(Pageable pageable, String lastTitle, String lastId) {
+    public List<PublicationImpl> getPublications(Pageable pageable, PublicationImpl pub, boolean init) {
 
         String[] title = pageable.getSort().toString().split(": ");
         int limit = pageable.getPageSize();
-        Criteria criteria1 = Criteria.where(title[0]).gt(lastTitle);
+        Criteria criteria1 = null;
+        Criteria criteria2 = null;
+        if (!init) {
+            if (title[0].equals(SortType.publishYear.toString())) {
+                criteria1 = Criteria.where(title[0]).gt(pub.getPublishYear());
+                criteria2 = Criteria.where(title[0]).is(pub.getPublishYear());
+            } else if (title[0].equals(SortType.journal.toString())) {
+                criteria1 = Criteria.where(title[0]).gt(pub.getJournal());
+                criteria2 = Criteria.where(title[0]).is(pub.getJournal());
+            } else {
+                criteria1 = Criteria.where(title[0]).gt(pub.getMetadata().getTitle());
+                criteria2 = Criteria.where(title[0]).is(pub.getMetadata().getTitle());
+            }
 
-        Criteria criteria2 = Criteria.where(title[0]).is(lastTitle);
-        if (lastId.length()!=0) {
-          criteria2 = criteria2.andOperator(Criteria.where("id").gt(new ObjectId(lastId)));
+            criteria2 = criteria2.andOperator(Criteria.where("id").gt(new ObjectId(pub.getId().toString())));
+
+        } else {
+            if (title[0].equals(SortType.publishYear.toString())) {
+                criteria1 = Criteria.where(title[0]).gt(0);
+                criteria2 = Criteria.where(title[0]).is(0);
+            } else {
+                criteria1 = Criteria.where(title[0]).gt("");
+                criteria2 = Criteria.where(title[0]).is("");
+            }
         }
-        Query query2 = new Query(new Criteria().orOperator(criteria1, criteria2))
-                .with(Sort.by(new Order(title[1].equals("ASC") ? Direction.ASC : Direction.DESC, title[0]))).limit(limit);
-               
 
-        return mongoTemplate.find(query2, PublicationImpl.class);
+        Query query = new Query(new Criteria().orOperator(criteria1, criteria2))
+                .with(Sort.by(new Order(title[1].equals("ASC") ? Direction.ASC : Direction.DESC, title[0])))
+                .limit(limit);
+
+        return mongoTemplate.find(query, PublicationImpl.class);
     }
 
     @Override

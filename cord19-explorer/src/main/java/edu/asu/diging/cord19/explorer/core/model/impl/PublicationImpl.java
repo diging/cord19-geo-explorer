@@ -3,6 +3,7 @@ package edu.asu.diging.cord19.explorer.core.model.impl;
 import java.util.List;
 import java.util.Map;
 
+
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 

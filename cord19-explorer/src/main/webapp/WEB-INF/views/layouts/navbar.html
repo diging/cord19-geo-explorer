@@ -3,21 +3,37 @@
 	   	<div style="display: flex; align-items: center;">
 	   		<span onclick="openNav()" class="btn dark-btn"><i class="fa fa-bars"></i></span>	
 	      	<a th:href="@{/}" class="navbar-brand">CORD19 Geo Explorer</a>
-	   	</div>
+		</div>
+		   
       <div style="display: flex">
          
          <form th:action="@{/login}">
             <button sec:authorize="!isAuthenticated()" class="btn primary-btn" type="submit" style="margin-right: 40px;">Login</button>
          </form>
-         <form th:action="@{'/search'}" method="GET" class="form" style="position: relative">
-            <button class="btn btn-outline-success form_icon" type="submit" id="submit"><i class="fa fa-search"></i></button>
-            <input class="form-control searchbox form_input" type="search" placeholder="Search" id="search" th:name="search">
-         </form>
-         <form th:action="@{/logout}" method="POST" sec:authorize="isAuthenticated()" role="presentation">
-            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-            <button class="btn primary-btn" type="submit" style="margin-left: 40px;">Logout</button>
-         </form>
-      </div>
+         <form th:action="@{'/publications/search'}" id="searchForm" method="GET" class="form" style="position: relative; display: flex; align-items: center">	
+		     <input class="form-control searchbox form_input" type="search" placeholder="Search" id="search" th:name="search">
+				<div class="form_icon">
+					<select aria-describedby="searchDropdownDescription" class="form-control searchbox" data-nav-selected="47"
+						id="searchDropdownBox" style="display: block; width: unset"
+						tabindex="18" title="Search in">
+	
+						<option th:each="search : ${T(edu.asu.diging.cord19.explorer.web.model.SearchType).values()}"
+                                        th:value="${search}" th:text="${#strings.capitalize(#strings.toLowerCase(search))}"></option>
+					</select>
+
+				</div>
+				<button class="btn btn-outline-success form_icon" type="submit" id="submit">
+					<i class="fa fa-search"></i>
+				</button>
+			</form>
+
+			<form th:action="@{/logout}" method="POST" sec:authorize="isAuthenticated()" role="presentation">
+				<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}" />
+				<button class="btn primary-btn" type="submit" style="margin-left: 40px;">Logout</button>
+			</form>
+			
+		</div>
+		
    </div>
    <div class="container">
       <div th:if="${show_alert}" class="alert alert-${alert_type}" role="alert">${alert_msg}</div>

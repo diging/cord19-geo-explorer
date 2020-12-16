@@ -52,7 +52,7 @@
       <tbody class="table-body">
        <tr th:each="aff, iter : ${affs}" th:classappend="(${aff.status} == 'INCORRECT' ? 'danger' : '') + (${aff.status} == 'CORRECT_REGION' ? 'warning' : '') + (${aff.status} == 'CORRECT' ? 'success' : '')" >
       	<td>
-      		 <a th:href="@{/publications(name=${aff.id})}"><span th:text="${aff.id}"></span></a>
+      		 <a th:href="@{/affiliation/publications(name=${aff.id})}"><span th:text="${aff.id}"></span></a>
       		 <br>[[${aff.settlement}]], [[${aff.country}]]
       	</td>
       	<td th:attr="id=${'name-' + iter.index}">

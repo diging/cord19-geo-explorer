@@ -17,7 +17,7 @@ public class PublicAffiliationController {
     @Autowired
     private PublicationRepository pubRepo;
 
-    @RequestMapping("/publications")
+    @RequestMapping("/affiliation/publications")
     public String findPublications(@RequestParam("name") String affiliation, Model model) {
         List<PublicationImpl> pubs = pubRepo.findByMetadataAuthorsAffiliationInstitution(affiliation);
         model.addAttribute("publications", pubs);

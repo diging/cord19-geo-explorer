@@ -23,7 +23,7 @@ public class ShowPublicationController {
     @Autowired
     private PublicationRepository pubRepo;
 
-    @RequestMapping("/pubs")
+    @RequestMapping("/publications")
     public String get(Model model, @PageableDefault(size = 20)Pageable pageable, @RequestParam(value = "last",required=false)String last, @RequestParam boolean init) {
         PublicationImpl pub = (PublicationImpl) pubRepo.findFirstByPaperId(last);
         List<PublicationImpl> page = pubDao.getPublications(pageable, pub, init);

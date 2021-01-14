@@ -1,7 +1,5 @@
 package edu.asu.diging.cord19.explorer.core.model.impl;
 
-import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -9,11 +7,15 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PropertiesImpl {
+public class CountryPropertiesImpl {
+    
+    /**
+     * Handle the properties of countries
+     */
     
     
     private String name;
-    private String center;
+    private String countryCenter;
     private int selectedWikipediaCount;
 
     public String getName() {
@@ -23,12 +25,12 @@ public class PropertiesImpl {
     public void setName(String name) {
         this.name = name;
     }
-    public String getCenter() {
-        return center;
+    public String getCountryCenter() {
+        return countryCenter;
     }
 
-    public void setCenter(String center) {
-        this.center = center;
+    public void setCountryCenter(String center) {
+        this.countryCenter = center;
     }
     
     public int getSelectedWikipediaCount() {

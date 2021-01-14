@@ -28,7 +28,7 @@ public class CoordinateCleaningManagerImpl implements CoordinateCleaningManager 
         TaskImpl task = new TaskImpl();
         task.setDateStarted(OffsetDateTime.now());
         task.setProcessed(0);
-        task.setType(TaskType.IMPORT);
+        task.setType(TaskType.CLEAN);
         task = taskRepo.save(task);
 
         /*

@@ -7,6 +7,6 @@ import edu.asu.diging.cord19.explorer.core.model.impl.CountriesImpl;
 
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, defaultImpl = CountriesImpl.class)
-public interface Country {
+public interface Countries {
 
 }

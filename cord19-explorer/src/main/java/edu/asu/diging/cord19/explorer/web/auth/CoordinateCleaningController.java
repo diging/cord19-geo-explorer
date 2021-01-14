@@ -15,7 +15,7 @@ import edu.asu.diging.cord19.explorer.core.service.CoordinateCleaningManager;
 @Controller
 public class CoordinateCleaningController {
     
-	@Autowired
+    @Autowired
     private CoordinateCleaningManager cleaningManager;
     
     @RequestMapping(value = "/auth/coordinates/clean", method = RequestMethod.GET)

@@ -8,5 +8,4 @@ public interface CoordinateCleaner {
 
     Publication cleanCoordinatesImport(Publication pub);
 
-
 }

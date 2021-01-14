@@ -65,7 +65,7 @@ public class HomeController {
                 if(country.getProperties().getSelectedWikipediaCount() > 0) {
                     ArrayList<String> properties = new ArrayList<String>();
                     properties.add(Integer.toString(country.getProperties().getSelectedWikipediaCount()));
-                    properties.add(country.getProperties().getCenter());     
+                    properties.add(country.getProperties().getCountryCenter());     
                     if(country.getProperties().getSelectedWikipediaCount() > highCount.intValue()) {
                         highCount.set(country.getProperties().getSelectedWikipediaCount());
                     }

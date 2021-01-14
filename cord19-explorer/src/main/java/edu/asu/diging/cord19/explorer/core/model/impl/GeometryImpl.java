@@ -2,9 +2,15 @@ package edu.asu.diging.cord19.explorer.core.model.impl;
 
 import java.util.ArrayList;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 public class GeometryImpl {
+    
+    /**
+     * Handles Geometry for a country from the Countries Class.
+     * Type can be point, Polygon, Multipolygon
+     * 
+     */
+    
+    
     private String type;
     
     private ArrayList<ArrayList<ArrayList<?>>> coordinates; 

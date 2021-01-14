@@ -7,18 +7,18 @@ import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import edu.asu.diging.cord19.explorer.core.model.Country;
+import edu.asu.diging.cord19.explorer.core.model.Countries;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonFilter("myFilter")
-public class CountriesImpl implements Country {
+public class CountriesImpl implements Countries {
     
     @Id
     private ObjectId _id;
     
     private String id;
     @JsonProperty("properties")
-    private PropertiesImpl properties;
+    private CountryPropertiesImpl properties;
     @JsonProperty("geometry")
     private GeometryImpl geometry;
     private String type;
@@ -32,11 +32,11 @@ public class CountriesImpl implements Country {
         this.type = type;
     }
 
-    public PropertiesImpl getProperties() {
+    public CountryPropertiesImpl getProperties() {
         return properties;
     }
 
-    public void setProperties(PropertiesImpl properties) {
+    public void setProperties(CountryPropertiesImpl properties) {
         this.properties = properties;
     }
 

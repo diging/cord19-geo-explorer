@@ -246,7 +246,6 @@ td, th {
 }
 
 .form_icon {
-  	position: absolute;
   	pointer-events: auto;
 	cursor: pointer;
 	z-index: 5;

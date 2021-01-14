@@ -24,9 +24,9 @@
 </head>
 
 <body>
-	<div th:replace="layouts/navbar :: navbar"></div>
+	<div layout:fragment="content">
 	
-	<div class="top-stats" layout:fragment="content">
+	<div class="top-stats">
 		<div class="stat">
 			<h6 class="stat-header">Countries with publications</h6>
 			<h2 style="color: var(--primary)">42</h2>
@@ -104,6 +104,6 @@
 		  </div>
 		</div>
 	</div>
-	
+	</div>
 </body>
 </html>

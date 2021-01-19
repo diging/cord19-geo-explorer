@@ -30,6 +30,7 @@ import com.mongodb.client.MongoCursor;
 
 import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
 import edu.asu.diging.cord19.explorer.core.mongo.PublicationDao;
+import edu.asu.diging.cord19.explorer.core.mongo.PublicationRepository;
 import edu.asu.diging.cord19.explorer.web.model.SortType;
 
 @Service
@@ -37,6 +38,10 @@ public class PublicationDaoImpl implements PublicationDao {
 
     @Autowired
     private MongoTemplate mongoTemplate;
+    
+    
+    @Autowired
+    private PublicationRepository pubRepo;
 
     /*
      * (non-Javadoc)
@@ -72,40 +77,84 @@ public class PublicationDaoImpl implements PublicationDao {
         return results;
     }
 
+    /**
+     * Returns a {@code List<PublicationImpl>} instance
+     * representing all publications sorted based on sortType from @code Pageable instance.
+     * 
+     * @param pageable   The pagination instance with sort and current page information
+     * 
+     * @param firstPubId PublicationId of the first title on the current page
+     * 
+     * @param lastPubId PublicationId of the last title on the current page
+     * 
+     * @param currentPage index of current page starting from 0
+     * 
+     * @return List of PublicationImpl instances containing sorted by fields in {@code Pageable} instance
+     * 
+     **/
     @Override
-    public List<PublicationImpl> getPublications(Pageable pageable, PublicationImpl pub, boolean init) {
+    public List<PublicationImpl> getPublications(Pageable pageable, String firstPubId, String lastPubId,
+            int currentPage) {
 
-        String[] title = pageable.getSort().toString().split(": ");
+        int requestedPage = pageable.getPageNumber() + 1;
+        PublicationImpl pub = null;
+        if (requestedPage > currentPage) {
+            pub = (PublicationImpl) pubRepo.findFirstByPaperId(lastPubId);
+        } else {
+            pub = (PublicationImpl) pubRepo.findFirstByPaperId(firstPubId);
+        }
+
+        String[] sortType = pageable.getSort().toString().split(": ");
         int limit = pageable.getPageSize();
         Criteria criteria1 = null;
         Criteria criteria2 = null;
-        if (!init) {
-            if (title[0].equals(SortType.publishYear.toString())) {
-                criteria1 = Criteria.where(title[0]).gt(pub.getPublishYear());
-                criteria2 = Criteria.where(title[0]).is(pub.getPublishYear());
-            } else if (title[0].equals(SortType.journal.toString())) {
-                criteria1 = Criteria.where(title[0]).gt(pub.getJournal());
-                criteria2 = Criteria.where(title[0]).is(pub.getJournal());
+
+        if (requestedPage == 1) {
+            if (sortType[0].equals(SortType.PUBLISHYEAR.toString())) {
+                criteria1 = Criteria.where(sortType[0]).gt(0);
+                criteria2 = Criteria.where(sortType[0]).is(0);
             } else {
-                criteria1 = Criteria.where(title[0]).gt(pub.getMetadata().getTitle());
-                criteria2 = Criteria.where(title[0]).is(pub.getMetadata().getTitle());
+                criteria1 = Criteria.where(sortType[0]).gt("");
+                criteria2 = Criteria.where(sortType[0]).is("");
+            }
+        } else if (requestedPage > currentPage) {
+            if (sortType[0].equals(SortType.PUBLISHYEAR.toString())) {
+                criteria1 = Criteria.where(sortType[0]).gt(pub.getPublishYear());
+                criteria2 = Criteria.where(sortType[0]).is(pub.getPublishYear());
+            } else if (sortType[0].equals(SortType.JOURNAL.toString())) {
+                criteria1 = Criteria.where(sortType[0]).gt(pub.getJournal());
+                criteria2 = Criteria.where(sortType[0]).is(pub.getJournal());
+            } else {
+                criteria1 = Criteria.where(sortType[0]).gt(pub.getMetadata().getTitle());
+                criteria2 = Criteria.where(sortType[0]).is(pub.getMetadata().getTitle());
             }
 
             criteria2 = criteria2.andOperator(Criteria.where("id").gt(new ObjectId(pub.getId().toString())));
 
         } else {
-            if (title[0].equals(SortType.publishYear.toString())) {
-                criteria1 = Criteria.where(title[0]).gt(0);
-                criteria2 = Criteria.where(title[0]).is(0);
+            if (sortType[0].equals(SortType.PUBLISHYEAR.toString())) {
+                criteria1 = Criteria.where(sortType[0]).lt(pub.getPublishYear());
+                criteria2 = Criteria.where(sortType[0]).is(pub.getPublishYear());
+            } else if (sortType[0].equals(SortType.JOURNAL.toString())) {
+                criteria1 = Criteria.where(sortType[0]).lt(pub.getJournal());
+                criteria2 = Criteria.where(sortType[0]).is(pub.getJournal());
             } else {
-                criteria1 = Criteria.where(title[0]).gt("");
-                criteria2 = Criteria.where(title[0]).is("");
+                criteria1 = Criteria.where(sortType[0]).lt(pub.getMetadata().getTitle());
+                criteria2 = Criteria.where(sortType[0]).is(pub.getMetadata().getTitle());
             }
+            criteria2 = criteria2.andOperator(Criteria.where("id").lt(new ObjectId(pub.getId().toString())));
         }
 
-        Query query = new Query(new Criteria().orOperator(criteria1, criteria2))
-                .with(Sort.by(new Order(title[1].equals("ASC") ? Direction.ASC : Direction.DESC, title[0])))
-                .limit(limit);
+        Sort sort = Sort.by(new Order(sortType[1].equals("ASC") ? Direction.ASC : Direction.DESC, sortType[0]));
+        if (pub != null)
+            sort = sort.and(Sort
+                    .by(new Order(sortType[1].equals("ASC") ? Direction.ASC : Direction.DESC, pub.getId().toString())));
+
+        Query query = new Query(new Criteria().orOperator(criteria1, criteria2)).with(sort).limit(limit);
+
+//        Query query = new Query(new Criteria().orOperator(criteria1, criteria2))
+//                .with(Sort.by(new Order(sortType[1].equals("ASC") ? Direction.ASC : Direction.DESC, sortType[0]))
+//                        .and(Sort.by(new Order(sortType[1].equals("ASC") ? Direction.ASC : Direction.DESC, pub.getId().toString())))).limit(limit);
 
         return mongoTemplate.find(query, PublicationImpl.class);
     }

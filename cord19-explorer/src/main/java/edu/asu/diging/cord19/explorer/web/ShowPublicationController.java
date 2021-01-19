@@ -12,21 +12,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
 import edu.asu.diging.cord19.explorer.core.mongo.PublicationDao;
-import edu.asu.diging.cord19.explorer.core.mongo.PublicationRepository;
 
 @Controller
 public class ShowPublicationController {
 
     @Autowired
     private PublicationDao pubDao;
-    
-    @Autowired
-    private PublicationRepository pubRepo;
+
 
     @RequestMapping("/publications")
-    public String get(Model model, @PageableDefault(size = 20)Pageable pageable, @RequestParam(value = "last",required=false)String last, @RequestParam boolean init) {
-        PublicationImpl pub = (PublicationImpl) pubRepo.findFirstByPaperId(last);
-        List<PublicationImpl> page = pubDao.getPublications(pageable, pub, init);
+    public String get(Model model, @PageableDefault(size = 20) Pageable pageable, @RequestParam(value = "first", required = false) String firstId,
+            @RequestParam(value = "last", required = false) String lastId, @RequestParam(value="currentPage") int currentPage) {
+        List<PublicationImpl> page = pubDao.getPublications(pageable, firstId, lastId, currentPage);
         long count = pubDao.getPublicationCount();
         model.addAttribute("pubs", page);
         model.addAttribute("total", count);

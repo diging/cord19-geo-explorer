@@ -176,7 +176,6 @@ public class AffiliationImpl implements Affiliation {
     public void setOther(Map<String, Object> other) {
         this.other = other;
     }
-   
 
     @Override
     public List<WikipediaArticleImpl> getWikiarticles() {

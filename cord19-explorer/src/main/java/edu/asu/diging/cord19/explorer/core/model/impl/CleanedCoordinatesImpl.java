@@ -14,7 +14,6 @@ public class CleanedCoordinatesImpl {
 
     private List<Double> coordinates; 
     
-    
     public CoordType getType() {
         return getType();
     }

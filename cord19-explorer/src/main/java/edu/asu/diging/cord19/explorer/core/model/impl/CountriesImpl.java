@@ -23,7 +23,6 @@ public class CountriesImpl implements Countries {
     private GeometryImpl geometry;
     private String type;
     
-    
     public String getType() {
         return type;
     }
@@ -63,6 +62,5 @@ public class CountriesImpl implements Countries {
     public void setGeometry(GeometryImpl geometry) {
         this.geometry = geometry;
     }
-    
 
 }

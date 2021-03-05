@@ -2,17 +2,25 @@ package edu.asu.diging.cord19.explorer.core.model.impl;
 
 import java.util.List;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+
+import edu.asu.diging.cord19.explorer.core.model.CoordType;
+
 public class CleanedCoordinatesImpl {
-    private String type;
+    
+    @Enumerated(EnumType.STRING)
+    private CoordType type;
+
     private List<Double> coordinates; 
     
     
-    public String getType() {
-        return type;
+    public CoordType getType() {
+        return getType();
     }
     
-    public void setType(String type) {
-        this.type = type;
+    public void setType(CoordType point) {
+        this.type = point;
     }
     
     public List<Double> getCoordinates() {
@@ -22,8 +30,5 @@ public class CleanedCoordinatesImpl {
     public void setCoordinates(List<Double> coordinates) {
         this.coordinates = coordinates;
     }
-
-    
-    
     
 }

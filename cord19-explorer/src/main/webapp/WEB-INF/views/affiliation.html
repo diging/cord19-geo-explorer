@@ -10,7 +10,7 @@
 
 		<div th:each="pub : ${publications}">
 			<h4>
-				<a th:href="@{'/paper/' + ${pub.paperId}}">[[${#strings.defaultString(pub.metadata.title,
+				<a th:href="@{'/paper?paperId='+ ${pub.paperId}}">[[${#strings.defaultString(pub.metadata.title,
 					'No title available')}]]</a>
 			</h4>
 			<ul style="color:white;">

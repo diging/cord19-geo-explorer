@@ -19,7 +19,9 @@ import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
+import edu.asu.diging.cord19.explorer.core.data.MapTotalsRepository;
 import edu.asu.diging.cord19.explorer.core.model.impl.CountriesImpl;
+import edu.asu.diging.cord19.explorer.core.model.impl.MapTotalsImpl;
 import edu.asu.diging.cord19.explorer.core.mongo.PublicationDao;
 import edu.asu.diging.cord19.explorer.core.mongo.PublicationRepository;
 import edu.asu.diging.cord19.explorer.core.mongo.PublicationStatsProvider;
@@ -35,6 +37,8 @@ public class HomeController {
     private PublicationRepository repo;
     @Autowired
     private MongoTemplate mongoTemplate;
+    @Autowired
+    private MapTotalsRepository totalsRepo;
     
 
     @RequestMapping(value = "/")
@@ -54,24 +58,11 @@ public class HomeController {
         model.addAttribute("journalCount", pubDao.getJournalCount());
         //model.addAttribute("textCountriesCount", pubDao.getCountriesInTextCount());
         
-		HashMap<String, List<String>> countriesMap = new HashMap<String, List<String>>();
 		ArrayList<String> countriesList = new ArrayList<String>();
-        //Is Atomic Int the best way to this?
-        AtomicInteger highCount = new AtomicInteger(0);
-        AtomicInteger lowCount = new AtomicInteger(0);
         try (CloseableIterator<CountriesImpl> countries = mongoTemplate.stream(new Query().noCursorTimeout(), CountriesImpl.class)) {
             while(countries.hasNext()) {
                 CountriesImpl country = countries.next();
                 if(country.getProperties().getSelectedWikipediaCount() > 0) {
-                    ArrayList<String> properties = new ArrayList<String>();
-                    properties.add(Integer.toString(country.getProperties().getSelectedWikipediaCount()));
-                    properties.add(country.getProperties().getCountryCenter());     
-                    if(country.getProperties().getSelectedWikipediaCount() > highCount.intValue()) {
-                        highCount.set(country.getProperties().getSelectedWikipediaCount());
-                    }
-                    if(country.getProperties().getSelectedWikipediaCount() < lowCount.intValue()) {
-                        lowCount.set(country.getProperties().getSelectedWikipediaCount());
-					}
 					ObjectMapper objectMapper = new ObjectMapper();
 					objectMapper.disableDefaultTyping();
 					SimpleBeanPropertyFilter theFilter = SimpleBeanPropertyFilter
@@ -80,13 +71,13 @@ public class HomeController {
 					          .addFilter("myFilter", theFilter);
 					String str = objectMapper.writer(filters).writeValueAsString(country);
 					countriesList.add(str);
-                    //countriesMap.put();
                 }
             }
         }
+        MapTotalsImpl totals = totalsRepo.findFirstByOrderByIdDesc();
         model.addAttribute("countries", countriesList);
-        model.addAttribute("low", lowCount);
-        model.addAttribute("high", highCount);
+        model.addAttribute("low", totals.getLowCount());
+        model.addAttribute("high", totals.getHighCount());
         return "home";
     }
     

@@ -9,6 +9,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOptions;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.CountOperation;
 import org.springframework.data.mongodb.core.aggregation.GroupOperation;
@@ -86,9 +87,11 @@ public class PublicationDaoImpl implements PublicationDao {
 
         SkipOperation skip = Aggregation.skip(start);
         LimitOperation limit = Aggregation.limit(pageSize);
+        
 
-        Aggregation aggregation = Aggregation.newAggregation(unwind, group, sort, skip, limit);
-
+        AggregationOptions options = AggregationOptions.builder().allowDiskUse(true).cursorBatchSize(500).build();
+        Aggregation aggregation = Aggregation.newAggregation(unwind, group, sort, skip, limit).withOptions(options);
+        
         AggregationResults<AffiliationPaperAggregationOutput> results = mongoTemplate.aggregate(aggregation,
                 PublicationImpl.class, AffiliationPaperAggregationOutput.class);
         return results.getMappedResults();
@@ -101,7 +104,8 @@ public class PublicationDaoImpl implements PublicationDao {
         GroupOperation group = Aggregation.group("metadata.authors.affiliation.institution");
 
         CountOperation count = Aggregation.count().as("total");
-        Aggregation aggregation = Aggregation.newAggregation(unwind, group, count);
+        AggregationOptions options = AggregationOptions.builder().allowDiskUse(true).cursorBatchSize(500).build();
+        Aggregation aggregation = Aggregation.newAggregation(unwind, group, count).withOptions(options);
         
         AggregationResults<Document> results = mongoTemplate.aggregate(aggregation,
                 PublicationImpl.class, Document.class);

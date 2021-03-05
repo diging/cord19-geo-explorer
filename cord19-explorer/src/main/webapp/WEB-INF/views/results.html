@@ -1,17 +1,15 @@
 <html layout:decorate="~{layouts/main}">
 <head>
-<title>Authority Matcher</title>
+	<title>CORD-19 Geo Explorer</title>
 </head>
 <body>
-	<div th:replace="layouts/navbar :: navbar"></div>
-	
 	<div layout:fragment="content" class="content">
-		<h3>[[${total}]] results for <span style="color: var(--primary)">"[[${query}]]"</span></h3>
+		<h3>[[${total}]] results in Publications for <span style="color: var(--primary)">"[[${query}]]"</span></h3>
 		<table class="table table-striped">
 			<tbody>
-				<div th:each="pub, iStat : ${matchedPublicationsPage}">
+				<div th:each="pub, iStat : ${matchedResultsPage}">
 					<tr>
-						<th scope="row" style="border: none;"><b><a th:href="@{'/paper/' + ${pub.paperId}}">[[${#strings.defaultString(pub.metadata.title, 'No title available')}]]</a></b> <br>
+						<th scope="row" style="border: none;"><b><a th:href="@{'/paper/?paperId=' + ${#uris.escapeQueryParam(pub.paperId)}}">[[${#strings.defaultString(pub.metadata.title, 'No title available')}]]</a></b> <br>
 							<div th:each="author, iterstat : ${pub.metadata.authors}" class="authors-list">
 								<b th:if="${author.name == null}">[[${author.first}]] [[${#strings.listJoin(author.middle,',')}]] [[${author.last}]]</b>
 								<b th:if="${author.name != null}">[[${author.name}]]</b><span th:text="!${iterstat.last} ? ',': ''"></span>
@@ -25,34 +23,34 @@
 		<div th:if="${totalPages > 0}"
 			class="pagination" th:each="pageNumber : ${pageNumbers}">
 			<a
-				th:href="@{/search(size=${#lists.size(matchedPublicationsPage)}, page=${pageNumber}, search=${query}, totalPages=${totalPages})}"
+				th:href="@{/publications/search(size=${#lists.size(matchedResultsPage)}, page=${pageNumber}, search=${query}, totalPages=${totalPages})}"
 				th:text=${pageNumber}></a>
 		</div>
 		
 		<nav>
 		  <ul class="pagination">
-		  	<li th:if="${page != 0}"><a href="#" th:href="@{/search(page=0, search=${query})}" aria-label="First"><span aria-hidden="true">&laquo;&laquo;</span></a></li>
+		  	<li th:if="${page != 0}"><a href="#" th:href="@{/publications/search(page=0, search=${query})}" aria-label="First"><span aria-hidden="true">&laquo;&laquo;</span></a></li>
 		  	<li th:if="${page == 0}" class="disabled"><a href="#" aria-label="First"><span aria-hidden="true">&laquo;&laquo;</span></a></li>
 		  	
-		    <li th:if="${page - 1 >= 0}"><a href="#" th:href="@{/search(page=${page-1}, search=${query})}" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+		    <li th:if="${page - 1 >= 0}"><a href="#" th:href="@{/publications/search(page=${page-1}, search=${query})}" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
 		    <li th:if="${page - 1 < 0}" class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
 		    
-		    <li th:if="${page - 4 >= 0}"><a href="#" th:href="@{/search(page=${page-5}, search=${query})}">[[${page-3}]]</a></li>
-		    <li th:if="${page - 3 >= 0}"><a href="#" th:href="@{/search(page=${page-3}, search=${query})}">[[${page-2}]]</a></li>
-		    <li th:if="${page - 2 >= 0}"><a href="#" th:href="@{/search(page=${page-2}, search=${query})}">[[${page-1}]]</a></li>
-		    <li th:if="${page - 1 >= 0}"><a href="#" th:href="@{/search(page=${page-1}, search=${query})}">[[${page}]]</a></li>
+		    <li th:if="${page - 4 >= 0}"><a href="#" th:href="@{/publications/search(page=${page-5}, search=${query})}">[[${page-3}]]</a></li>
+		    <li th:if="${page - 3 >= 0}"><a href="#" th:href="@{/publications/search(page=${page-3}, search=${query})}">[[${page-2}]]</a></li>
+		    <li th:if="${page - 2 >= 0}"><a href="#" th:href="@{/publications/search(page=${page-2}, search=${query})}">[[${page-1}]]</a></li>
+		    <li th:if="${page - 1 >= 0}"><a href="#" th:href="@{/publications/search(page=${page-1}, search=${query})}">[[${page}]]</a></li>
 		    
 		    <li class="active"><a href="#">[[${page+1}]]</a></li>
 		    
-		    <li th:if="${page + 1 < pageCount}"><a href="#" th:href="@{/search(page=${page+1}, search=${query})}">[[${page+2}]]</a></li>
-		    <li th:if="${page + 2 < pageCount}"><a href="#" th:href="@{/search(page=${page+2}, search=${query})}">[[${page+3}]]</a></li>
-		    <li th:if="${page + 3 < pageCount}"><a href="#" th:href="@{/search(page=${page+3}, search=${query})}">[[${page+4}]]</a></li>
-		    <li th:if="${page + 4 < pageCount}"><a href="#" th:href="@{/search(page=${page+4}, search=${query})}">[[${page+5}]]</a></li>
+		    <li th:if="${page + 1 < pageCount}"><a href="#" th:href="@{/publications/search(page=${page+1}, search=${query})}">[[${page+2}]]</a></li>
+		    <li th:if="${page + 2 < pageCount}"><a href="#" th:href="@{/publications/search(page=${page+2}, search=${query})}">[[${page+3}]]</a></li>
+		    <li th:if="${page + 3 < pageCount}"><a href="#" th:href="@{/publications/search(page=${page+3}, search=${query})}">[[${page+4}]]</a></li>
+		    <li th:if="${page + 4 < pageCount}"><a href="#" th:href="@{/publications/search(page=${page+4}, search=${query})}">[[${page+5}]]</a></li>
 		    
-		    <li th:if="${page + 1 < pageCount}"><a href="#" th:href="@{/search(page=${page+1}, search=${query})}" aria-label="Previous"><span aria-hidden="true">&raquo;</span></a></li>
+		    <li th:if="${page + 1 < pageCount}"><a href="#" th:href="@{/publications/search(page=${page+1}, search=${query})}" aria-label="Previous"><span aria-hidden="true">&raquo;</span></a></li>
 		    <li th:if="${page + 1 >= pageCount}" class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&raquo;</span></a></li>
 		    
-		    <li th:if="${page != pageCount-1}"><a href="#" th:href="@{/search(page=${pageCount-1}, search=${query})}" aria-label="Last"><span aria-hidden="true">&raquo;&raquo;</span></a></li>
+		    <li th:if="${page != pageCount-1}"><a href="#" th:href="@{/publications/search(page=${pageCount-1}, search=${query})}" aria-label="Last"><span aria-hidden="true">&raquo;&raquo;</span></a></li>
 		  	<li th:if="${page == pageCount-1}" class="disabled"><a href="#" aria-label="Last"><span aria-hidden="true">&raquo;&raquo;</span></a></li>
 		  	
 		  </ul>
@@ -60,6 +58,6 @@
 		
 		
 		
-		
+		</div>
 		</body>
 </html>

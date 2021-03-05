@@ -202,6 +202,7 @@ public class DocImporterImpl implements DocImporter {
             extractYear(pub);
             coordinateCleaner.cleanCoordinatesImport(pub);
             pubRepo.save((PublicationImpl)pub);
+            coordinateCleaner.calculateCountryStats();
             
         }
         

@@ -2,10 +2,12 @@ package edu.asu.diging.cord19.explorer.core.model.impl;
 
 import java.util.List;
 
+import org.springframework.data.mongodb.core.index.TextIndexed;
+
 import edu.asu.diging.cord19.explorer.core.model.Metadata;
 
 public class MetadataImpl implements Metadata {
-
+    @TextIndexed
     private String title;
     private List<PersonImpl> authors;
     private List<AffiliationImpl> affiliationCountries;

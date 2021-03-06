@@ -1,9 +1,9 @@
 <div class="map" th:fragment="map">
-	<div id="mapid" style=" height: 400px;"></div>
-	<span hidden id="countries" th:text="${countries}"></span>
-	   <span hidden id="low" th:text="${low}"></span>
-	   <span hidden id="high" th:text="${high}"></span>
-	   <script th:inline="javascript">
+	<div id="mapid" style="height: 400px;"></div>
+	<span hidden id="countries" th:text="${countries}"></span> <span hidden
+		id="low" th:text="${low}"></span> <span hidden id="high"
+		th:text="${high}"></span>
+	<script th:inline="javascript">
 	   $(document).ready(function(){
 		   loadMap();
 		   
@@ -117,6 +117,6 @@
 	   }
 	
 	</script>
-	
-	      <!-- Create an element where the map will take place -->
-	</div>
+
+	<!-- Create an element where the map will take place -->
+</div>

@@ -1,19 +1,13 @@
 package edu.asu.diging.cord19.explorer.core.model.impl;
 
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-
-
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CountryPropertiesImpl {
-    
+
     /**
      * Handle the properties of countries
      */
-    
-    
     private String name;
     private String countryCenter;
     private int selectedWikipediaCount;
@@ -25,6 +19,7 @@ public class CountryPropertiesImpl {
     public void setName(String name) {
         this.name = name;
     }
+
     public String getCountryCenter() {
         return countryCenter;
     }
@@ -32,7 +27,7 @@ public class CountryPropertiesImpl {
     public void setCountryCenter(String center) {
         this.countryCenter = center;
     }
-    
+
     public int getSelectedWikipediaCount() {
         return selectedWikipediaCount;
     }
@@ -40,10 +35,9 @@ public class CountryPropertiesImpl {
     public void setSelectedWikipediaCount(int selectedWikipediaCount) {
         this.selectedWikipediaCount = selectedWikipediaCount;
     }
-    
+
     public void incrementSelectedWikipediaCount() {
         this.selectedWikipediaCount++;
     }
-    
 
 }

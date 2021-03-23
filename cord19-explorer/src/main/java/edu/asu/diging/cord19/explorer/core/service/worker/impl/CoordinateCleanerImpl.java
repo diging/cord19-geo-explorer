@@ -161,7 +161,6 @@ public class CoordinateCleanerImpl implements CoordinateCleaner {
         Optional<TaskImpl> optional = taskRepo.findById(taskId);
         if (!optional.isPresent()) {
             return;
-            // FIXME: mark as failure
         }
 
         Task task = optional.get();

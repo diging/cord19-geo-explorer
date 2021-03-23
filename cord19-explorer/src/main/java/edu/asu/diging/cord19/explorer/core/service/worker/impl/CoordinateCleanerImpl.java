@@ -243,11 +243,4 @@ public class CoordinateCleanerImpl implements CoordinateCleaner {
         }
         return pub;
     }
-
-    @Override
-    public void cleanCoordinates(String taskId) {
-        // TODO Auto-generated method stub
-        
-    }
-
 }

@@ -28,6 +28,5 @@ public class CleanedCoordinatesImpl {
     
     public void setCoordinates(List<Double> coordinates) {
         this.coordinates = coordinates;
-    }
-    
+    }   
 }

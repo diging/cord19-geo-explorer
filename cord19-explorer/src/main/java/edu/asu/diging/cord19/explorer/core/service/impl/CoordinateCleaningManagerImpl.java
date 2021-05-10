@@ -10,7 +10,7 @@ import edu.asu.diging.cord19.explorer.core.data.TaskRepository;
 import edu.asu.diging.cord19.explorer.core.model.task.TaskType;
 import edu.asu.diging.cord19.explorer.core.model.task.impl.TaskImpl;
 import edu.asu.diging.cord19.explorer.core.service.CoordinateCleaningManager;
-import edu.asu.diging.cord19.explorer.core.service.worker.CoordinateCleaner;;
+import edu.asu.diging.cord19.explorer.core.service.worker.CoordinateCleaner;
 
 @Component
 public class CoordinateCleaningManagerImpl implements CoordinateCleaningManager {
@@ -30,7 +30,7 @@ public class CoordinateCleaningManagerImpl implements CoordinateCleaningManager 
         task.setType(TaskType.CLEAN);
         task = taskRepo.save(task);
 
-        cleaner.startCleanCoordinates(task.getId());
+        cleaner.startCleaningCoordinates(task.getId());
         return task.getId();
 
     }

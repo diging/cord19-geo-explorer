@@ -21,12 +21,12 @@ public class MapTotalsImpl implements MapTotals {
     private int lowCount;
 
     @Override
-    public Long getU_id() {
+    public Long getId() {
         return id;
     }
 
     @Override
-    public void setU_id(Long u_id) {
+    public void setId(Long u_id) {
         id = u_id;
     }
 

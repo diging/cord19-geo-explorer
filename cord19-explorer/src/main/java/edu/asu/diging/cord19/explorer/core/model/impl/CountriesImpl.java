@@ -16,7 +16,7 @@ public class CountriesImpl implements Countries {
     @Id
     private ObjectId _id;
     
-    private String id;
+    private String countryCode;
     @JsonProperty("properties")
     private CountryPropertiesImpl properties;
     @JsonProperty("geometry")
@@ -49,11 +49,11 @@ public class CountriesImpl implements Countries {
     }
 
     public String getCountryCode() {
-        return id;
+        return countryCode;
     }
 
     public void setCountryCode(String countryCode) {
-        this.id = countryCode;
+        this.countryCode = countryCode;
     }
 
     public GeometryImpl getGeometry() {

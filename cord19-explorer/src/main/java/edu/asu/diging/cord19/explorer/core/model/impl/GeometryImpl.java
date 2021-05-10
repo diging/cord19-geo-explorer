@@ -7,13 +7,12 @@ import javax.persistence.Enumerated;
 
 import edu.asu.diging.cord19.explorer.core.model.CoordType;
 
-public class GeometryImpl {
+/**
+ * Handles Geometry for a country from the Countries Class. Type can be point,
+ * Polygon, Multipolygon
+ */
 
-    /**
-     * Handles Geometry for a country from the Countries Class. Type can be point,
-     * Polygon, Multipolygon
-     * 
-     */
+public class GeometryImpl {
 
     private CoordType type;
 

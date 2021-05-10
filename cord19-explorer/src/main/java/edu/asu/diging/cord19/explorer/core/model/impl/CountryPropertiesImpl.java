@@ -2,12 +2,13 @@ package edu.asu.diging.cord19.explorer.core.model.impl;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+/**
+ * Handle the properties of countries
+ */
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CountryPropertiesImpl {
 
-    /**
-     * Handle the properties of countries
-     */
     private String name;
     private String countryCenter;
     private int selectedWikipediaCount;

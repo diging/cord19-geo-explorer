@@ -23,9 +23,9 @@ public class CoordinateCleaningController {
 
     @RequestMapping(value = "/auth/coordinates/clean", method = RequestMethod.POST)
     public String start() throws ClassCastException, ClassNotFoundException, IOException {
-        cleaningManager.startCleaningCoordinates();
+      cleaningManager.startCleaningCoordinates();
 
-        return "redirect:/";
+      return "redirect:/";
     }
 
 }

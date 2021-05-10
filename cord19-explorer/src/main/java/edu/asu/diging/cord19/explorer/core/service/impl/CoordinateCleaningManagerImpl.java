@@ -30,10 +30,7 @@ public class CoordinateCleaningManagerImpl implements CoordinateCleaningManager 
         task.setType(TaskType.CLEAN);
         task = taskRepo.save(task);
 
-        /*
-         * Start async import
-         */
-        cleaner.cleanCoordinates(task.getId());
+        cleaner.startCleanCoordinates(task.getId());
         return task.getId();
 
     }

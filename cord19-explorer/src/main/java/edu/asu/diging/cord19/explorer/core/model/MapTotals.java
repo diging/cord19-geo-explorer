@@ -10,8 +10,9 @@ public interface MapTotals {
 
     void setLowCount(int lowCount);
 
-    Long getU_id();
+    Long getId();
 
-    void setU_id(Long u_id);
+    void setId(Long u_id);
+
     
 }

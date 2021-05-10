@@ -8,48 +8,46 @@ import javax.persistence.Id;
 
 import edu.asu.diging.cord19.explorer.core.model.MapTotals;
 
-
 @Entity
 public class MapTotalsImpl implements MapTotals {
-    
+
     @Id
-    @Column(name="U_id")
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @Column(name = "U_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
- 
+
     private int highCount;
-    
+
     private int lowCount;
-    
+
     @Override
-    public Long getU_id() {
+    public Long getId() {
         return id;
     }
-    
+
     @Override
-    public void setU_id(Long u_id) {
-       id = u_id;
+    public void setId(Long u_id) {
+        id = u_id;
     }
+
     @Override
     public int getHighCount() {
         return highCount;
     }
-    
+
     @Override
     public void setHighCount(int i) {
         this.highCount = i;
     }
-    
+
     @Override
     public int getLowCount() {
         return lowCount;
     }
+
     @Override
     public void setLowCount(int lowCount) {
         this.lowCount = lowCount;
     }
-    
-    
-    
+
 }

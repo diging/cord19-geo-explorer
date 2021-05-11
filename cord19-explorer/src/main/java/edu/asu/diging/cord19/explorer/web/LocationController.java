@@ -31,5 +31,4 @@ public class LocationController {
         model.addAttribute("location", location);
         return "location";
     }
-
 }

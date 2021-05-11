@@ -13,6 +13,4 @@ public interface MapTotals {
     Long getId();
 
     void setId(Long u_id);
-
-    
 }

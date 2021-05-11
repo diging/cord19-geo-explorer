@@ -13,8 +13,6 @@ import com.mongodb.client.MongoCursor;
 import edu.asu.diging.cord19.explorer.core.model.impl.CountriesImpl;
 import edu.asu.diging.cord19.explorer.core.mongo.CountriesDao;
 
-
-
 @Service
 public class CountriesDaoImpl implements CountriesDao {
     

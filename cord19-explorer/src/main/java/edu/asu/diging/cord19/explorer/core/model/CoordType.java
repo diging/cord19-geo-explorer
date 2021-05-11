@@ -5,4 +5,3 @@ public enum CoordType {
     Polygon,
     MultiPolygon; // must be lower case due to geojson formatting.
 }
-

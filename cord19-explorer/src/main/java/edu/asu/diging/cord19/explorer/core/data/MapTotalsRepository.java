@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import edu.asu.diging.cord19.explorer.core.model.impl.MapTotalsImpl;
 
 @Repository
-public interface MapTotalsRepository extends PagingAndSortingRepository<MapTotalsImpl, String> {
+public interface MapTotalsRepository extends PagingAndSortingRepository<MapTotalsImpl, Long> {
 
     public MapTotalsImpl findFirstByOrderByIdDesc();
     

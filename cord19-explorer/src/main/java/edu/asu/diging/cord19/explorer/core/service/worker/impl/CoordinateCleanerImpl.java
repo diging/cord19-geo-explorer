@@ -15,6 +15,8 @@ import edu.asu.diging.cord19.explorer.core.model.task.TaskStatus;
 import edu.asu.diging.cord19.explorer.core.model.task.impl.TaskImpl;
 import edu.asu.diging.cord19.explorer.core.mongo.PublicationRepository;
 import edu.asu.diging.cord19.explorer.core.service.worker.CoordinateCleaner;
+import edu.asu.diging.cord19.explorer.core.service.worker.CoordinateParser;
+
 import java.util.List;
 
 import org.springframework.data.mongodb.core.query.Query;
@@ -83,19 +85,11 @@ public class CoordinateCleanerImpl implements CoordinateCleaner {
         Task task = optional.get();
         task.setStatus(TaskStatus.PROCESSING);
         taskRepo.save((TaskImpl) task);
-        
-        CoordinateParser coordinateParser = new CoordinateParser();
 
-        try (CloseableIterator<PublicationImpl> docs = mongoTemplate.stream(new Query(), PublicationImpl.class)) {
+        try (CloseableIterator<PublicationImpl> docs = mongoTemplate.stream(new Query().noCursorTimeout(), PublicationImpl.class)) {
             while (docs.hasNext()) {
                 PublicationImpl pub = docs.next();
-                List<PersonImpl> authors = pub.getMetadata().getAuthors();
-                for (PersonImpl author : authors) {
-                    if (author.getAffiliation().getSelectedWikiarticle() != null) {
-                        WikipediaArticleImpl article = author.getAffiliation().getSelectedWikiarticle();                        
-                        article.setCleanedCoords(coordinateParser.parse(article.getCoordinates()));
-                    }
-                }
+                cleanCoordinates(pub);
                 pubRepo.save(pub);
             }
         }
@@ -106,9 +100,9 @@ public class CoordinateCleanerImpl implements CoordinateCleaner {
         taskRepo.save((TaskImpl) task);
     }
 
-    public Publication cleanCoordinatesImport(Publication pub) {
+    public PublicationImpl cleanCoordinates(PublicationImpl pub) {
         List<PersonImpl> authors = pub.getMetadata().getAuthors();
-        CoordinateParser coordinateParser = new CoordinateParser();
+        CoordinateParser coordinateParser = new CoordinateParserImpl();
         for (PersonImpl author : authors) {
             if (author.getAffiliation().getSelectedWikiarticle() != null) {
                 WikipediaArticleImpl article = author.getAffiliation().getSelectedWikiarticle();

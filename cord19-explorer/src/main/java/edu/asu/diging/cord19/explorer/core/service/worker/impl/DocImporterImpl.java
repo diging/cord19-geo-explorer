@@ -201,12 +201,10 @@ public class DocImporterImpl implements DocImporter {
 
             fillPublication(entry, pub);
             extractYear(pub);
-            coordinateCleaner.cleanCoordinatesImport(pub);
+            coordinateCleaner.cleanCoordinates((PublicationImpl) pub);
             pubRepo.save((PublicationImpl) pub);
-            coordinateCleaner.calculateCountryStats();
-
         }
-
+        coordinateCleaner.calculateCountryStats();
     }
 
     private CsvParseResult parseDimensionsCsv(String metadataFilename) throws IOException {

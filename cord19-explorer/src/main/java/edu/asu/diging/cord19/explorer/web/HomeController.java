@@ -25,6 +25,7 @@ import edu.asu.diging.cord19.explorer.core.model.impl.MapTotalsImpl;
 import edu.asu.diging.cord19.explorer.core.mongo.PublicationDao;
 import edu.asu.diging.cord19.explorer.core.mongo.PublicationRepository;
 import edu.asu.diging.cord19.explorer.core.mongo.PublicationStatsProvider;
+import edu.asu.diging.cord19.explorer.core.service.impl.CountryManager;
 
 @Controller
 public class HomeController {
@@ -39,6 +40,8 @@ public class HomeController {
     private MongoTemplate mongoTemplate;
     @Autowired
     private MapTotalsRepository totalsRepo;
+    @Autowired
+    private CountryManager countryManager;
 
     @RequestMapping(value = "/")
     public String home(Model model) throws JsonProcessingException {
@@ -47,22 +50,8 @@ public class HomeController {
         model.addAttribute("years", pubDao.getYears());
         model.addAttribute("totalPublications", repo.count());
         model.addAttribute("journalCount", pubDao.getJournalCount());
-
-        ArrayList<String> countriesList = new ArrayList<String>();
-        try (CloseableIterator<CountriesImpl> countries = mongoTemplate.stream(new Query().noCursorTimeout(),
-                CountriesImpl.class)) {
-            while (countries.hasNext()) {
-                CountriesImpl country = countries.next();
-                if (country.getProperties().getSelectedWikipediaCount() > 0) {
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    objectMapper.disableDefaultTyping();
-                    SimpleBeanPropertyFilter theFilter = SimpleBeanPropertyFilter.serializeAllExcept("id", "@type");
-                    FilterProvider filters = new SimpleFilterProvider().addFilter("myFilter", theFilter);
-                    String str = objectMapper.writer(filters).writeValueAsString(country);
-                    countriesList.add(str);
-                }
-            }
-        }
+        
+        ArrayList<String> countriesList = countryManager.getCountries();
         
         MapTotalsImpl totals = totalsRepo.findFirstByOrderByIdDesc();
         model.addAttribute("countries", countriesList);

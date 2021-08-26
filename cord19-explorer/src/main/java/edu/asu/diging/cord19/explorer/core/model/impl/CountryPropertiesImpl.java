@@ -4,6 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * Handle the properties of countries
+ * 
+ * @param name country name
+ * @param countryCenter the centroid of the country polygon represented as a lat/long pair
+ * @param selectedWikipediaCount count of selected wikipedia articles for a giving country. Used for map shading.
+ * 
  */
 
 @JsonIgnoreProperties(ignoreUnknown = true)

@@ -9,7 +9,8 @@ import org.junit.Test;
 
 import edu.asu.diging.cord19.explorer.core.model.CoordType;
 import edu.asu.diging.cord19.explorer.core.model.impl.CleanedCoordinatesImpl;
-import edu.asu.diging.cord19.explorer.core.service.worker.impl.CoordinateParser;
+import edu.asu.diging.cord19.explorer.core.service.worker.CoordinateParser;
+import edu.asu.diging.cord19.explorer.core.service.worker.impl.CoordinateParserImpl;
 
 public class CoordinateParserTest {
     
@@ -17,7 +18,7 @@ public class CoordinateParserTest {
     @Test
     public void test_parseLength3Coords_success() {
         String coords = "Coord|40|00|00|N|116|19|36|E|region:CN-11_type:edu|display=inline,title";
-        CoordinateParser coordinateParser = new CoordinateParser();
+        CoordinateParser coordinateParser = new CoordinateParserImpl();
         CleanedCoordinatesImpl cleanedCoords = coordinateParser.parse(coords);
         CleanedCoordinatesImpl coordsToTest = new CleanedCoordinatesImpl();
         coordsToTest.setType(CoordType.Point);
@@ -31,7 +32,7 @@ public class CoordinateParserTest {
     @Test
     public void test_parseLength2Coords() {
         String coords = "coord|37|34|N|126|58|E|region:KR-11|display=title,inline";
-        CoordinateParser coordinateParser = new CoordinateParser();
+        CoordinateParser coordinateParser = new CoordinateParserImpl();
         CleanedCoordinatesImpl cleanedCoords = coordinateParser.parse(coords);
         CleanedCoordinatesImpl coordsToTest = new CleanedCoordinatesImpl();
         coordsToTest.setType(CoordType.Point);

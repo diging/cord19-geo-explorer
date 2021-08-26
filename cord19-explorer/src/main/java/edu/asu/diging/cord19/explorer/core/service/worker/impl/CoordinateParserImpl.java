@@ -5,9 +5,10 @@ import java.util.List;
 
 import edu.asu.diging.cord19.explorer.core.model.CoordType;
 import edu.asu.diging.cord19.explorer.core.model.impl.CleanedCoordinatesImpl;
+import edu.asu.diging.cord19.explorer.core.service.worker.CoordinateParser;
 
 
-public class CoordinateParser {
+public class CoordinateParserImpl implements CoordinateParser {
     
     private CleanedCoordinatesImpl createCleanCoords(List<Double> formattedCoords) {
         CleanedCoordinatesImpl cleanedCoords = new CleanedCoordinatesImpl();
@@ -71,6 +72,10 @@ public class CoordinateParser {
         return formattedCoords;
     }
 
+    /* (non-Javadoc)
+     * @see edu.asu.diging.cord19.explorer.core.service.worker.impl.CoordinateParser#parse(java.lang.String)
+     */
+    @Override
     public CleanedCoordinatesImpl parse(String coordinates) {
         String[] splitted = coordinates.split("\\|");
         return createCleanCoords(iterateCoordString(splitted));

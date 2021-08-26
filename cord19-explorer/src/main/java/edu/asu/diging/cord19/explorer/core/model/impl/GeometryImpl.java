@@ -13,11 +13,10 @@ import edu.asu.diging.cord19.explorer.core.model.CoordType;
  */
 
 public class GeometryImpl {
-
+    
+    @Enumerated(EnumType.STRING)
     private CoordType type;
 
-    @Enumerated(EnumType.STRING)
-    private CoordType coordType;
 
     private ArrayList<ArrayList<ArrayList<?>>> coordinates;
 
@@ -36,5 +35,4 @@ public class GeometryImpl {
     public void setCoordinates(ArrayList<ArrayList<ArrayList<?>>> coordinates) {
         this.coordinates = coordinates;
     }
-
 }

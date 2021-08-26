@@ -1,10 +1,11 @@
 package edu.asu.diging.cord19.explorer.core.service.worker;
 
 import edu.asu.diging.cord19.explorer.core.model.Publication;
+import edu.asu.diging.cord19.explorer.core.model.impl.PublicationImpl;
 
 public interface CoordinateCleaner {
 
-    Publication cleanCoordinatesImport(Publication pub);
+    Publication cleanCoordinates(PublicationImpl pub);
 
     void calculateCountryStats();
 

@@ -20,9 +20,9 @@ public class Wikientry {
     private String content;
     @Field(type = FieldType.Text)
     private String complete_text;
-    @Field(type = FieldType.Keyword)
+    @Field(type = FieldType.Text)
     private String coordinates;
-    @Field(type = FieldType.Keyword, includeInParent = true)
+    @Field(type = FieldType.Text, includeInParent = true)
     private List<String> categories;
     
     private String redirectsTo;

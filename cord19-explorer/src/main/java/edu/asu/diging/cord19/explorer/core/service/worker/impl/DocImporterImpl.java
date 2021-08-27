@@ -52,6 +52,7 @@ import edu.asu.diging.cord19.explorer.core.model.task.TaskStatus;
 import edu.asu.diging.cord19.explorer.core.model.task.impl.TaskImpl;
 import edu.asu.diging.cord19.explorer.core.mongo.PublicationRepository;
 import edu.asu.diging.cord19.explorer.core.service.worker.AffiliationCleaner;
+import edu.asu.diging.cord19.explorer.core.service.worker.CoordinateCleaner;
 import edu.asu.diging.cord19.explorer.core.service.worker.DimensionsMapper;
 import edu.asu.diging.cord19.explorer.core.service.worker.DocImporter;
 import edu.asu.diging.cord19.explorer.core.service.worker.TextLocationMatcher;
@@ -74,7 +75,7 @@ public class DocImporterImpl implements DocImporter {
 
     @Value("${app.data.path}")
     private String appdataPath;
-        
+
     @Autowired
     private TaskRepository taskRepo;
 
@@ -89,10 +90,13 @@ public class DocImporterImpl implements DocImporter {
 
     @Autowired
     private MongoTemplate mongoTemplate;
-    
+
     @Autowired
     private DimensionsMapper dimensionsMapper;
-    
+
+    @Autowired
+    private CoordinateCleaner coordinateCleaner;
+
     private ObjectMapper mapper;
     private AuthorsParser authorParser;
 
@@ -159,7 +163,6 @@ public class DocImporterImpl implements DocImporter {
         writer.close();
 
         parseMetadataCsv(rootFolder + File.separator + metadataFilename);
-
         task.setStatus(TaskStatus.DONE);
         task.setDateEnded(OffsetDateTime.now());
         taskRepo.save((TaskImpl) task);
@@ -168,24 +171,25 @@ public class DocImporterImpl implements DocImporter {
     private void parseMetadataCsv(String metadataFilename) throws FileNotFoundException {
         File metadataFile = new File(metadataFilename);
 
-        CsvToBean<MetadataEntry> bean = new CsvToBeanBuilder<MetadataEntry>(new FileReader(metadataFile)).withType(MetadataEntry.class)
-                .withIgnoreLeadingWhiteSpace(true).withSeparator(',').withQuoteChar('\"').build();
+        CsvToBean<MetadataEntry> bean = new CsvToBeanBuilder<MetadataEntry>(new FileReader(metadataFile))
+                .withType(MetadataEntry.class).withIgnoreLeadingWhiteSpace(true).withSeparator(',').withQuoteChar('\"')
+                .build();
 
         Iterator<MetadataEntry> it = bean.iterator();
         while (it.hasNext()) {
             MetadataEntry entry = it.next();
-            logger.debug("Parsing metadata entry: "  + entry.getCord_uid());
+            logger.debug("Parsing metadata entry: " + entry.getCord_uid());
             Publication pub = null;
             if (entry.getSha() != null && !entry.getSha().isEmpty()) {
                 pub = pubRepo.findFirstByPaperId(entry.getSha());
             }
             if (pub == null && entry.getPmcid() != null && !entry.getPmcid().isEmpty()) {
                 pub = pubRepo.findFirstByPaperId(entry.getPmcid());
-            } 
+            }
             if (pub == null) {
                 pub = pubRepo.findFirstByPaperId(entry.getCord_uid());
             }
-            
+
             if (pub == null) {
                 pub = new PublicationImpl();
                 String paperId = entry.getSha() != null ? entry.getSha() : entry.getPmcid();
@@ -197,41 +201,41 @@ public class DocImporterImpl implements DocImporter {
 
             fillPublication(entry, pub);
             extractYear(pub);
-            pubRepo.save((PublicationImpl)pub);
-            
+            coordinateCleaner.cleanCoordinates((PublicationImpl) pub);
+            pubRepo.save((PublicationImpl) pub);
         }
-        
+        coordinateCleaner.calculateCountryStats();
     }
-    
+
     private CsvParseResult parseDimensionsCsv(String metadataFilename) throws IOException {
         DimensionsParserImpl parser = new DimensionsParserImpl(metadataFilename);
-        
+
         CsvParseResult result = new CsvParseResult();
-        
+
         while (parser.hasNext()) {
             edu.asu.diging.pubmeta.util.model.Publication entry = parser.next();
-            result.setProcessed(result.getProcessed()+1);
-            logger.debug("Parsing metadata entry: "  + entry.getId());
-            
+            result.setProcessed(result.getProcessed() + 1);
+            logger.debug("Parsing metadata entry: " + entry.getId());
+
             Publication pub = null;
             if (entry.getPmcid() != null && !entry.getPmcid().trim().isEmpty()) {
                 pub = pubRepo.findFirstByPaperId(entry.getPmcid());
                 if (pub == null) {
                     pub = pubRepo.findFirstByPmcid(entry.getPmcid());
                 }
-            } 
+            }
             if (pub == null && entry.getPubmedId() != null && !entry.getPubmedId().trim().isEmpty()) {
                 pub = pubRepo.findFirstByPubmedId(entry.getPubmedId());
             }
-            
+
             if (pub == null && entry.getDoi() != null && !entry.getDoi().isEmpty()) {
                 pub = pubRepo.findFirstByDoi(entry.getDoi());
             }
-            
+
             if (pub == null && entry.getId() != null && !entry.getId().trim().isEmpty()) {
                 pub = pubRepo.findFirstByPaperId(entry.getId().trim());
             }
-            
+
             if (pub == null) {
                 pub = new PublicationImpl();
                 String paperId = entry.getPmcid() != null ? entry.getPmcid() : entry.getPubmedId();
@@ -240,23 +244,22 @@ public class DocImporterImpl implements DocImporter {
                 }
                 pub.setPaperId(paperId);
                 pub.setDatabase(Publication.DATABASE_DIMENSIONS);
-                result.setAdded(result.getAdded()+1);
+                result.setAdded(result.getAdded() + 1);
             } else {
-                result.setUpdated(result.getUpdated()+1);
+                result.setUpdated(result.getUpdated() + 1);
             }
-            
+
             if (pub.getMetadata() == null) {
                 pub.setMetadata(new MetadataImpl());
             }
-            
+
             dimensionsMapper.map(entry, pub);
-            
-            pubRepo.save((PublicationImpl)pub);
+
+            pubRepo.save((PublicationImpl) pub);
         }
-        
+
         return result;
     }
-
 
     private void fillPublication(MetadataEntry entry, Publication pub) {
         pub.setHasPdfParse(entry.getPdfJsonFiles() != null && !entry.getPdfJsonFiles().trim().isEmpty());
@@ -281,15 +284,15 @@ public class DocImporterImpl implements DocImporter {
                 pub.setMetadata(new MetadataImpl());
             }
         }
-        
+
         if (pub.getMetadata().getTitle() == null || pub.getMetadata().getTitle().isEmpty()) {
             pub.getMetadata().setTitle(entry.getTitle());
         }
-        
+
         if (pub.getMetadata().getAuthors() == null) {
             pub.getMetadata().setAuthors(new ArrayList<>());
         }
-        
+
         if (pub.getMetadata().getAuthors().isEmpty()) {
             List<edu.asu.diging.pubmeta.util.model.Person> authors = authorParser.parseAuthorString(entry.getAuthors());
             for (edu.asu.diging.pubmeta.util.model.Person author : authors) {
@@ -339,7 +342,7 @@ public class DocImporterImpl implements DocImporter {
 
         Task task = optional.get();
         task.setStatus(TaskStatus.PROCESSING);
-        
+
         try {
             parseMetadataCsv(metadataFile);
             task.setStatus(TaskStatus.DONE);
@@ -347,12 +350,11 @@ public class DocImporterImpl implements DocImporter {
             logger.error("Could not parse metadata file.", e);
             task.setStatus(TaskStatus.FAILURE);
         }
-        
+
         task.setDateEnded(OffsetDateTime.now());
         taskRepo.save((TaskImpl) task);
     }
 
-    
     @Override
     @Async
     public void importDimensionsMetadata(String taskId, String metadataFile) {
@@ -363,22 +365,22 @@ public class DocImporterImpl implements DocImporter {
 
         Task task = optional.get();
         task.setStatus(TaskStatus.PROCESSING);
-        
+
         try {
             CsvParseResult result = parseDimensionsCsv(metadataFile);
             task.setStatus(TaskStatus.DONE);
             task.setProcessed(result.getProcessed());
-            logger.info(String.format("Dimensions CSV Import ----- Processed: %s, Updated: %s, Added: %s, Skipped: %s", result.getProcessed(), result.getUpdated(), result.getAdded(), result.getSkipped()));
+            logger.info(String.format("Dimensions CSV Import ----- Processed: %s, Updated: %s, Added: %s, Skipped: %s",
+                    result.getProcessed(), result.getUpdated(), result.getAdded(), result.getSkipped()));
         } catch (IOException e) {
             logger.error("Could not parse metadata file.", e);
             task.setStatus(TaskStatus.FAILURE);
         }
-        
+
         task.setDateEnded(OffsetDateTime.now());
         taskRepo.save((TaskImpl) task);
     }
 
-    
     @Override
     @Async
     public void cleanAffiliations(String taskId, boolean reprocess) {

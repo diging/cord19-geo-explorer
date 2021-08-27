@@ -7,6 +7,15 @@ public class WikipediaArticleImpl {
     private String coordinates;
     private LocationType locationType;
     private String selectedOn;
+    private CleanedCoordinatesImpl cleanedCoords;
+
+    public CleanedCoordinatesImpl getCleanedCoords() {
+        return cleanedCoords;
+    }
+
+    public void setCleanedCoords(CleanedCoordinatesImpl cleanedCoords) {
+        this.cleanedCoords = cleanedCoords;
+    }
 
     public String getTitle() {
         return title;

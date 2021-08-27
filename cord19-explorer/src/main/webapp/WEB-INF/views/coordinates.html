@@ -1,0 +1,16 @@
+<html layout:decorate="~{layouts/main}">
+<head>
+<title>Authority Matcher</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<div class="row">
+			<div class="col-md-4">
+				<h4>Countries in affiliation field</h4>
+				<div th:each="country : ${countries}">[[${country}]]</div>
+			</div>
+		</div>
+
+	</div>
+</body>
+</html>

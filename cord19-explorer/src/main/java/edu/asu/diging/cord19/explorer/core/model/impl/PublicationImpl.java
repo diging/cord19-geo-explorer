@@ -47,7 +47,7 @@ public class PublicationImpl implements Publication {
     private String volume;
     private String issue;
     private String pages;
-    
+
     private String database;
     private boolean duplicate;
 
@@ -61,14 +61,14 @@ public class PublicationImpl implements Publication {
     private Map<String, RefEntryImpl> refEntries;
     @JsonProperty("back_matter")
     private List<ParagraphImpl> backMatter;
-    
+
     private List<CategoryImpl> categories;
     private CategoryImpl primaryCategory;
     private String comment;
     private List<String> meshTerms;
     private int timesCited;
     private int recentCitations;
-    
+
     private Map<String, Object> extraData;
 
     public ObjectId getId() {
